@@ -28,16 +28,16 @@
 2) Создание локального виртуального окружения 
 	перейти в корневую папку, где находится SGUplatform. Далее, 
 	команда:  python -m venv venv
-3) Активация виртуального окружения 
-	перейти в корневую папку (где папка venv)
-	команда: source ./venv/Scripts/activate
-4) Переходим в папку проекта SGUplatform
-5) Выбор интерпретатора python:
+3) Выбор интерпретатора python:
 	Выбрать из папки виртуального окружения, которую создали. 
-	Интерпретатор лежит тут: ...your_path_to_venv/venv/Scripts/python
+	Интерпретатор лежит тут: ...your_path_to_venv\venv\Scripts\python
+4) Активация виртуального окружения 
+	перейти в корневую папку (где папка venv)
+	команда: \venv\Scripts\activate
+5) Переходим в папку проекта SGUevents
 6) Установить пакеты с помощью команды 
 	команда: pip install -r requirements.txt
-7) Запуск проекта. Находимся в директории SGUplatform (где лежит файл manage.py)
+7) Запуск проекта. Находимся в директории SGUevents (где лежит файл manage.py)
 	python manage.py runserver 
 
 	или настроить автоматический запуск (PyCharm - через EditConfigurations с параметром runserver VSCode - через добавление launch.json )
