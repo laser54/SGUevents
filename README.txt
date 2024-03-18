@@ -1,5 +1,4 @@
 Создать папку SGUplatform и устанавливить проект 
-команда git clone [http]
 
 Запуск на Linux:
 1) Открыть терминал в PyCharm / VSCode
