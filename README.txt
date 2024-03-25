@@ -1,5 +1,4 @@
 Создать папку SGUplatform и установить проект 
-
 Запуск на Linux:
 1) Открыть терминал в PyCharm / VSCode
 2) Создание локального виртуального окружения 
@@ -16,13 +15,11 @@
 	Выбрать из папки виртуального окружения, которую создали. 
 	Интерпретатор лежит тут: ...your_path_to_venv/venv/bin/python3
 6) Установка всех пакетов. Находимся в директории SGUplatform (где лежит файл requirements.txt):
-	команда: pip3 install -r requirements.txt 
-7) Запуск проекта. Находимся в директории SGUplatform (где лежит файл manage.py)
+	команда: pip3 install -r requirements.txt
+7) Создаем .env в корне по образцу .env.example
+8) Запуск проекта. Находимся в директории SGUplatform (где лежит файл manage.py)
 	команда: python3 manage.py runserver
-
 	или настроить автоматический запуск (PyCharm - через EditConfigurations с параметром runserver VSCode - через добавление launch.json )
-
-
 Запуск на Windows:
 1) Отркыть терминал (в PyCharm - внизу Terminal - alt+F12). 
 2) Создание локального виртуального окружения 
@@ -31,7 +28,6 @@
 3) Активация виртуального окружения 
 	перейти в корневую папку (где папка venv)
 	команда: \venv\Scripts\activate
-
 	Если ошибка:  Невозможно загрузить файл , так как выполнение сценариев отключено в этой системе. Для получения дополн
 ительных сведений см. about_Execution_Policies по адресу https:/go.microsoft.com/fwlink/?LinkID=135170, то нужно:
 	1. Открываем PowerShell от админа 
@@ -44,8 +40,15 @@
 5) Переходим в папку проекта SGUevents
 6) Установить пакеты с помощью команды 
 	команда: pip install -r requirements.txt
-7) Запуск проекта. Находимся в директории SGUevents (где лежит файл manage.py)
+7) Создаем .env в корне по образцу .env.example
+8) Запуск проекта. Находимся в директории SGUevents (где лежит файл manage.py)
 	python manage.py runserver 
 
 	или настроить автоматический запуск (PyCharm - через EditConfigurations с параметром runserver VSCode - через добавление launch.json )
-	
+
+Запуск из докера (пока локально на винде):
+Windows - зпускаем Docker desktop
+docker-compose build
+docker-compose up -d
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
