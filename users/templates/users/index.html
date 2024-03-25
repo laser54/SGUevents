@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Выбор действия</title>
+<style>
+    .container {
+        width: 300px;
+        height: 150px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Выберите действие:</h2>
+    <button onclick="window.location.href='{% url "users:login" %}'">Авторизация</button>
+    <button onclick="window.location.href='{% url "users:signup" %}'">Регистрация</button>
+	<button onclick="window.location.href='{% url "main:index" %}'">Главная страница</button>
+</div>
+</body>
+</html>
+

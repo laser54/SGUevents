@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
-def aa(request):
-    return HttpResponse('ev')
+def index(request):
+    return render(request, 'events_available/index.html')
