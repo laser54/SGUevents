@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+
+def index(request):
+    return render(request, 'users/index.html')
 
 def log_in(request):
     return render(request, 'users/users_log_in.html')

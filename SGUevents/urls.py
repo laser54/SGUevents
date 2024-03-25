@@ -5,7 +5,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main.urls')),
-    path('users_log_in/', include('users.urls')),
-    path('register/', include('events_available.urls')),
+    path('general/', include('main.urls', namespace='main')),
+		path('support/', include('support.urls', namespace='support')),
+		path('events_available/', include('events_available.urls', namespace='events_available')),
+		path('events_calendar/', include('events_calendar.urls', namespace='events_calendar')),
+		path('events_cultural/', include('events_cultural.urls', namespace='events_cultural')),
+		path('application_for_admin_rights/', include('application_for_admin_rights.urls', namespace='application_for_admin_rights')),
+		path('personal/', include('personal.urls', namespace='personal')),
+		path('bookmarks/', include('bookmarks.urls', namespace='bookmarks')),
+		path('', include('users.urls', namespace='users')),
 ]
