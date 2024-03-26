@@ -1,11 +1,21 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins&display=swap);
+
+body {
+	font-family: Poppins, serif;
+	/* background: linear-gradient(341deg, #8ff0a4 14%, #ffffff 71%); */
+	background: linear-gradient(348deg, #62a0ea 5%, #ffffff 86%);
+}
 .navbar-brand {
-    color: white;
+	color: white;
 }
 
 .nav-link {
-    color: white;
+	color: white;
 }
 
+.event_cards {
+	box-shadow: 1px 1px 4px 1px #3e3c3c;
+}
 /* .nav-link:hover {
     color: rgb(187, 175, 175);
 }
