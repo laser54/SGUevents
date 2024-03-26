@@ -50,6 +50,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             cd ..
             cd home/events.larin.work
