@@ -22,6 +22,21 @@ body {
     margin-top: 1rem;
 }
 
+.card-body .card-title {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.col-md-8 .card-date {
+    font-size: 0.85rem;
+}
+
+.col-md-8 .card-date .card-time {
+    padding-left: 0.5rem;
+    font-size: 0.7rem;
+}
+
+
 /* .nav-link:hover {
     color: rgb(187, 175, 175);
 }
