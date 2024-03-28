@@ -23,7 +23,7 @@ services:
     ports:
       - 8887:80
     volumes:
-      - static_value:/static/
+      - ./staticfiles:/static/
       - ./nginx.conf/default.conf:/etc/nginx/conf.d/default.conf
     restart: always
     depends_on:
