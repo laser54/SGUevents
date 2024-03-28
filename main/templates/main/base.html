@@ -52,9 +52,16 @@
 							<a class="nav-link" aria-current="page" href={% url "events_calendar:index" %}>Календарь
 								мероприятий</a>
 						</li>
-
-						<li class="nav-item">
-							<a class="nav-link" aria-current="page" href={% url "bookmarks:index" %}>Закладки</a>
+						
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+								aria-expanded="false">
+								Закладки
+							</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href={% url "bookmarks:favorites" %}>Избранное</a></li>
+								<li><a class="dropdown-item" href={% url "bookmarks:events_attended" %}>Посещенные мероприятия</a></li>
+							</ul>
 						</li>
 
 						<li class="nav-item dropdown">
@@ -71,13 +78,12 @@
 
 
 
-
-
-
 					</ul>
 					<form class="d-flex" role="search">
 						<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-						<button class="btn btn-outline-success" type="submit">S</button>
+						<button class="btn btn-outline-success" type="submit">
+							<img src="{% static "general/icons/search.svg" %}" alt="S">
+						</button>
 					</form>
 				</div>
 			</div>
