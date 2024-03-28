@@ -18,9 +18,12 @@ body {
     box-shadow: 1px 1px 4px 1px #3e3c3c;
 }
 
-.pagination {
-    margin-top: 1rem;
-}
+
+
+/* .col-md-4 .img-fluid {
+    height: 200px;
+    margin: 1rem;
+} */
 
 .card-body .card-title {
     color: #dc3545;
@@ -36,6 +39,11 @@ body {
     font-size: 0.7rem;
 }
 
+
+
+.pagination {
+    margin-top: 1rem;
+}
 
 /* .nav-link:hover {
     color: rgb(187, 175, 175);
