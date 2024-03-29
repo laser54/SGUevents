@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Poppins&display=swap);
 
 body {
-    font-family: Poppins, serif;
+    /* font-family: Poppins, serif; */
     /* background: linear-gradient(341deg, #8ff0a4 14%, #ffffff 71%); */
     background: linear-gradient(348deg, #62a0ea 5%, #ffffff 86%);
 }
@@ -14,16 +14,54 @@ body {
     color: white;
 }
 
+.d-flex .form-control {
+    width: 300px;
+}
+
 .event_cards {
     box-shadow: 1px 1px 4px 1px #3e3c3c;
 }
 
+.btn-favorites {
+    position: absolute;
+    border-radius: 50%;
+    background-color: white;
+    top: 0.4rem;
+    left: 0.5rem;
+}
 
+.card-img-info p:first-of-type {
+    margin-top: 1rem;
+    margin-bottom: 0;
 
-/* .col-md-4 .img-fluid {
-    height: 200px;
-    margin: 1rem;
+}
+
+.card-img-info p {
+    font-weight: bold;
+}
+
+.card-img-info {
+    display: inline-block;
+    text-align: justify;
+}
+
+.card-img-info>p>span {
+    text-align: right;
+}
+
+/* .card-img-info>p>span {
+    display: inline-block;
+    text-align: right;
 } */
+
+/* .card-img-info>p~p {
+    margin-bottom: 1rem;
+} */
+
+.btn-favorites>img {
+    width: 1rem;
+}
+
 
 .card-body .card-title {
     color: #dc3545;
@@ -41,19 +79,8 @@ body {
 
 
 
+
+
 .pagination {
     margin-top: 1rem;
 }
-
-/* .nav-link:hover {
-    color: rgb(187, 175, 175);
-}
-
-.dropdown-toggle:hover {
-    color: rgb(187, 175, 175);
-} */
-
-/* .filter-events-row {
-    text-align: center;
-    border-style: solid;
-} */
