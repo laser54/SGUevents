@@ -33,7 +33,6 @@
         <input type="hidden" id="telegramData" name="telegramData"><br><br>
 
         <p>Для окончания регистрации потребуется привязать telegram по ссылке:</p>
-        <!-- Контейнер для центрирования виджета Telegram -->
         <div class="telegram-widget-container">
             <script async src="{{ telegram_data.script_src }}" data-telegram-login="{{ telegram_data.bot_username }}" data-size="{{ telegram_data.data_size }}" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
         </div>
