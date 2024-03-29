@@ -1,16 +1,44 @@
+import os
+import json
 from django.contrib.auth.models import User
+from django.shortcuts import render
 from .models import Profile
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
+# Функция для определения данных виджета Telegram
+def get_telegram_widget_data():
+    django_env = os.getenv('DJANGO_ENV', 'development')
+    if django_env == 'production':
+        # Данные для продакшен виджета
+        return {
+            'script_src': "https://telegram.org/js/telegram-widget.js?7&production=1",
+            'bot_username': 'event_sgu_bot',  # Измените на имя вашего бота для продакшена
+            'data_size': 'large'
+        }
+    else:
+        # Данные для виджета в разработке
+        return {
+            'script_src': "https://telegram.org/js/telegram-widget.js?7&development=1",
+            'bot_username': 'Event_dev_sgu_bot',  # Измените на имя вашего бота для разработки
+            'data_size': 'small'
+        }
+
 def index(request):
-    return render(request, 'users/index.html')
+    # Добавляем данные виджета в контекст шаблона
+    telegram_data = get_telegram_widget_data()
+    context = {'telegram_data': telegram_data}
+    return render(request, 'users/index.html', context)
 
 def log_in(request):
     return render(request, 'users/users_log_in.html')
 
 def sign_up(request):
-    return render(request, 'users/users_sign_up.html')
+    # Также добавляем данные виджета в контекст для страницы регистрации
+    telegram_data = get_telegram_widget_data()
+    context = {'telegram_data': telegram_data}
+    return render(request, 'users/users_sign_up.html', context)
+
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
