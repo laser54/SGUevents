@@ -47,13 +47,8 @@
     - Выполнить команду: `python manage.py runserver`
     - Или настроить автоматический запуск (PyCharm - через Edit Configurations с параметром `runserver`, VSCode - через добавление `launch.json`).
 
-## Запуск из Docker (пока локально на Windows):
+## Запуск локально на Windows:
 
-- Запустите Docker desktop для Windows.
-- Выполните следующие команды:
-    ```
-    docker-compose build
-    docker-compose up -d
-    docker-compose exec web python manage.py migrate
-    docker-compose exec web python manage.py createsuperuser
-    ```
+- Для работоспособности Telegram login Widget требуется [ngrok](https://dashboard.ngrok.com/get-started/setup/windows)
+- Делаем по инструкции потом запускаем `ngrok http http://localhost:8000`
+
