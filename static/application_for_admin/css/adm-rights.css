@@ -9,7 +9,7 @@
 	text-align: right;
 }
 
-.name-page>p {
+.name-page > p {
 	font-weight: bolder;
 }
 
@@ -21,9 +21,8 @@
 
 .btn-sent_app {
 	/* position: absolute; */
-	/* bottom: 20px;
-	right: 230px; */
 
+	right: 230px;
 	width: 155px;
 	height: 45px;
 	border-radius: 40px;
@@ -32,8 +31,7 @@
 
 .btn-canel-app {
 	/* position: absolute; */
-	/* bottom: 20px;
-	right: 50px; */
+	right: 70px;
 	width: 155px;
 	height: 45px;
 	border-radius: 40px;
