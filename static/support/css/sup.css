@@ -1,29 +1,11 @@
-.container-registration_adm {
-	background-color: white;
-}
-
-/* .col-form-label {
-	width: 100%;
-} */
-.col-form-label {
-	text-align: right;
-}
-
-.name-page>p {
-	font-weight: bolder;
-}
-
-.col-sm-10 .textarea {
-	height: 7rem;
-	text-align: left;
-	overflow-wrap: break-word;
+.btn-app-canel {
+	display: flex;
+	justify-content: flex-end;
 }
 
 .btn-sent_app {
 	/* position: absolute; */
-
-	right: 230px;
-	width: 155px;
+	width: 255px;
 	height: 45px;
 	border-radius: 40px;
 	font-size: 0.76rem;
@@ -31,7 +13,7 @@
 
 .btn-canel-app {
 	/* position: absolute; */
-	right: 70px;
+
 	width: 155px;
 	height: 45px;
 	border-radius: 40px;

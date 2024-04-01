@@ -1,21 +1,26 @@
-{% extends 'events_calendar/base.html' %} {% load static %} {% block title %} Главная
-страница {% endblock %} {% block content %}
-<!-- Контент на странице -->
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-lg-1"></div>
+{% extends 'events_calendar/base.html' %} {% load static %} {% block title %}
+  Главная страница
+{% endblock %} {% block content %}
+  <!-- Контент на странице -->
+  <div class="container text-center">
+    <div class="row my-4">
+      <div class="col-1 col-sm-1 h-100">111</div>
+      <div class="col-1 col-sm-1 h-100">111</div>
+      <div class="col-1 col-sm-1 h-100">111</div>
+      <div class="col-1 col-sm-1 h-100">111</div>
+      <div class="col-1 col-sm-1 h-100">111</div>
+      <div class="col-1 col-sm-1 h-100">111</div>
+      <div class="col-1 col-sm-1 h-100">111</div>
 
-		<div class="col-lg-10">
-			<div class="row calendar">
-				<div class="row">
-					<div class="col-6 col-md-4">.col-6 .col-md-4</div>
-					<div class="col-6 col-md-4">.col-6 .col-md-4</div>
-					<div class="col-6 col-md-4">.col-6 .col-md-4</div>
-				</div>			
-			</div>
-		</div>
-
-		<div class="col-lg-1"></div>
-	</div>
-</div>
-{% endblock content %}
+      <!-- Force next columns to break to new line -->
+      <div class="w-100 my-5"></div>
+      <div class="col-1 col-sm-1">111</div>
+      <div class="col-1 col-sm-1">111</div>
+      <div class="col-1 col-sm-1">111</div>
+      <div class="col-1 col-sm-1">111</div>
+      <div class="col-1 col-sm-1">111</div>
+      <div class="col-1 col-sm-1">111</div>
+      <div class="col-1 col-sm-1">111</div>
+    </div>
+  </div>
+{% endblock %}
