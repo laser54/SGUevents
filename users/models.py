@@ -5,7 +5,8 @@ class User(models.Model):
     last_name = models.CharField(max_length=100, verbose_name='Фамилия')
     middle_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='Отчество')
     department_id = models.IntegerField(verbose_name='ID отдела')
-    telegram_id = models.CharField(max_length=100, unique=True, verbose_name='Telegram ID')
+    # telegram_id = models.CharField(max_length=100, unique=True, verbose_name='Telegram ID')
+    telegram_id = models.CharField(max_length=100, unique=True, verbose_name='Telegram ID', null=True, blank=True)
 
     def __str__(self):
         # Возвращает полное имя пользователя, включая отчество, если оно указано
