@@ -17,6 +17,7 @@ def register(request):
             new_user = form.save(commit=False)
             # Здесь можно добавить дополнительную логику обработки, если это необходимо
             # Например, обработка или сохранение telegram_id из формы
+            new_user.telegram_id = form.cleaned_data.get('telegram_id', None)
             new_user.save()
             # После успешной регистрации перенаправляем пользователя на главную страницу
             return redirect('users:home')
