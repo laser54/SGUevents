@@ -46,17 +46,12 @@
 </div>
 
 <script>
-function onTelegramAuth(user) {
-    console.log(user);
-    document.getElementById('authStatus').style.display = 'block'; // Показываем сообщение об успешной аутентификации
-    document.getElementById('id_telegram_id').value = user.id; // Сохраняем telegram_id
-    // Не деактивируем кнопку, если она уже активна
-}
-
-// Активировать кнопку регистрации, если Telegram не используется
-document.addEventListener('DOMContentLoaded', (event) => {
-    document.getElementById('signupButton').disabled = false;
-});
+    function onTelegramAuth(user) {
+        console.log(user);
+        document.getElementById('authStatus').style.display = 'block';
+        document.getElementById('signupButton').disabled = false;
+        document.getElementById('id_telegram_id').value = user.id;
+    }
 </script>
 
 

@@ -2,7 +2,7 @@ from django import forms
 from .models import User
 
 class RegistrationForm(forms.ModelForm):
-    telegram_id = forms.CharField(required=False, widget=forms.HiddenInput())
+    # telegram_id = forms.CharField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'middle_name', 'department_id', 'telegram_id']
