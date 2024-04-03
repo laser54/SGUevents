@@ -22,8 +22,10 @@
 
 <div class="container">
     <h2 class="mb-4 text-center">Регистрация</h2>
-    <div id="authStatus" class="alert alert-success auth-status" style="display: none;">
-        Вы успешно авторизовались через Telegram!
+    <div class="alert alert-info" role="alert">
+      Для регистрации на портале введите ваше ФИО и код подразделения.
+        <br>Код подразделения можно посмотреть на корпоративном портале.
+        <br>Для регистрации необходимо авторизоватья через телеграм.
     </div>
     <form method="post" action="{% url 'users:register' %}">
         {% csrf_token %}
@@ -38,6 +40,9 @@
             <script async src="https://telegram.org/js/telegram-widget.js?7"
                     data-telegram-login="{{ telegram_bot_username }}" data-size="large"
                     data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+        </div>
+        <div id="authStatus" class="alert alert-success auth-status" style="display: none;">
+            Вы успешно авторизовались через Telegram!
         </div>
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary mt-3" id="signupButton" disabled>Зарегистрироваться</button>
