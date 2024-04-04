@@ -27,9 +27,6 @@
         <br>Код подразделения можно посмотреть на корпоративном портале.
         <br>Для регистрации необходимо авторизоватья через телеграм.
     </div>
-    <div id="authStatus" class="alert alert-success auth-status" style="display: none;">
-        Вы успешно авторизовались через Telegram!
-    </div>
     <form method="post" action="{% url 'users:register' %}">
         {% csrf_token %}
         {{ form.as_p }}
@@ -45,7 +42,7 @@
                     data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
         </div>
         <div id="authStatus" class="alert alert-success auth-status" style="display: none;">
-        Вы успешно авторизовались через Telegram!
+            Вы успешно авторизовались через Telegram!
         </div>
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary mt-3" id="signupButton" disabled>Зарегистрироваться</button>
