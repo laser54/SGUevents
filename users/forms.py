@@ -5,7 +5,7 @@ class RegistrationForm(forms.ModelForm):
     # telegram_id = forms.CharField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'middle_name', 'department_id', 'telegram_id']
+        fields = ['last_name', 'first_name', 'middle_name', 'department_id', 'telegram_id']
         widgets = {
             'middle_name': forms.TextInput(attrs={'placeholder': 'Отчество (необязательно)'}),
             'department_id': forms.NumberInput(attrs={'placeholder': 'ID отдела'}),
