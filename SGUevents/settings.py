@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from pathlib import Path
+from aiogram import Bot
 
 load_dotenv()
 
@@ -19,6 +20,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='p&l%385148kslhtyn^##a1)ilz@4z
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_DEV_BOT_TOKEN = os.getenv("TELEGRAM_DEV_BOT_TOKEN")
+
 
 ALLOWED_HOSTS = ['*']
 
@@ -77,6 +83,11 @@ WSGI_APPLICATION = 'SGUevents.wsgi.application'
 
 # Значение по умолчанию для разработки
 DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development')
+
+if DJANGO_ENV == 'development':
+    TELEGRAM_BOT = Bot(token=TELEGRAM_DEV_BOT_TOKEN)
+else:
+    TELEGRAM_BOT = Bot(token=TELEGRAM_BOT_TOKEN)
 
 if DJANGO_ENV == 'development':
     DATABASES = {

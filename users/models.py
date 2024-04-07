@@ -23,7 +23,10 @@ class CustomUserManager(BaseUserManager):
         return transliterated
 
     def create_user(self, email=None, password=None, **extra_fields):
-        email = self.normalize_email(email)
+        if email:
+            email = self.normalize_email(email)
+        else:
+            email = None  # Убедитесь, что email может быть None, если не предоставлен
         password = get_random_string(8) if password is None else password
         first_name = extra_fields.pop('first_name', '')
         last_name = extra_fields.pop('last_name', '')
@@ -31,7 +34,6 @@ class CustomUserManager(BaseUserManager):
         department_id = extra_fields.pop('department_id', None)
         telegram_id = extra_fields.pop('telegram_id', None)
 
-        # Генерация username из ФИО, если он не предоставлен
         username = extra_fields.pop('username', None) or self.transliterate_username(last_name, first_name, middle_name)
 
         user = self.model(
@@ -48,14 +50,12 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email=None, password=None, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-
-        # Установка значений по умолчанию для дополнительных полей
         extra_fields.setdefault('first_name', 'Admin')
         extra_fields.setdefault('last_name', 'User')
-        extra_fields.setdefault('department_id', 1)  # Пример значения по умолчанию
+        extra_fields.setdefault('department_id', 1)  # Убеждаемся, что это значение применяется
         extra_fields.setdefault('telegram_id', 'default_telegram_id')  # Можете установить другое значение по умолчанию
 
         if not email:
@@ -74,6 +74,7 @@ class User(AbstractUser):
     middle_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='Отчество')
     department_id = models.IntegerField(verbose_name='ID отдела', default=666)
     telegram_id = models.CharField(max_length=100, unique=True, null=True, blank=True, verbose_name='Telegram ID')
+    email = models.EmailField('email address', blank=True, null=True, unique=True)  # Добавлено blank=True, null=True
 
     objects = CustomUserManager()
 
