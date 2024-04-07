@@ -25,7 +25,7 @@
 
 <div class="container">
     <h1>Добро пожаловать!</h1>
-    <a href="#" class="btn btn-primary">Авторизация</a>
+    <a href="{% url 'users:login' %}" class="btn btn-success">Авторизация</a>
     <a href="{% url 'users:register' %}" class="btn btn-success">Регистрация</a>
     <a href="#" class="btn btn-secondary">Главная страница</a>
 </div>
