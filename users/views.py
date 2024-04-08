@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
 from .forms import RegistrationForm
-from .telegram_utils import send_login_details_sync
+from .telegram_utils import send_login_details
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
@@ -15,14 +15,11 @@ def home(request):
     return render(request, 'users/home.html')
 
 
-def register(request):
-    if request.method == 'POST':
+async def register(request):
+    if request.method == "POST":
         form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            # Генерируем пароль перед созданием пользователя
             generated_password = get_random_string(8)
-
-            # Создаем пользователя
             user_kwargs = {
                 'email': form.cleaned_data.get('email'),  # Может быть None
                 'password': generated_password,  # Используем заранее сгенерированный пароль
@@ -34,9 +31,9 @@ def register(request):
             }
             new_user = User.objects.create_user(**user_kwargs)
 
-            # Отправляем логин и пароль через Telegram
             if new_user.telegram_id:
-                send_login_details_sync(new_user.telegram_id, new_user.username, generated_password)
+                # Используем await для асинхронной отправки
+                await send_login_details(new_user.telegram_id, new_user.username, generated_password)
 
             return redirect('users:login')
     else:
