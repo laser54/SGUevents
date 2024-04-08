@@ -54,3 +54,7 @@ def login_view(request):
         else:
             messages.error(request, "Неверный логин или пароль.")
     return render(request, 'users/login.html')
+
+def general(request):
+    # Представление для страницы с контентом
+    return render(request, 'main/index.html')
