@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from pathlib import Path
-from aiogram import Bot
+from telegram import Bot
 
 load_dotenv()
 
