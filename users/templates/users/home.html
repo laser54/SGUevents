@@ -27,7 +27,7 @@
     <h1>Добро пожаловать!</h1>
     <a href="{% url 'users:login' %}" class="btn btn-success">Авторизация</a>
     <a href="{% url 'users:register' %}" class="btn btn-success">Регистрация</a>
-    <a href="#" class="btn btn-secondary">Главная страница</a>
+    <a href="{% url 'main:index' %}" class="btn btn-secondary">Главная страница</a>
 </div>
 
 <!-- Включаем Bootstrap Bundle с Popper -->

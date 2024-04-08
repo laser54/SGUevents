@@ -1,3 +1,11 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins&display=swap);
+
+body {
+    /* font-family: Poppins, serif; */
+    /* background: linear-gradient(341deg, #8ff0a4 14%, #ffffff 71%); */
+    background: linear-gradient(348deg, #62a0ea 5%, #ffffff 86%);
+}
+
 .navbar-brand {
     color: white;
 }
@@ -6,15 +14,73 @@
     color: white;
 }
 
-/* .nav-link:hover {
-    color: rgb(187, 175, 175);
+.d-flex .form-control {
+    width: 300px;
 }
 
-.dropdown-toggle:hover {
-    color: rgb(187, 175, 175);
+.event_cards {
+    box-shadow: 1px 1px 4px 1px #3e3c3c;
+}
+
+.btn-favorites {
+    position: absolute;
+    border-radius: 50%;
+    background-color: white;
+    top: 0.4rem;
+    left: 0.5rem;
+}
+
+.card-img-info p:first-of-type {
+    margin-top: 1rem;
+    margin-bottom: 0;
+
+}
+
+.card-img-info p {
+    font-weight: bold;
+}
+
+.card-img-info {
+    display: inline-block;
+    text-align: justify;
+}
+
+.card-img-info>p>span {
+    text-align: right;
+}
+
+/* .card-img-info>p>span {
+    display: inline-block;
+    text-align: right;
 } */
 
-/* .filter-events-row {
-    text-align: center;
-    border-style: solid;
+/* .card-img-info>p~p {
+    margin-bottom: 1rem;
 } */
+
+.btn-favorites>img {
+    width: 1rem;
+}
+
+
+.card-body .card-title {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.col-md-8 .card-date {
+    font-size: 0.85rem;
+}
+
+.col-md-8 .card-date .card-time {
+    padding-left: 0.5rem;
+    font-size: 0.7rem;
+}
+
+
+
+
+
+.pagination {
+    margin-top: 1rem;
+}

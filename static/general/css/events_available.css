@@ -1,0 +1,83 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins&display=swap);
+
+body {
+	font-family: Poppins, serif;
+	/* background: linear-gradient(341deg, #8ff0a4 14%, #ffffff 71%); */
+	background: linear-gradient(348deg, #62a0ea 5%, #ffffff 86%);
+}
+
+.navbar-brand {
+	color: white;
+}
+
+.nav-link {
+	color: white;
+}
+
+.event_cards {
+	box-shadow: 1px 1px 4px 1px #3e3c3c;
+}
+
+.pagination {
+	margin-top: 1rem;
+}
+
+.card-title {
+	color: #dc3545;
+	font-weight: bold;
+}
+
+.col-md-8 .card-date {
+	font-size: 0.85rem;
+}
+
+.col-md-8 .card-date .card-time {
+	padding-left: 0.5rem;
+	font-size: 0.7rem;
+}
+
+.btn-registration {
+	position: absolute;
+	bottom: 20px;
+	right: 230px;
+	width: 155px;
+	height: 45px;
+	border-radius: 40px;
+	font-size: 0.76rem;
+}
+
+.btn-canel-registration {
+	position: absolute;
+	bottom: 20px;
+	right: 50px;
+	width: 155px;
+	height: 45px;
+	border-radius: 40px;
+	border: 0.5px #dc3545 solid;
+	font-size: 0.73rem;
+	text-align: center;
+	padding-bottom: 0.375rem;
+	font-family: Poppins, serif;
+}
+
+.btn-canel-registration:hover {
+	border-color: #b02a37;
+}
+
+.btn-light.btn-canel-registration:active {
+	border: 0.5px #a52834 solid;
+}
+
+
+/* .nav-link:hover {
+    color: rgb(187, 175, 175);
+}
+
+.dropdown-toggle:hover {
+    color: rgb(187, 175, 175);
+} */
+
+/* .filter-events-row {
+    text-align: center;
+    border-style: solid;
+} */

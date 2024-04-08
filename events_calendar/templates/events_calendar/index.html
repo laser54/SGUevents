@@ -1,11 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-</head>
-<body>
-<h1> Календарь мероприятий </h1>
-</body>
-</html>
+{% extends 'events_calendar/base.html' %} {% load static %} {% block title %}
+Главная страница {% endblock %} {% block content %}
+<!-- Контент на странице -->
+<div class="container text-center">
+	<div class="row my-4">
+		<div class="col-1 col-sm-1 h-100">111</div>
+		<div class="col-1 col-sm-1 h-100">111</div>
+		<div class="col-1 col-sm-1 h-100">111</div>
+		<div class="col-1 col-sm-1 h-100">111</div>
+		<div class="col-1 col-sm-1 h-100">111</div>
+		<div class="col-1 col-sm-1 h-100">111</div>
+		<div class="col-1 col-sm-1 h-100">111</div>
+
+		<!-- Force next columns to break to new line -->
+		<div class="w-100 my-5"></div>
+		<div class="col-1 col-sm-1">111</div>
+		<div class="col-1 col-sm-1">111</div>
+		<div class="col-1 col-sm-1">111</div>
+		<div class="col-1 col-sm-1">111</div>
+		<div class="col-1 col-sm-1">111</div>
+		<div class="col-1 col-sm-1">111</div>
+		<div class="col-1 col-sm-1">111</div>
+	</div>
+</div>
+{% endblock content %}

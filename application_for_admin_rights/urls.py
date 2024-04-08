@@ -4,5 +4,5 @@ from application_for_admin_rights import views
 app_name = 'application_for_admin_rights'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.application_for_admin_rights, name='application_for_admin_rights'),
 ]

@@ -4,5 +4,6 @@ from bookmarks import views
 app_name = 'bookmarks'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('events_attended', views.events_attended, name='events_attended'),
+    path('favorites', views.favorites, name='favorites'),
 ]
