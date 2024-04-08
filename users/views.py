@@ -30,8 +30,6 @@ def register(request):
             }
             new_user = User.objects.create_user(**user_kwargs)
 
-            # Так как ваша функция send_login_details_sync предполагает синхронный вызов,
-            # Не требуется специальной обработки для асинхронности.
             if new_user.telegram_id:
                 send_login_details_sync(new_user.telegram_id, new_user.username, generated_password)
 
@@ -39,11 +37,9 @@ def register(request):
     else:
         form = RegistrationForm()
 
-    bot_username = 'Event_dev_sgu_bot' if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot'
-
     context = {
         'form': form,
-        'telegram_bot_username': bot_username,
+        'telegram_bot_username': 'Event_dev_sgu_bot' if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot',
     }
     return render(request, 'users/register.html', context)
 
