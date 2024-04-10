@@ -6,7 +6,7 @@ class Events_online(models.Model):
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
     place = models.TextField(blank=True, null=True, verbose_name='Место')
     speakers = models.TextField(blank=True, null=True, verbose_name='Спикеры')
-    image = models.ImageField(upload_to='#', blank=True, null=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to='events_available_images/online', blank=True, null=True, verbose_name='Изображение')
     
     class Meta:
         db_table = 'Events_online'
@@ -22,7 +22,7 @@ class Events_offline(models.Model):
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
     place = models.TextField(blank=True, null=True, verbose_name='Место')
     speakers = models.TextField(blank=True, null=True, verbose_name='Спикеры')
-    image = models.ImageField(upload_to='#', blank=True, null=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
     
     class Meta:
         db_table = 'Events_offline'

@@ -142,8 +142,11 @@
 							<div class="card mb-3">
 								<div class="row g-0">
 									<div class="col-md-4">
-										<img src="{% static "general/images/img.png" %}"
-										class="img-fluid rounded-start " alt="...">
+										{% if events.image %}
+											<img src="{{ events.image.url }}" class="img-fluid rounded-start " alt="{{ events.name }}">
+										{% else %} 
+											<img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
+										{% endif %}
 										<button type="button" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt=""></button>
 										<div class="card-img-info">
 											<p>Конференция </p> 
