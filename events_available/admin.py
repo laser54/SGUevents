@@ -1,3 +1,13 @@
 from django.contrib import admin
 
-# Register your models here.
+from events_available.models import Events_offline, Events_online
+
+@admin.register(Events_online)
+class Events_onlineAdmin(admin.ModelAdmin):
+	prepopulated_fields = {'slug': ('name',)}
+
+@admin.register(Events_offline)
+class Events_offlineAdmin(admin.ModelAdmin):
+	prepopulated_fields = {'slug': ('name',)}
+
+
