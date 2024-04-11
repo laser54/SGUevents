@@ -1,38 +1,53 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="{% static 'users/css/users_sign_up.css' %}">
-    <title>Document</title>
+    <title>Регистрация</title>
+    <style>
+        /* Стили для центрирования виджета Telegram */
+        .telegram-widget-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px; /* Отступ сверху, для примера */
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Зарегистрироваться</h1>
-        <p>Заполните форму для регистрации.</p>
+<div class="container">
+    <h1>Зарегистрироваться</h1>
+    <p>Заполните форму для регистрации.</p>
 
-        <!-- Форма регистрации -->
-        <form action="/register/" method="POST">
-            <label for="username">ФИО пользователя:</label><br>
-            <input type="text" id="username" name="username" placeholder="username"><br><br>
+    <!-- Форма регистрации -->
+    <form id="registrationForm" action="/register/" method="POST">
+        {% csrf_token %}
+        <label for="username">ФИО пользователя:</label><br>
+        <input type="text" id="username" name="username" placeholder="username"><br><br>
 
-            <label for="password">Код подразделения:</label><br>
-            <input type="password" id="password" name="password" placeholder="password"><br><br>
+        <label for="password">Код подразделения:</label><br>
+        <input type="password" id="password" name="password" placeholder="password"><br><br>
 
-            <p>Для окончания регистрации потребуется привязать telegram по ссылке:</p>
+        <input type="hidden" id="telegramData" name="telegramData"><br><br>
 
+        <p>Для окончания регистрации потребуется привязать telegram по ссылке:</p>
+        <div class="telegram-widget-container">
+            <script async src="{{ telegram_data.script_src }}" data-telegram-login="{{ telegram_data.bot_username }}" data-size="{{ telegram_data.data_size }}" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+        </div>
 
-            <button type="submit", id="signupButton">Зарегистрироваться</button>
-        </form>
-    </div>
+        <button type="submit" id="signupButton" disabled>Зарегистрироваться</button>
+    </form>
+</div>
 
-    <script>  {% static 'js/users_log_in.js' %} </script>
+<script>
+  function onTelegramAuth(user) {
+    alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+    document.getElementById('telegramData').value = JSON.stringify(user);
+    document.getElementById('signupButton').disabled = false;
+  }
+</script>
 
 </body>
 </html>
-
-
-
