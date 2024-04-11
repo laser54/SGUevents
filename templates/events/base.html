@@ -135,14 +135,18 @@
 							<h2> {{ name_page }} </h2>
 						</div>
 					</div>
-		
+
+					{% for events in events_available %}
 					<div class="row mt-2 event_cards">
 						<div class="col-lg-12">
 							<div class="card mb-3">
 								<div class="row g-0">
 									<div class="col-md-4">
-										<img src="{% static "general/images/img.png" %}"
-										class="img-fluid rounded-start " alt="...">
+										{% if events.image %}
+											<img src="{{ events.image.url }}" class="img-fluid rounded-start " alt="{{ events.name }}">
+										{% else %} 
+											<img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
+										{% endif %}
 										<button type="button" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt=""></button>
 										<div class="card-img-info">
 											<p>Конференция </p> 
@@ -155,7 +159,9 @@
 											<h6 class="card-date"> 
 												<split class="card-day"><b>01.03.2024</b></split> 
 												<split class="card-time">14:00 - 18:00</split> </h6> 
-											<p class="card-text">{{ 1_event_info }}</p>
+											<h6 class="event-place"> {{ events.place }} </h6>
+											<h6 class="event-place"> {{ events.speakers }} </h6>
+											<p class="card-text">{{ events.description }}</p>
 											<p class="card-text">
 												<small class="text-muted">Тег</small>
 											</p>
@@ -165,57 +171,11 @@
 							</div>
 						</div>
 					</div>
+
+					
+					{% endfor %}
 		
-					<div class="row mt-2 event_cards">
-						<div class="col-lg-12">
-							<div class="card mb-3">
-								<div class="row g-0">
-									<div class="col-md-4">
-										<img src="{% static "general/images/img.png" %}"
-										class="img-fluid rounded-start" alt="...">
-									</div>
-									<div class="col-md-8">
-										<div class="card-body">
-											<h5 class="card-title">{{ 2_event_title }}</h5>
-											<h6 class="card-date"> 
-												<split class="card-day"><b>01.03.2024</b></split> 
-												<split class="card-time">14:00 - 18:00</split> </h6> 
-											<p class="card-text">{{ 2_event_info }}</p>
-											<p class="card-text">
-												<small class="text-muted">Тег</small>
-											</p>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-		
-					<div class="row mt-2 event_cards">
-						<div class="col-lg-12">
-							<div class="card mb-3">
-								<div class="row g-0">
-									<div class="col-md-4">
-										<img src="{% static "general/images/img.png" %}"
-										class="img-fluid rounded-start" alt="...">
-									</div>
-									<div class="col-md-8">
-										<div class="card-body">
-											
-											<p class="card-text"> {% block content %} {% endblock %} </p>
-											
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-		
-		
-		
-		
-		
-		
+					
 				</div>
 		
 				<div class="col-lg-1"></div>

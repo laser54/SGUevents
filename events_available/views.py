@@ -3,12 +3,12 @@ from django.shortcuts import render
 from events_available.models import Events_offline, Events_online
 
 def online(request):
-	ev_online = Events_online.objects.all()
+	events_available = Events_online.objects.all()
 	
 	
 	context: dict[str, str] = {
 			'name_page': 'Онлайн',
-            'ev_online': ev_online
+            'events_available': events_available
 	# 		'1_event_online_title': 'Первое название онлайн мероприятия',
 	# 		'1_event_online_info': 'Каждый первый онлайн предприниматель, развивая свой бизнес, стремится, чтобы о нем узнали, выбирали его товар или услугу. Как управлять деловой репутацией, создать позитивный имидж компании, повысить эффективность организации, как работать с лидерами мнений, СМИ',
 	# 		'2_event_online_title': 'Второе название онлайн мероприятия',
@@ -28,9 +28,11 @@ def online(request):
 
 def offline(request):
     
-	ev_offline = Events_offline.objects.all()
-	context2: dict[str, str] = {
+	events_available = Events_offline.objects.all()
+
+	context: dict[str, str] = {
         'name_page': 'Оффлайн',
+		'events_available': events_available
 		# '1_event_offline_title': 'Первое название оффлайн мероприятия',
 		# '1_event_offline_info': 'Каждый первый оффалйн предприниматель, развивая свой бизнес, стремится, чтобы о нем узнали, выбирали его товар или услугу. Как управлять деловой репутацией, создать позитивный имидж компании, повысить эффективность организации, как работать с лидерами мнений, СМИ',
 		# '2_event_offline_title': 'Второе название оффлайн мероприятия',
@@ -44,7 +46,7 @@ def offline(request):
 		# '6_event_offline_title': 'Шестое название оффлайн мероприятия',
 		# '6_event_offline_info': 'Каждый шестой оффалйн предприниматель, развивая свой бизнес, стремится, чтобы о нем узнали, выбирали его товар или услугу. Как управлять деловой репутацией, создать позитивный имидж компании, повысить эффективность организации, как работать с лидерами мнений, СМИ'
     }
-	return render(request, 'events_available/offline_events.html', context2)
+	return render(request, 'events_available/offline_events.html', context)
 
 
     
