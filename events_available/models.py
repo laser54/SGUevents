@@ -4,7 +4,8 @@ class Events_online(models.Model):
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True, verbose_name='URL')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
-    time = models.TimeField(max_length=15, unique=False, blank=False, null=False, verbose_name='Время' )
+    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала' )
+    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания' )
     description = models.TextField(unique=False, blank=False, null=False, verbose_name='Описание')
     speakers = models.CharField(max_length=250, unique=False, blank=False, null=False, verbose_name='Спикеры')
     member = models.TextField(unique=False, blank=False, null=False, verbose_name='Участники')
@@ -13,7 +14,7 @@ class Events_online(models.Model):
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/online', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.TextField(unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
 
     class Meta:
@@ -28,7 +29,8 @@ class Events_offline(models.Model):
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True, verbose_name='URL')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
-    time = models.TimeField(max_length=15, unique=False, blank=False, null=False, verbose_name='Время' )
+    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала' )
+    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания' )
     description = models.TextField(unique=False, blank=False, null=False, verbose_name='Описание')
     speakers = models.CharField(max_length=250, unique=False, blank=False, null=False, verbose_name='Спикеры')
     member = models.TextField(unique=False, blank=False, null=False, verbose_name='Участники')
@@ -39,7 +41,7 @@ class Events_offline(models.Model):
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.TextField(unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     
     class Meta:
