@@ -1,8 +1,15 @@
 from django.shortcuts import render
 
+from events_cultural.models import Attractions, Events_for_visiting
+
 def attractions(request):
-		context: dict[str, str] = {
-			'name_page': 'Достопримечательности',
+	attractions = Attractions.objects.all()
+	
+	
+	context: dict[str, str] = {
+		'name_page': 'Онлайн',
+        'attractions': attractions,
+		'name_page': 'Достопримечательности',
 		'1_attractions_title': 'Первое название достопремичательности',
 		'1_attractions_info': 'Каждый первый объект будет иметь свое описание',
 		'2_attractions_title': 'Второе название достопремичательности',
@@ -16,7 +23,7 @@ def attractions(request):
 		'6_attractions_title': 'Шестое название достопремичательности',
 		'6_attractions_info': 'Каждый шестой объект будет иметь свое описание'
 	}
-		return render(request, 'events_cultural/attractions.html', context)
+	return render(request, 'events_cultural/attractions.html', context)
 
 
 def events_for_visiting(request):
