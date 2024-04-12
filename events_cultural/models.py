@@ -12,7 +12,7 @@ class Attractions(models.Model):
     link = models.URLField(unique=False, blank=False, null=False, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
-    rating = models.DecimalField(default=0.00, max_digits=2, decimal_places=2, blank=False, null=False, verbose_name='Рейтинг 1-10')
+    rating = models.DecimalField(default=0.00, max_digits=4, decimal_places=2, blank=False, null=False, verbose_name='Рейтинг 1-10')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     
     class Meta:

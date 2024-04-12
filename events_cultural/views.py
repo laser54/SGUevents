@@ -3,12 +3,12 @@ from django.shortcuts import render
 from events_cultural.models import Attractions, Events_for_visiting
 
 def attractions(request):
-	attractions = Attractions.objects.all()
+	attractions_content= Attractions.objects.all()
 	
 	
 	context: dict[str, str] = {
 		'name_page': 'Онлайн',
-        'attractions': attractions,
+        'event_card_views': attractions_content,
 		'name_page': 'Достопримечательности',
 		'1_attractions_title': 'Первое название достопремичательности',
 		'1_attractions_info': 'Каждый первый объект будет иметь свое описание',
@@ -27,8 +27,11 @@ def attractions(request):
 
 
 def events_for_visiting(request):
+	events_for_visiting_content = Events_for_visiting.objects.all()
+
 	context: dict[str, str] = {
-			'name_page': 'Доступно к посещению',
+		'name_page': 'Доступно к посещению',
+		'event_card_views': events_for_visiting_content,
 		'1_events_for_visiting_title': 'Первое название мероприятия, доступного к посещению',
 		'1_events_for_visiting_info': 'Каждый первый объект будет иметь свое описание',
 		'2_events_for_visiting_title': 'Второе название мероприятия, доступного к посещению',
