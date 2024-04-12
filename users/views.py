@@ -53,7 +53,13 @@ def login_view(request):
             return redirect('users:home')
         else:
             messages.error(request, "Неверный логин или пароль.")
-    return render(request, 'users/login.html')
+
+    telegram_bot_username = 'Event_dev_sgu_bot' if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot'
+
+    context = {
+        'telegram_bot_username': telegram_bot_username
+    }
+    return render(request, 'users/login.html', context)
 
 def general(request):
     # Представление для страницы с контентом
