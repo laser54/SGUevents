@@ -22,6 +22,9 @@ class Attractions(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def display_id(self):
+        return f'{self.id:05}'
 
 
 class Events_for_visiting(models.Model):
@@ -51,3 +54,6 @@ class Events_for_visiting(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def display_id(self):
+        return f'{self.id:05}'

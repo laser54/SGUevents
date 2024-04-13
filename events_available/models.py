@@ -2,7 +2,7 @@ from django.db import models
 
 class Events_online(models.Model):
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
-    slug = models.SlugField(max_length=200, unique=True, blank=True, null=True, verbose_name='URL')
+    slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
     time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала' )
     time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания' )
@@ -11,7 +11,7 @@ class Events_online(models.Model):
     member = models.TextField(unique=False, blank=False, null=False, verbose_name='Участники')
     tags = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Теги')
     platform = models.CharField(max_length=50, unique=False, blank=False, null=False, verbose_name='Платформа')
-    link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
+    link = models.URLField(unique=False, blank=False, null=False, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/online', blank=True, null=True, verbose_name='Изображение')
     events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
@@ -25,9 +25,12 @@ class Events_online(models.Model):
     def __str__(self):
         return self.name
     
+    def display_id(self):
+        return f'{self.id:05}'
+    
 class Events_offline(models.Model):
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
-    slug = models.SlugField(max_length=200, unique=True, blank=True, null=True, verbose_name='URL')
+    slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
     time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала' )
     time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания' )
@@ -51,3 +54,6 @@ class Events_offline(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def display_id(self):
+        return f'{self.id:05}'
