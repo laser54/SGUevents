@@ -34,13 +34,26 @@
         .divider::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid #ccc; /* Светлее для более тонкого вида */
         }
         .divider::before {
             margin-right: 10px;
         }
         .divider::after {
             margin-left: 10px;
+        }
+        .btn-primary {
+            background-color: #0088BB; /* Корпоративный цвет */
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0077A3; /* Немного темнее при наведении */
+        }
+        a {
+            color: #0088BB; /* Ссылки в корпоративном цвете */
+        }
+        a:hover {
+            color: #005577; /* Темнее при наведении */
         }
     </style>
 </head>
