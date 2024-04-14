@@ -50,6 +50,24 @@
             margin-bottom: 15px;
             display: none; /* Скрыто по умолчанию */
         }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ccc; /* Светлее для более тонкого вида */
+        }
+        .divider::before {
+            margin-right: 10px;
+        }
+        .divider::after {
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
