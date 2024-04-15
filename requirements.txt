@@ -11,4 +11,5 @@ django-sslserver==0.22
 transliterate
 requests
 Pillow
+django-debug-toolbar
 

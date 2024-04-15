@@ -44,8 +44,7 @@ INSTALLED_APPS = [
 	'application_for_admin_rights',
 	'support',
 	'personal',
-	
-    "debug_toolbar",
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
