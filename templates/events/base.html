@@ -157,7 +157,13 @@
 									</div>
 									<div class="col-md-8">
 										<div class="card-body">
-											<h5 class="card-title">{{ events.name }}</h5>
+											<h5 class="card-title">
+												<a href="
+												{% if name_page == 'Онлайн' %}
+													{% url "events_available:online_card" events.slug %}
+												{% elif name_page == 'Оффлайн' %}
+													{% url "events_available:offline_card" events.slug %}
+												{% endif %}">{{ events.name }}</a></h5>
 											<h6 class="card-date"> 
 												<split class="card-day"><b>{{ events.date }}</b></split> 
 												<split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
