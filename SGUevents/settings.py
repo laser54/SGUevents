@@ -94,9 +94,13 @@ ACTIVE_TELEGRAM_BOT_TOKEN = TELEGRAM_DEV_BOT_TOKEN if DJANGO_ENV == 'development
 if DJANGO_ENV == 'development':
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': os.getenv('LOCAL_DB_NAME'),
+                    'USER': os.getenv('LOCAL_DB_USER'),
+                    'PASSWORD': os.getenv('LOCAL_DB_PASSWORD'),
+                    'HOST': os.getenv('LOCAL_DB_HOST', 'localhost'),
+                    'PORT': os.getenv('LOCAL_DB_PORT', '5432'),
+    }
     }
 else:
     DATABASES = {
