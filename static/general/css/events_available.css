@@ -1,26 +1,37 @@
-/* @import url(https://fonts.googleapis.com/css?family=Poppins&display=swap); */
-
-body {
-	/* font-family: Poppins, serif; */
-	font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-	/* background: linear-gradient(341deg, #8ff0a4 14%, #ffffff 71%); */
-	background: linear-gradient(348deg, #62a0ea 5%, #ffffff 86%);
+/* Карточка */
+.d-flex .form-control {
+    width: 300px;
 }
 
-.navbar-brand {
-	color: white;
-}
-
-.nav-link {
-	color: white;
+.event_cards {
+    box-shadow: 1px 1px 4px 1px #3e3c3c;
 }
 
 .event_cards {
 	box-shadow: 1px 1px 4px 1px #3e3c3c;
 }
 
-.pagination {
-	margin-top: 1rem;
+ /* Поле фотографии */	
+ .btn-favorites {
+	position: absolute;
+	border-radius: 50%;
+	background-color: white;
+	top: 0.4rem;
+	left: 0.5rem;
+}
+	
+.btn-favorites>img {
+	width: 1rem;
+}
+
+	/* Информация под фотографией */
+.card-img-info p {
+	font-weight: bold;
+}
+
+.card-img-info {
+    display: inline-block;
+    text-align: justify;
 }
 
 .card-title {
@@ -28,15 +39,25 @@ body {
 	font-weight: bold;
 }
 
+
+
+    /* Область карточки с описанием */
+
+	/* Заголовок */
+.card-body .card-title {
+	color: #dc3545;
+	font-weight: bold;
+}
+	/* Дата */
 .col-md-8 .card-date {
 	font-size: 0.85rem;
 }
-
+	/* Время */
 .col-md-8 .card-date .card-time {
 	padding-left: 0.5rem;
 	font-size: 0.7rem;
 }
-
+	/* Кнопки */
 .btn-registration {
 	position: absolute;
 	bottom: 20px;
@@ -68,17 +89,3 @@ body {
 .btn-light.btn-canel-registration:active {
 	border: 0.5px #a52834 solid;
 }
-
-
-/* .nav-link:hover {
-    color: rgb(187, 175, 175);
-}
-
-.dropdown-toggle:hover {
-    color: rgb(187, 175, 175);
-} */
-
-/* .filter-events-row {
-    text-align: center;
-    border-style: solid;
-} */
