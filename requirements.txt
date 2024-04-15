@@ -10,6 +10,4 @@ gunicorn==20.1.0
 django-sslserver==0.22
 transliterate
 requests
-Pillow
-django-debug-toolbar
 

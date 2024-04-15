@@ -70,3 +70,17 @@
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/attractions.json`
 7. Загружаем информацию для страницы доступные к посещению:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/events_for_visiting.json`
+
+## При запуске на сервере:
+1. Из каталога с файлом docker-compose.yml:
+   - Выполнить команды: `docker-compose exec backend python manage.py makemigrations`
+   - `docker-compose exec backend python manage.py migrate`
+   - `docker-compose exec backend python manage.py collectstatic --noinput`
+   - при невозможности применения миграций - сбрасывам таблицы:
+   - `docker exec -it [id контейнера] bash`
+   - `psql -U [db_user] -d [db_name]`
+   - `DROP SCHEMA public CASCADE;`
+   - `CREATE SCHEMA public;`
+   - Для выхода из psql используйте команду \q, и для выхода из оболочки контейнера используйте exit.
+   - Далее миграции, superuser и fixtures
+
