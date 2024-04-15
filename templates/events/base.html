@@ -163,6 +163,10 @@
 													{% url "events_available:online_card" events.slug %}
 												{% elif name_page == 'Оффлайн' %}
 													{% url "events_available:offline_card" events.slug %}
+												{% elif name_page == 'Достопримечательности' %}
+													{% url "events_cultural:attractions_card" events.slug %}
+												{% elif name_page == 'Доступно к посещению' %}
+													{% url "events_cultural:events_for_visiting_card" events.slug %}
 												{% endif %}">{{ events.name }}</a></h5>
 											<h6 class="card-date"> 
 												<split class="card-day"><b>{{ events.date }}</b></split> 

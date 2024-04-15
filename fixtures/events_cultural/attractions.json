@@ -1,7 +1,7 @@
 [
 	{
 		"model": "events_cultural.attractions",
-		"pk": 2,
+		"pk": 1,
 		"fields": {
 			"name": "Новосибирский театр оперы и балета",
 			"slug": "novosibirskij-teatr-opery-i-baleta",
@@ -20,7 +20,7 @@
 	},
 	{
 		"model": "events_cultural.attractions",
-		"pk": 3,
+		"pk": 2,
 		"fields": {
 			"name": "Сибирь-Арена",
 			"slug": "sibir-arena",
