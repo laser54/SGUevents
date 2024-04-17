@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import login_view
+from .views import telegram_auth
 
 app_name = 'users'
 
@@ -9,4 +10,5 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('general/', views.general, name='general'),
     path('register/', views.register, name='register'),
+    path('telegram-auth/', telegram_auth, name='telegram_auth'),
 ]
