@@ -1,14 +1,20 @@
 import os
+import json
+import logging
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, login as auth_login, get_user_model
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.crypto import get_random_string
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import login as auth_login
 
 from .forms import RegistrationForm
 from .telegram_utils import send_login_details_sync
+
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 def home(request):
     # Представление для главной страницы
@@ -60,6 +66,25 @@ def login_view(request):
         'telegram_bot_username': telegram_bot_username
     }
     return render(request, 'users/login.html', context)
+
+@csrf_exempt
+def telegram_auth(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            telegram_id = data.get('telegram_id')
+            user = User.objects.filter(telegram_id=telegram_id).first()
+            if user:
+                auth_login(request, user)
+                return JsonResponse({'success': True, 'message': 'Вы успешно вошли в систему через Telegram.'})
+            else:
+                return JsonResponse({'success': False, 'error': 'Пользователь не зарегистрирован. Пожалуйста, пройдите регистрацию.', 'redirect_url': '/register'})
+        except Exception as e:
+            logger.error(f"Ошибка при аутентификации через Telegram: {e}")
+            return JsonResponse({'success': False, 'error': 'Внутренняя ошибка сервера'})
+    return JsonResponse({'success': False, 'error': 'Неверный запрос'})
+
+
 
 def general(request):
     # Представление для страницы с контентом
