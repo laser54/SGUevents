@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -18,29 +17,11 @@
         }
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #ccc; /* Светлее для более тонкого вида */
-        }
-        .divider::before {
-            margin-right: 10px;
-        }
-        .divider::after {
-            margin-left: 10px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 380px;
         }
         .btn-primary {
             background-color: #0088BB; /* Корпоративный цвет */
@@ -55,12 +36,34 @@
         a:hover {
             color: #005577; /* Темнее при наведении */
         }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ccc;
+        }
+        .divider::before {
+            margin-right: 10px;
+        }
+        .divider::after {
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2 class="mb-4 text-center">Вход</h2>
+
+    <!-- Место для сообщений -->
+    <div id="messageArea" class="alert alert-info" style="display: none;"></div>
+
     <form method="post" action="">
         {% csrf_token %}
         <div class="mb-3">
@@ -78,9 +81,7 @@
 
     <div class="text-center">
         <p>Войдите через Telegram:</p>
-        <script async src="https://telegram.org/js/telegram-widget.js?7"
-                data-telegram-login="{{ telegram_bot_username }}" data-size="large"
-                data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+        <script async src="https://telegram.org/js/telegram-widget.js?7" data-telegram-login="{{ telegram_bot_username }}" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
     </div>
     <div class="mt-3 text-center">
         Нет аккаунта? <a href="/register">Регистрация</a>
@@ -88,10 +89,42 @@
 </div>
 
 <script>
-    function onTelegramAuth(user) {
-        console.log(user);
-        // Реализация действий после успешной аутентификации через Telegram
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
+    return cookieValue;
+}
+</script>
+
+<script>
+function onTelegramAuth(user) {
+    console.log(user);
+    fetch('/telegram-auth/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ telegram_id: user.id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            alert(data.error);
+        }
+    });
+}
 </script>
 
 </body>
