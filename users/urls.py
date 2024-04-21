@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, login_view, register, general, telegram_auth, success
+from .views import home, login_view, register, general, telegram_auth, success, change_password
 
 app_name = 'users'
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('general/', general, name='general'),
     path('telegram-auth/', telegram_auth, name='telegram_auth'),
     path('success/', success, name='success'),
+    path('change-password/', change_password, name='change_password'),
 ]

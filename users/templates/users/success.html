@@ -11,7 +11,26 @@
 <div class="container mt-5">
     <h1>Успешный вход</h1>
     <p>Вы вошли в систему: {{ login_method }}.</p>
-    <a href="/">Вернуться на главную страницу</a></p>
+    {% if request.user.telegram_id %}
+    <button class="btn btn-warning" onclick="requestPasswordChange()">Сменить пароль</button>
+    {% endif %}
+    <a href="/">Вернуться на главную страницу</a>
 </div>
+
+<script>
+function requestPasswordChange() {
+    fetch('/change-password/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    });
+}
+</script>
 </body>
 </html>
