@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
 
 from .forms import RegistrationForm
 from .telegram_utils import send_login_details_sync
@@ -89,6 +90,17 @@ def telegram_auth(request):
     else:
         logger.error("Invalid request")
         return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+@csrf_exempt
+@login_required
+def change_password(request):
+    if request.method == 'POST' and request.user.telegram_id:
+        new_password = get_random_string(8)
+        request.user.set_password(new_password)
+        request.user.save()
+        send_login_details_sync(request.user.telegram_id, request.user.username, new_password)
+        return JsonResponse({'success': True, 'message': 'Ваш пароль успешно изменен и отправлен в Telegram.'})
+    return JsonResponse({'success': False, 'error': 'Доступ запрещен.'})
 
 
 
