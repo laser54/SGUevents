@@ -5,6 +5,8 @@ app_name = 'events_available'
 
 urlpatterns = [
 	path('online/', views.online, name='online'),
+	path('online/<int:page>/', views.online, name='online'),
+	
 	path('online/event/<int:event_id>/', views.online_card, name='online_card'),
 	path('online/event/<slug:event_slug>/', views.online_card, name='online_card'),
 

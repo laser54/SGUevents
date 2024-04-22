@@ -1,14 +1,18 @@
 from django.shortcuts import render
-
+from django.core.paginator import Paginator
 from events_available.models import Events_offline, Events_online
 
-def online(request):
+def online(request, page=1):
 	events_available = Events_online.objects.all()
 	# event = Events_online.objects.get(id=events_id)
 	
+	paginator = Paginator(events_available, 3)
+	current_page = paginator.page(page)
+
+
 	context: dict[str, str] = {
 			'name_page': 'Онлайн',
-            'event_card_views': events_available,
+            'event_card_views': current_page,
 			# 'pere': event
 	}
 	return render(request, 'events_available/online_events.html', context=context)
