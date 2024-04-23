@@ -8,11 +8,13 @@ from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from django.conf import settings
-
+from django.apps import apps
 
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
-django.setup()
+
+if not apps.ready:
+    django.setup()
 
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 
