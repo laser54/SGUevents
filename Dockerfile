@@ -15,6 +15,7 @@ COPY . .
 
 # Установка переменных окружения для доступа к настройкам Django
 ENV DJANGO_SETTINGS_MODULE=SGUevents.settings
+ENV PYTHONPATH=/code
 
 # Открытие порта 8887 для внешнего доступа к Django
 EXPOSE 8887
