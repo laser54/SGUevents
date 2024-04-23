@@ -17,14 +17,17 @@ from .telegram_utils import send_login_details_sync
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+
 def home(request):
     # Представление для главной страницы
     return render(request, 'users/home.html')
+
 
 def success(request):
     # Получаем метод входа из сессии
     login_method = request.session.get('login_method', 'Неизвестный способ входа')
     return render(request, 'users/success.html', {'login_method': login_method})
+
 
 def register(request):
     if request.method == "POST":
@@ -54,6 +57,7 @@ def register(request):
         'telegram_bot_username': 'Event_dev_sgu_bot' if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot',
     }
     return render(request, 'users/register.html', context)
+
 
 def login_view(request):
     if request.method == "POST":
@@ -86,10 +90,12 @@ def telegram_auth(request):
             return JsonResponse({'success': True, 'redirect_url': '/success'})
         else:
             logger.error("User not found")
-            return JsonResponse({'success': False, 'error': 'User not registered. Please register.', 'redirect_url': '/register'})
+            return JsonResponse(
+                {'success': False, 'error': 'User not registered. Please register.', 'redirect_url': '/register'})
     else:
         logger.error("Invalid request")
         return JsonResponse({'success': False, 'error': 'Invalid request'})
+
 
 @csrf_exempt
 @login_required
@@ -101,7 +107,6 @@ def change_password(request):
         send_login_details_sync(request.user.telegram_id, request.user.username, new_password)
         return JsonResponse({'success': True, 'message': 'Ваш пароль успешно изменен и отправлен в Telegram.'})
     return JsonResponse({'success': False, 'error': 'Доступ запрещен.'})
-
 
 
 def general(request):
