@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Запускаем Gunicorn для Django
 gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887 &
