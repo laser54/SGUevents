@@ -1,17 +1,15 @@
 import asyncio
 import logging
-import os
-from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from django.conf import settings
 
 
-# Загрузка переменных окружения
-load_dotenv()
-TOKEN = os.getenv("TELEGRAM_DEV_BOT_TOKEN")
+
+TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 
 # Инициализация бота и диспетчера
 dp = Dispatcher()
