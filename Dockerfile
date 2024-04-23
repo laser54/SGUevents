@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11-slim as builder
 
 # Установка рабочей директории в контейнере
 WORKDIR /code
