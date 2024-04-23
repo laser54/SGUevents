@@ -10,7 +10,8 @@ services:
       - ./.env
 
   backend:
-    build: .
+    build:
+      context: .
     command: gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887
     restart: always
     volumes:
@@ -23,7 +24,8 @@ services:
       - "8887:8887"
 
   bot:
-    build: .
+    build:
+      context: .
     command: python /code/bot/main.py
     restart: always
     depends_on:
