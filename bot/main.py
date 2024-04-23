@@ -1,6 +1,7 @@
 import asyncio
 import django
 import os
+import sys
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, types, F
@@ -13,7 +14,7 @@ from django.apps import apps
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
 
-if not apps.ready:
+if 'django' not in sys.modules:
     django.setup()
 
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
