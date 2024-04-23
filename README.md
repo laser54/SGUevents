@@ -44,7 +44,7 @@
    - Выполнить команду: `pip install -r requirements.txt`
 7. Создаем `.env` в корне по образцу `.env.example`.
 8. Запуск проекта. Находимся в директории SGUevents (где лежит файл `manage.py`):
-   - Выполнить команду: `python manage.py runserver & python manage.py startbot
+   - Выполнить команду: `python manage.py runserver & python manage.py startbot`
    - Или настроить автоматический запуск (PyCharm - через Edit Configurations с параметром `runserver`, VSCode - через добавление `launch.json`).
 
 ## Запуск локально на Windows:
