@@ -9,5 +9,9 @@ COPY --from=builder /root/.local /root/.local
 COPY . .
 # Установка переменной окружения для использования пакетов, установленных в --user
 ENV PATH=/root/.local/bin:$PATH
-# Используйте Gunicorn в качестве WSGI сервера для запуска приложения
-CMD gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887
+# Создаем entrypoint скрипт, который будет запускать и бота, и Django
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# CMD заменен на entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
