@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import django
 import os
 from dotenv import load_dotenv
@@ -53,7 +52,6 @@ async def without_puree(message: types.Message):
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 async def run_bot():
     try:
-        logging.basicConfig(level=logging.INFO)
         await dp.start_polling(bot)
     finally:
         await bot.close()
