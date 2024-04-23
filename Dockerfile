@@ -2,6 +2,7 @@ FROM python:3.11-slim as builder
 WORKDIR /code
 COPY requirements.txt .
 RUN pip3 install --user -r requirements.txt
+ENV DJANGO_SETTINGS_MODULE=SGUevents.settings
 
 FROM python:3.11-slim
 WORKDIR /code
