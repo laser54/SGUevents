@@ -1,5 +1,8 @@
 import asyncio
 import logging
+import django
+import os
+from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
@@ -8,6 +11,9 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from django.conf import settings
 
 
+load_dotenv()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
+django.setup()
 
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 

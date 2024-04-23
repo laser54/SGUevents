@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DJANGO_SETTINGS_MODULE=SGUevents.settings
+
 # Запускаем Gunicorn для Django
 gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887 &
 
