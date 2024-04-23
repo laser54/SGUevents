@@ -1,7 +1,6 @@
 version: '3'
 
 services:
-
   db:
     image: postgres:12.4
     volumes:
@@ -9,8 +8,10 @@ services:
     restart: always
     env_file:
       - ./.env
+
   backend:
     image: la5er/events:latest
+    command: gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887
     restart: always
     volumes:
       - static_value:/code/staticfiles/
@@ -18,6 +19,18 @@ services:
       - db
     env_file:
       - ./.env
+    ports:
+      - "8887:8887"
+
+  bot:
+    image: la5er/events:latest
+    command: python /code/bot/main.py
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+
   nginx:
     image: nginx:1.19.3
     ports:
@@ -30,7 +43,7 @@ services:
     restart: always
     depends_on:
       - backend
-
+      - bot
 
 volumes:
   postgres_data:
