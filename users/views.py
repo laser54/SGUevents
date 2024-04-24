@@ -17,6 +17,7 @@ from .telegram_utils import send_login_details_sync
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+DEV_BOT_NAME = os.getenv('DEV_BOT_NAME')
 
 def home(request):
     # Представление для главной страницы
@@ -54,7 +55,7 @@ def register(request):
 
     context = {
         'form': form,
-        'telegram_bot_username': 'Event_dev_sgu_bot' if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot',
+        'telegram_bot_username': DEV_BOT_NAME if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot',
     }
     return render(request, 'users/register.html', context)
 
