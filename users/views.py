@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import RegistrationForm
 from .telegram_utils import send_login_details_sync
+from .models import Department  # Импорт модели отдела
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -20,28 +21,27 @@ logger = logging.getLogger(__name__)
 DEV_BOT_NAME = os.getenv('DEV_BOT_NAME')
 
 def home(request):
-    # Представление для главной страницы
     return render(request, 'users/home.html')
 
-
 def success(request):
-    # Получаем метод входа из сессии
     login_method = request.session.get('login_method', 'Неизвестный способ входа')
     return render(request, 'users/success.html', {'login_method': login_method})
-
 
 def register(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             generated_password = get_random_string(8)
+            department_id = form.cleaned_data['department_id']
+            department, _ = Department.objects.get_or_create(department_id=department_id)
+
             user_kwargs = {
                 'email': form.cleaned_data.get('email'),
                 'password': generated_password,
                 'first_name': form.cleaned_data['first_name'],
                 'last_name': form.cleaned_data['last_name'],
                 'middle_name': form.cleaned_data.get('middle_name', ''),
-                'department_id': form.cleaned_data['department_id'],
+                'department': department,
                 'telegram_id': form.cleaned_data['telegram_id'],
             }
             new_user = User.objects.create_user(**user_kwargs)
@@ -59,7 +59,6 @@ def register(request):
     }
     return render(request, 'users/register.html', context)
 
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get('username')
@@ -76,27 +75,20 @@ def login_view(request):
     }
     return render(request, 'users/login.html', context)
 
-
 @csrf_exempt
 def telegram_auth(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         telegram_id = data.get('telegram_id')
-        logger.debug(f"Received Telegram ID: {telegram_id}")
         user = User.objects.filter(telegram_id=telegram_id).first()
         if user:
             auth_login(request, user)
             request.session['login_method'] = 'Через Telegram'
-            logger.debug("User authenticated via Telegram")
             return JsonResponse({'success': True, 'redirect_url': '/success'})
         else:
-            logger.error("User not found")
-            return JsonResponse(
-                {'success': False, 'error': 'User not registered. Please register.', 'redirect_url': '/register'})
+            return JsonResponse({'success': False, 'error': 'User not registered. Please register.', 'redirect_url': '/register'})
     else:
-        logger.error("Invalid request")
         return JsonResponse({'success': False, 'error': 'Invalid request'})
-
 
 @csrf_exempt
 @login_required
@@ -106,10 +98,8 @@ def change_password(request):
         request.user.set_password(new_password)
         request.user.save()
         send_login_details_sync(request.user.telegram_id, request.user.username, new_password)
-        return JsonResponse({'success': True, 'message': 'Ваш пароль успешно изменен и отправлен в Telegram.'})
-    return JsonResponse({'success': False, 'error': 'Доступ запрещен.'})
-
+        return JsonResponse({'success': True, 'message': 'Your password has been successfully changed and sent via Telegram.'})
+    return JsonResponse({'success': False, 'error': 'Access denied.'})
 
 def general(request):
-    # Представление для страницы с контентом
     return render(request, 'main/index.html')
