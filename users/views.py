@@ -71,7 +71,7 @@ def login_view(request):
         else:
             messages.error(request, "Неверный логин или пароль.")
     context = {
-        'telegram_bot_username': 'Event_dev_sgu_bot' if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot'
+        'telegram_bot_username': DEV_BOT_NAME if os.getenv('DJANGO_ENV') == 'development' else 'Event_sgu_bot'
     }
     return render(request, 'users/login.html', context)
 
