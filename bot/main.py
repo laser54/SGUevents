@@ -1,16 +1,16 @@
 import asyncio
-import django
+import logging
 import os
 import sys
-import logging
-from dotenv import load_dotenv
 
+import django
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
+from aiogram.filters import CommandStart
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from asgiref.sync import sync_to_async
+from dotenv import load_dotenv
 
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
@@ -21,7 +21,6 @@ if 'django' not in sys.modules:
 logging.basicConfig(level=logging.INFO)
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 
-# Инициализация бота и диспетчера
 dp = Dispatcher()
 User = get_user_model()
 
@@ -32,7 +31,7 @@ async def get_user_profile(telegram_id):
     except User.DoesNotExist:
         return None
 
-# Обработчик команды /start
+
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
     kb = [
@@ -47,7 +46,8 @@ async def cmd_start(message: types.Message):
         resize_keyboard=True,
         input_field_placeholder="Выберите пункт меню"
     )
-    await message.answer("Вас приветсвует Event бот СГУ", reply_markup=keyboard)
+    await message.answer("Вас приветствует Event бот СГУ", reply_markup=keyboard)
+
 
 @dp.message(F.text == "\U0001F464 Мой профиль")
 async def profile(message: types.Message):
@@ -55,9 +55,8 @@ async def profile(message: types.Message):
         user = await get_user_profile(message.from_user.id)
         if user:
             department_name = await sync_to_async(get_department_name)(user)
-            # Проверяем наличие отчества и формируем строку ФИО соответственно
             full_name = f"{user.last_name} {user.first_name}" + (f" {user.middle_name}" if user.middle_name else "")
-            response_text = f"ФИО: {full_name}\nОтдел: {department_name}"
+            response_text = f"Ваше ФИО: {full_name}\nОтдел: {department_name}"
         else:
             response_text = "Вы не зарегистрированы на портале."
     except User.DoesNotExist:
@@ -66,6 +65,7 @@ async def profile(message: types.Message):
         response_text = "Произошла ошибка при получении вашего профиля."
         logging.error(f"Error fetching profile: {e}")
     await message.answer(response_text)
+
 
 def get_department_name(user):
     # Эта функция теперь синхронная
@@ -76,17 +76,22 @@ def get_department_name(user):
 async def without_puree(message: types.Message):
     await message.answer("Функция 'Мои мероприятия' еще не реализована. Подождите немного!")
 
+
 @dp.message(F.text == "\U00002754 Помощь")
 async def without_puree(message: types.Message):
     await message.answer("Функция 'Помощь' еще не реализована. Подождите немного!")
 
+
 # Функция запуска бота
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+
+
 async def run_bot():
     try:
         await dp.start_polling(bot)
     finally:
         await bot.close()
+
 
 if __name__ == "__main__":
     asyncio.run(run_bot())
