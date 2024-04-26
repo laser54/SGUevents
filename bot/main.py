@@ -11,16 +11,21 @@ from asgiref.sync import sync_to_async
 
 # Configure environment variables and Django settings
 load_dotenv()
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
 
-from bot.django_initializer import setup_django_environment
-setup_django_environment()
+# Установка Django окружения в зависимости от режима выполнения
+if os.getenv('DJANGO_ENV') == 'development':
+    import django
+    if 'django' not in sys.modules:
+        django.setup()
+else:
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
 
-# Теперь безопасно использовать Django-компоненты:
+# После установки Django окружения можно безопасно импортировать модели
+from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
-# Now we can safely import models and other Django components
-from django.conf import settings
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
