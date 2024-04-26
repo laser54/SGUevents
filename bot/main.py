@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import sys
 
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
@@ -14,7 +15,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
 
 # Setup Django environment
 import django
-django.setup()
+if 'django' not in sys.modules:
+    django.setup()
 
 # Now we can safely import models and other Django components
 from django.conf import settings
