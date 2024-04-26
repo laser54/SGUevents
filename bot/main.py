@@ -11,16 +11,16 @@ from asgiref.sync import sync_to_async
 
 # Configure environment variables and Django settings
 load_dotenv()
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
 
-# Setup Django environment
-import django
-if 'django' not in sys.modules:
-    django.setup()
+from bot.django_initializer import setup_django_environment
+setup_django_environment()
 
+# Теперь безопасно использовать Django-компоненты:
+from django.contrib.auth import get_user_model
+User = get_user_model()
 # Now we can safely import models and other Django components
 from django.conf import settings
-from django.contrib.auth import get_user_model
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO)
 # Initialize bot
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 dp = Dispatcher()
-User = get_user_model()
+
 
 async def get_user_profile(telegram_id):
     try:

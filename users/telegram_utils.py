@@ -28,6 +28,7 @@ def send_message_to_admin(telegram_id, message):
         "chat_id": admin_tg_username,
         "text": message,
     }
+    print("Sending message to admin:", admin_tg_username) # для отладки
     response = requests.post(send_url, data=data)
     if not response.ok:
         print(f"Ошибка отправки сообщения администратору: {response.text}")
