@@ -1,19 +1,21 @@
-import os
 import json
 import logging
+import os
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import login as auth_login
-from django.contrib.auth.decorators import login_required
 
 from .forms import RegistrationForm
-from .telegram_utils import send_login_details_sync
 from .models import Department  # Импорт модели отдела
+from .telegram_utils import send_login_details_sync
+from .telegram_utils import send_message_to_admin
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -98,8 +100,27 @@ def change_password(request):
         request.user.set_password(new_password)
         request.user.save()
         send_login_details_sync(request.user.telegram_id, request.user.username, new_password)
-        return JsonResponse({'success': True, 'message': 'Your password has been successfully changed and sent via Telegram.'})
-    return JsonResponse({'success': False, 'error': 'Access denied.'})
+        logger.info("Password changed, logging out user and redirecting to login page")
+        logout(request)
+        return redirect('/login/')
+    else:
+        logger.error("Failed to change password: Access denied or missing telegram_id")
+        return JsonResponse({'success': False, 'error': 'Access denied.'})
+
+@csrf_exempt
+@login_required
+def request_admin_rights(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            justification = data.get('reason', '')
+            user_full_name = f"{request.user.last_name} {request.user.first_name} {' ' + request.user.middle_name if request.user.middle_name else ''}".strip()
+            message = f"Запрос на админские права от {user_full_name}: {justification}"
+            send_message_to_admin(request.user.telegram_id, message)
+            return JsonResponse({'success': True, 'message': 'Запрос на админские права отправлен администратору.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Ошибка в формате данных.'})
+    return JsonResponse({'success': False, 'error': 'Недопустимый запрос.'})
 
 def general(request):
     return render(request, 'main/index.html')
