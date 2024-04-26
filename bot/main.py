@@ -9,18 +9,15 @@ from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from asgiref.sync import sync_to_async
 
+from bot.django_initializer import setup_django_environment
+app = setup_django_environment()
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
 # Configure environment variables and Django settings
 load_dotenv()
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
 
-# Установка Django окружения в зависимости от режима выполнения
-if os.getenv('DJANGO_ENV') == 'development':
-    import django
-    if 'django' not in sys.modules:
-        django.setup()
-else:
-    from django.core.wsgi import get_wsgi_application
-    application = get_wsgi_application()
 
 # После установки Django окружения можно безопасно импортировать модели
 from django.conf import settings
