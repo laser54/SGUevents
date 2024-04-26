@@ -21,6 +21,7 @@ if 'django' not in sys.modules:
 logging.basicConfig(level=logging.INFO)
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 
+from django.contrib.auth import get_user_model
 dp = Dispatcher()
 User = get_user_model()
 
