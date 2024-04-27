@@ -1,13 +1,9 @@
+# django_initializer.py
 import os
 import django
-from django.core.wsgi import get_wsgi_application
 
 def setup_django_environment():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SGUevents.settings")
-    if os.getenv('DJANGO_ENV') == 'production':
-        # В продакшене используем get_wsgi_application, которое делает setup автоматически
-        return get_wsgi_application()
-    else:
-        # В разработке просто делаем setup
-        if not django.apps.apps.ready:
-            django.setup()
+    # В разработке вызываем setup, если приложения Django еще не загружены
+    if os.getenv('DJANGO_ENV') == 'development' and not django.apps.apps.ready:
+        django.setup()
