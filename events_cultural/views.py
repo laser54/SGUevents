@@ -1,14 +1,17 @@
 from django.shortcuts import render
-
+from django.core.paginator import Paginator
 from events_cultural.models import Attractions, Events_for_visiting
 
 def attractions(request):
+	page = request.GET.get('page',1)
 	attractions_content= Attractions.objects.all()
 	
+	paginator = Paginator(attractions_content, 2)
+	current_page = paginator.page(int(page))
 	
 	context: dict[str, str] = {
 		'name_page': 'Достопримечательности',
-        'event_card_views': attractions_content,
+        'event_card_views': current_page,
 	}
 	return render(request, 'events_cultural/attractions.html', context)
 
@@ -27,11 +30,15 @@ def attractions_card(request, event_slug=False, event_id=False):
 	return render(request, 'events_cultural/card.html', context=context)
 
 def events_for_visiting(request):
+	page = request.GET.get('page',1)
 	events_for_visiting_content = Events_for_visiting.objects.all()
+
+	paginator = Paginator(events_for_visiting_content, 2)
+	current_page = paginator.page(int(page))
 
 	context: dict[str, str] = {
 		'name_page': 'Доступно к посещению',
-		'event_card_views': events_for_visiting_content,
+		'event_card_views': current_page,
 	}
 	return render(request, 'events_cultural/events_for_visiting.html', context)
 

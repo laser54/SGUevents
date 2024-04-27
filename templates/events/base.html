@@ -173,9 +173,10 @@
 												<split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
 											<h6 class="event-place"> {{ events.place }} </h6>
 											<h6 class="event-place"> {{ events.speakers }} </h6>
-											<p class="card-text">{{ events.description }}</p>
+											
+											<p class="card-text">{{ events.description|truncatechars:615 }}</p>
 											<p class="card-text">
-												<small class="text-muted">{% if events.tags %}
+												<small class="text-muted">{% if events.tags %} 
 													{{ events.tags }}
 													{% else %}
 													{% endif %}
@@ -204,14 +205,32 @@
 	<pagination>
 		<nav aria-label="Page navigation example" >
 			<ul class="pagination justify-content-center">
-				<li class="page-item disabled">
-					<a class="page-link">Previous</a>
+				<li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
+					<a class="page-link" href="
+					{% if event_card_views.has_previous %}  
+						?page={{ event_card_views.previous_page_number }}
+					{% else %} 
+						#
+					{% endif %}">Назад </a>
 				</li>
-				<li class="page-item"><a class="page-link" href="#">1</a></li>
-				<li class="page-item"><a class="page-link" href="#">2</a></li>
-				<li class="page-item"><a class="page-link" href="#">3</a></li>
-				<li class="page-item">
-					<a class="page-link" href="#">Next</a>
+
+				{% for page in event_card_views.paginator.page_range %}		
+					{% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
+						<li class="page-item {% if event_card_views.number == page %} active {% endif %}">
+							<a class="page-link" href="
+							?page={{ page }}">
+							{{ page }}</a>
+						</li>
+					{% endif %}		
+				{% endfor %}
+				
+				<li class="page-item {% if not event_card_views.has_next %} disabled {% else %}{% endif %}">
+					<a class="page-link" href="
+					{% if event_card_views.has_next %}
+						?page={{ event_card_views.next_page_number }}
+					{% else %} 
+						#
+					{% endif %}">Следющая </a>
 				</li>
 			</ul>
 		</nav>
