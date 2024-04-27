@@ -10,10 +10,11 @@ from aiogram.enums import ParseMode
 from asgiref.sync import sync_to_async
 
 from bot.django_initializer import setup_django_environment
-app = setup_django_environment()
+setup_django_environment()
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
+User = get_user_model()
+from django.conf import settings
 
 # Configure environment variables and Django settings
 load_dotenv()
