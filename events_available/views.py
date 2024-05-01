@@ -15,12 +15,13 @@ def online(request):
 	context: dict[str, str] = {
 			'name_page': 'Онлайн',
             'event_card_views': current_page,
+						
 			# 'slug_url': event_slug
 	}
 	return render(request, 'events_available/online_events.html', context=context)
 
 def online_card(request, event_slug=False, event_id=False):
-	event = Events_online.objects.all()
+	# event = Events_online.objects.all()
 	# event = Events_online.objects.get(id=events_id)
 	if event_id:
 		event = Events_online.objects.get(id=event_id)
@@ -51,7 +52,7 @@ def offline(request):
 
 
 def offline_card(request, event_slug=False, event_id=False):
-	event = Events_offline.objects.all()
+	# event = Events_offline.objects.all()
 	# event = Events_online.objects.get(id=events_id)
 	if event_id:
 		event = Events_offline.objects.get(id=event_id)
