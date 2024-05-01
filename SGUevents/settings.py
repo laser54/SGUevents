@@ -90,6 +90,7 @@ TELEGRAM_DEV_BOT_TOKEN = os.getenv("TELEGRAM_DEV_BOT_TOKEN")
 # Выбор активного токена на основе окружения
 ACTIVE_TELEGRAM_BOT_TOKEN = TELEGRAM_DEV_BOT_TOKEN if DJANGO_ENV == 'development' else TELEGRAM_BOT_TOKEN
 
+
 if DJANGO_ENV == 'development':
     DATABASES = {
         'default': {
@@ -114,6 +115,7 @@ else:
                     'PORT': os.getenv('DB_PORT'),
         }
     }
+
 
 
 # Password validation
