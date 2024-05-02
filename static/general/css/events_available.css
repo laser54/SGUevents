@@ -12,6 +12,11 @@
 }
 
  /* Поле фотографии */	
+.img-fluid {
+	height: 17rem;
+	width: 40rem;
+}
+
  .btn-favorites {
 	position: absolute;
 	border-radius: 50%;
