@@ -16,6 +16,7 @@ class Events_online(models.Model):
     image = models.ImageField(upload_to='events_available_images/online', blank=True, null=True, verbose_name='Изображение')
     events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
+    category = "Онлайн"
 
     class Meta:
         db_table = 'Events_online'
@@ -27,6 +28,11 @@ class Events_online(models.Model):
     
     def display_id(self):
         return f'{self.id:05}'
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.category = "Онлайн"
+        super(Events_online, self).save(*args, **kwargs)
     
 class Events_offline(models.Model):
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
@@ -46,6 +52,7 @@ class Events_offline(models.Model):
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
     events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
+    category = "Оффлайн"
     
     class Meta:
         db_table = 'Events_offline'
@@ -57,3 +64,8 @@ class Events_offline(models.Model):
     
     def display_id(self):
         return f'{self.id:05}'
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.category = "Оффлайн"
+        super(Events_offline, self).save(*args, **kwargs)
