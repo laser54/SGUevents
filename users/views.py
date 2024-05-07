@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import RegistrationForm
 from .models import Department  # Импорт модели отдела
 from .telegram_utils import send_login_details_sync
-from .telegram_utils import send_message_to_admin
+from .telegram_utils import send_message_to_admin, send_confirmation_to_user
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -116,7 +116,10 @@ def request_admin_rights(request):
             justification = data.get('reason', '')
             user_full_name = f"{request.user.last_name} {request.user.first_name} {' ' + request.user.middle_name if request.user.middle_name else ''}".strip()
             message = f"Запрос на админские права от {user_full_name}: {justification}"
+            # Отправка сообщения администратору
             send_message_to_admin(request.user.telegram_id, message)
+            # Уведомление пользователя о том, что запрос отправлен
+            send_confirmation_to_user(request.user.telegram_id)
             return JsonResponse({'success': True, 'message': 'Запрос на админские права отправлен администратору.'})
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'error': 'Ошибка в формате данных.'})
