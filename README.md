@@ -65,7 +65,7 @@
 4. Загружаем информацию для страницы онлайн мероприятий:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_online.json`
 5. Загружаем информацию для страницы оффлайн мероприятий:
-   - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_offline.json `
+   - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_offline.json`
 6. Загружаем информацию для страницы достопримечательности:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/attractions.json`
 7. Загружаем информацию для страницы доступные к посещению:

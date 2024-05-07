@@ -9,6 +9,8 @@ from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from asgiref.sync import sync_to_async
 
+
+load_dotenv()
 from bot.django_initializer import setup_django_environment
 setup_django_environment()
 
@@ -16,8 +18,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.conf import settings
 
-# Configure environment variables and Django settings
-load_dotenv()
 
 
 # После установки Django окружения можно безопасно импортировать модели
