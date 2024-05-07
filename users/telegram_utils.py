@@ -33,4 +33,15 @@ def send_message_to_admin(telegram_id, message):
     if not response.ok:
         print(f"Ошибка отправки сообщения администратору: {response.text}")
 
+def send_confirmation_to_user(telegram_id):
+    send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    confirmation_message = "Ваш запрос на предоставление админских прав был отправлен администратору."
+    data = {
+        "chat_id": telegram_id,
+        "text": confirmation_message,
+    }
+    response = requests.post(send_url, data=data)
+    if not response.ok:
+        print(f"Ошибка отправки подтверждающего сообщения пользователю: {response.text}")
+
 
