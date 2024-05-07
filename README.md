@@ -82,5 +82,5 @@
    - `DROP SCHEMA public CASCADE;`
    - `CREATE SCHEMA public;`
    - Для выхода из psql используйте команду \q, и для выхода из оболочки контейнера используйте exit.
-   - Далее миграции, superuser и fixtures
+   - Далее миграции, superuser и fixtures.
 
