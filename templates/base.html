@@ -1,4 +1,6 @@
 {% load static %}
+{% load events_available_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,7 +46,7 @@
 							</a>
 							<ul class="dropdown-menu">
 								<li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
-								<li><a class="dropdown-item" href={% url "events_cultural:events_registered" %}>Зарегестрированные</a></li>
+								<li><a class="dropdown-item" href={% url "events_cultural:events_registered" %}>Зарегистрированные</a></li>
 								<li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
 							</ul>
 						</li>

@@ -5,12 +5,20 @@ from django.core.paginator import Paginator
 
 def online(request):
 	page = request.GET.get('page',1)
-	events_available = Events_online.objects.all()
-	
-	# event = Events_online.objects.get(id=events_id)
-	paginator = Paginator(events_available, 2)
-	current_page = paginator.page(int(page))
+	f_online = request.GET.get('f_online', None)
+	order_by = request.GET.get('order_by', None)
 
+	events_available = Events_online.objects.order_by('time_start')
+
+	if f_online:
+		events_available = events_available.filter(category="Онлайн")
+	
+	if order_by and order_by != "default":
+		events_available = events_available.order_by(order_by)
+	# event = Events_online.objects.get(id=events_id)
+
+	paginator = Paginator(events_available, 5)
+	current_page = paginator.page(int(page))
 
 	context: dict[str, str] = {
 			'name_page': 'Онлайн',

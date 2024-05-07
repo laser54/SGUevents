@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load events_available_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -46,7 +46,7 @@
 							</a>
 							<ul class="dropdown-menu">
 								<li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
-								<li><a class="dropdown-item" href={% url "events_cultural:events_registered" %}>Зарегестрированные</a></li>
+								<li><a class="dropdown-item" href={% url "events_cultural:events_registered" %}>Зарегистрированные</a></li>
 								<li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
 							</ul>
 						</li>
@@ -79,8 +79,6 @@
 							</ul>
 						</li>
 
-
-
 					</ul>
 					<form class="d-flex" role="search">
 						<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -107,21 +105,32 @@
 									<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 										Дата
 									</button>
-									<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
+									<form action="{% url "events_available:online" %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
 										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
+											<input class="form-check-input" type="checkbox" name="f_online" id="flexCheckDefault" value="on" 
+											{% if request.GET.f_online == 'on' %}checked{% endif %}>
+											{% comment %} <input type="hidden" name="q" value="request.GET.q"> {% endcomment %}
+											<label class="form-check-label" for="flexCheckDefault">
+												Онлайн
+											</label>
+										</div>
+										<div class="form-check text-white mx-3">
+												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default"
+												{% if not request.GET.order_by or request.GET.order_by == 'default' %}checked{% endif %}>
 												<label class="form-check-label" for="flexRadioDefault1">
 														По умолчанию
 												</label>
 										</div>
 										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="date">
+												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="-date" 
+												{% if request.GET.order_by == '-date' %}checked{% endif %}>
 												<label class="form-check-label" for="flexRadioDefault2">
 														Сначала новые
 												</label>
 										</div>
 										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="-date">
+												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="date" 
+												{% if request.GET.order_by == 'date' %}checked{% endif %}>
 												<label class="form-check-label" for="flexRadioDefault3">
 														Сначала старые
 												</label>
@@ -360,7 +369,7 @@
 				<li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
 					<a class="page-link" href="
 					{% if event_card_views.has_previous %}  
-						?page={{ event_card_views.previous_page_number }}
+						?{% change_params page=event_card_views.previous_page_number %}
 					{% else %} 
 						#
 					{% endif %}">Назад </a>
@@ -370,7 +379,7 @@
 					{% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
 						<li class="page-item {% if event_card_views.number == page %} active {% endif %}">
 							<a class="page-link" href="
-							?page={{ page }}">
+							?{% change_params page=page %}">
 							{{ page }}</a>
 						</li>
 					{% endif %}		
@@ -379,10 +388,10 @@
 				<li class="page-item {% if not event_card_views.has_next %} disabled {% else %}{% endif %}">
 					<a class="page-link" href="
 					{% if event_card_views.has_next %}
-						?page={{ event_card_views.next_page_number }}
+						?{% change_params page=event_card_views.next_page_number %}
 					{% else %} 
 						#
-					{% endif %}">Следющая </a>
+					{% endif %}">Следующая </a>
 				</li>
 			</ul>
 		</nav>
