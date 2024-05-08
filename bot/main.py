@@ -9,23 +9,12 @@ from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from asgiref.sync import sync_to_async
 
-from bot.django_initializer import setup_django_environment
-setup_django_environment()
 
-from django.contrib.auth import get_user_model
-User = get_user_model()
-from django.conf import settings
-
-# Configure environment variables and Django settings
 load_dotenv()
+from bot.django_initializer import setup_django_environment
 
-
-# После установки Django окружения можно безопасно импортировать модели
-from django.conf import settings
 from django.contrib.auth import get_user_model
-User = get_user_model()
-
-# Configure logging
+from django.conf import settings
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot
@@ -33,7 +22,10 @@ TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 dp = Dispatcher()
 
 
+
+
 async def get_user_profile(telegram_id):
+    User = get_user_model()
     try:
         return await sync_to_async(User.objects.get)(telegram_id=telegram_id)
     except User.DoesNotExist:
@@ -90,4 +82,5 @@ async def run_bot():
 
 
 if __name__ == "__main__":
+    setup_django_environment()
     asyncio.run(run_bot())
