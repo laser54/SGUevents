@@ -1,13 +1,25 @@
-FROM python:3.11-slim as builder
-WORKDIR /code
-COPY requirements.txt .
-RUN pip3 install --user -r requirements.txt
-
+# Используем официальный образ Python Slim для минимизации размера образа
 FROM python:3.11-slim
+
+# Установка рабочей директории в контейнере
 WORKDIR /code
-COPY --from=builder /root/.local /root/.local
+
+# Копирование файла зависимостей
+COPY requirements.txt .
+
+# Установка зависимостей
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копирование всего проекта в рабочую директорию
 COPY . .
-# Установка переменной окружения для использования пакетов, установленных в --user
-ENV PATH=/root/.local/bin:$PATH
-# Используйте Gunicorn в качестве WSGI сервера для запуска приложения
-CMD gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887
+
+# Установка переменных окружения для доступа к настройкам Django
+ENV DJANGO_SETTINGS_MODULE=SGUevents.settings
+ENV PYTHONPATH=/code
+
+# Открытие порта 8887 для внешнего доступа к Django
+EXPOSE 8887
+
+# Команда для запуска Gunicorn с вашим приложением Django
+CMD ["gunicorn", "SGUevents.wsgi:application", "--bind", "0.0.0.0:8887"]
+

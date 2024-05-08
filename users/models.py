@@ -1,8 +1,20 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.crypto import get_random_string
 from transliterate import translit, exceptions
 
+
+class Department(models.Model):
+    department_id = models.CharField(max_length=50, unique=True, verbose_name='ID отдела')
+    department_name = models.CharField(max_length=100, verbose_name='Название отдела')
+
+    def __str__(self):
+        return self.department_name
+
+    class Meta:
+        verbose_name = 'Отдел'
+        verbose_name_plural = 'Отделы'
 
 class CustomUserManager(BaseUserManager):
     def transliterate_username(self, last_name, first_name, middle_name=''):
@@ -25,13 +37,11 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, email=None, password=None, **extra_fields):
         if email:
             email = self.normalize_email(email)
-        else:
-            email = None  # Убедитесь, что email может быть None, если не предоставлен
         password = get_random_string(8) if password is None else password
         first_name = extra_fields.pop('first_name', '')
         last_name = extra_fields.pop('last_name', '')
         middle_name = extra_fields.pop('middle_name', '')
-        department_id = extra_fields.pop('department_id', None)
+        department = extra_fields.pop('department', None)
         telegram_id = extra_fields.pop('telegram_id', None)
 
         username = extra_fields.pop('username', None) or self.transliterate_username(last_name, first_name, middle_name)
@@ -42,7 +52,7 @@ class CustomUserManager(BaseUserManager):
             first_name=first_name,
             last_name=last_name,
             middle_name=middle_name,
-            department_id=department_id,
+            department=department,
             telegram_id=telegram_id,
             **extra_fields
         )
@@ -55,8 +65,8 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('first_name', 'Admin')
         extra_fields.setdefault('last_name', 'User')
-        extra_fields.setdefault('department_id', 1)  # Убеждаемся, что это значение применяется
-        extra_fields.setdefault('telegram_id', 'default_telegram_id')  # Можете установить другое значение по умолчанию
+        extra_fields.setdefault('department', Department.objects.get_or_create(department_id='1', defaults={'department_name': 'Administration'})[0])
+        extra_fields.setdefault('telegram_id', 'default_telegram_id')
 
         if not email:
             raise ValueError('The Email must be set for superuser')
@@ -69,12 +79,11 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
 class User(AbstractUser):
     middle_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='Отчество')
-    department_id = models.IntegerField(verbose_name='ID отдела', default=666)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, verbose_name='Отдел')
     telegram_id = models.CharField(max_length=100, unique=True, null=True, blank=True, verbose_name='Telegram ID')
-    email = models.EmailField('email address', blank=True, null=True, unique=True)  # Добавлено blank=True, null=True
+    email = models.EmailField('email address', blank=True, null=True, unique=True)
 
     objects = CustomUserManager()
 
@@ -84,3 +93,16 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+class AdminRightRequest(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
+    reason = models.TextField(verbose_name="Основание")
+    status = models.CharField(max_length=20, choices=[('pending', 'Ожидает'), ('granted', 'Предоставлено'), ('denied', 'Отказано')], default='pending', verbose_name="Статус")
+    response = models.TextField(blank=True, null=True, verbose_name="Ответ")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.status}"
+
+    class Meta:
+        verbose_name = "Запрос на админские права"
+        verbose_name_plural = "Запросы на админские права"

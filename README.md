@@ -20,7 +20,7 @@
    - Выполнить команду: `pip3 install -r requirements.txt`
 7. Создаем `.env` в корне по образцу `.env.example`.
 8. Запуск проекта. Находимся в директории SGUplatform (где лежит файл `manage.py`):
-   - Выполнить команду: `python3 manage.py runserver`
+   - Выполнить команду: `python3 manage.py runserver & python3 manage.py startbot`
    - Или настроить автоматический запуск (PyCharm - через Edit Configurations с параметром `runserver`, VSCode - через добавление `launch.json`).
 
 ## Запуск на Windows:
@@ -44,7 +44,7 @@
    - Выполнить команду: `pip install -r requirements.txt`
 7. Создаем `.env` в корне по образцу `.env.example`.
 8. Запуск проекта. Находимся в директории SGUevents (где лежит файл `manage.py`):
-   - Выполнить команду: `python manage.py runserver`
+   - Выполнить команду: `python manage.py runserver & python manage.py startbot`
    - Или настроить автоматический запуск (PyCharm - через Edit Configurations с параметром `runserver`, VSCode - через добавление `launch.json`).
 
 ## Запуск локально на Windows:
@@ -65,8 +65,22 @@
 4. Загружаем информацию для страницы онлайн мероприятий:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_online.json`
 5. Загружаем информацию для страницы оффлайн мероприятий:
-   - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_offline.json `
+   - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_offline.json`
 6. Загружаем информацию для страницы достопримечательности:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/attractions.json`
 7. Загружаем информацию для страницы доступные к посещению:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/events_for_visiting.json`
+
+## При запуске на сервере:
+1. Из каталога с файлом docker-compose.yml:
+   - Выполнить команды: `docker-compose exec backend python manage.py makemigrations`
+   - `docker-compose exec backend python manage.py migrate`
+   - `docker-compose exec backend python manage.py collectstatic --noinput`
+   - при невозможности применения миграций - сбрасывам таблицы:
+   - `docker exec -it [id контейнера] bash`
+   - `psql -U [db_user] -d [db_name]`
+   - `DROP SCHEMA public CASCADE;`
+   - `CREATE SCHEMA public;`
+   - Для выхода из psql используйте команду \q, и для выхода из оболочки контейнера используйте exit.
+   - Далее миграции, superuser и fixtures.
+

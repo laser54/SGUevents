@@ -44,8 +44,7 @@ INSTALLED_APPS = [
 	'application_for_admin_rights',
 	'support',
 	'personal',
-	
-    "debug_toolbar",
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -56,8 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	
-	"debug_toolbar.middleware.DebugToolbarMiddleware",
+	'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'SGUevents.urls'
@@ -88,6 +86,8 @@ DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development')
 # Токены для разработки и продакшена
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_DEV_BOT_TOKEN = os.getenv("TELEGRAM_DEV_BOT_TOKEN")
+ADMIN_TG_NAME = os.getenv("ADMIN_TG_NAME")
+
 
 # Выбор активного токена на основе окружения
 ACTIVE_TELEGRAM_BOT_TOKEN = TELEGRAM_DEV_BOT_TOKEN if DJANGO_ENV == 'development' else TELEGRAM_BOT_TOKEN
@@ -168,6 +168,8 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = 'media/'
+
+LOGIN_URL = '/login/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
