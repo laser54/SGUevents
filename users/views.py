@@ -13,7 +13,7 @@ from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import RegistrationForm
-from .models import Department  # Импорт модели отдела
+from .models import Department, AdminRightRequest
 from .telegram_utils import send_login_details_sync
 from .telegram_utils import send_message_to_admin, send_confirmation_to_user
 
@@ -116,11 +116,18 @@ def request_admin_rights(request):
             justification = data.get('reason', '')
             user_full_name = f"{request.user.last_name} {request.user.first_name} {' ' + request.user.middle_name if request.user.middle_name else ''}".strip()
             message = f"Запрос на админские права от {user_full_name}: {justification}"
+
+            # Создание новой записи запроса на админские права
+            new_request = AdminRightRequest(user=request.user, reason=justification)
+            new_request.save()
+
             # Отправка сообщения администратору
             send_message_to_admin(request.user.telegram_id, message)
             # Уведомление пользователя о том, что запрос отправлен
             send_confirmation_to_user(request.user.telegram_id)
-            return JsonResponse({'success': True, 'message': 'Запрос на админские права отправлен администратору.'})
+
+            return JsonResponse({'success': True,
+                                 'message': 'Запрос на админские права отправлен администратору и зарегистрирован в системе.'})
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'error': 'Ошибка в формате данных.'})
     return JsonResponse({'success': False, 'error': 'Недопустимый запрос.'})

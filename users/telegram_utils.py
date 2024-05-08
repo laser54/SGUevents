@@ -24,11 +24,23 @@ def send_login_details_sync(telegram_id, login, password):
 def send_message_to_admin(telegram_id, message):
     admin_tg_username = ADMIN_TG_NAME
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+
+    reply_markup = json.dumps({
+        "inline_keyboard": [
+            [
+                {"text": "Предоставить", "callback_data": f"grant_{telegram_id}"},
+                {"text": "Отказать", "callback_data": f"deny_{telegram_id}"}
+            ]
+        ]
+    })
+
     data = {
         "chat_id": admin_tg_username,
         "text": message,
+        "reply_markup": reply_markup
     }
-    print("Sending message to admin:", admin_tg_username) # для отладки
+
+    print("Sending message to admin:", admin_tg_username)
     response = requests.post(send_url, data=data)
     if not response.ok:
         print(f"Ошибка отправки сообщения администратору: {response.text}")

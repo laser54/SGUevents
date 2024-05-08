@@ -1,7 +1,9 @@
-from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db import models
 from django.utils.crypto import get_random_string
 from transliterate import translit, exceptions
+
 
 class Department(models.Model):
     department_id = models.CharField(max_length=50, unique=True, verbose_name='ID отдела')
@@ -91,3 +93,16 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+class AdminRightRequest(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
+    reason = models.TextField(verbose_name="Основание")
+    status = models.CharField(max_length=20, choices=[('pending', 'Ожидает'), ('granted', 'Предоставлено'), ('denied', 'Отказано')], default='pending', verbose_name="Статус")
+    response = models.TextField(blank=True, null=True, verbose_name="Ответ")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.status}"
+
+    class Meta:
+        verbose_name = "Запрос на админские права"
+        verbose_name_plural = "Запросы на админские права"
