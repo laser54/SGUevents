@@ -15,7 +15,8 @@
 			"qr": "",
 			"image": "events_available_images/offline/novat.jpg",
 			"rating": "4.97",
-			"documents": ""
+			"documents": "",
+			"category": "Достопримечательности"
 		}
 	},
 	{
@@ -24,7 +25,7 @@
 		"fields": {
 			"name": "Сибирь-Арена",
 			"slug": "sibir-arena",
-			"date": "2024-04-12",
+			"date": "2024-01-12",
 			"time_start": "08:57:24",
 			"time_end": "08:57:25",
 			"description": "«Сибирь-Арена» представляет собой шестиэтажный комплекс высотой 38,2 метра и общей площадью 72 тыс. кв. м., внутри которого располагаются основная арена на 10 634 зрителей и тренировочная арена с трибунами на 200 зрителей. Также, по проекту строительства, предусмотрены спортивный, тренажёрный залы, спортивные раздевалки для команд, офисы делегаций и необходимые вспомогuтельные помещения. Многофункциональная ледовая арена является объектом капитального строительства.\r\n\r\nФасад здания спроектирован на алюминиевой пространственной структуре. Эта система позволяет при наименьшей металлоемкости получить необычную поверхность, которая создает уникальный для России и мира архитектурный комплекс. Кровля ледового дворца, повторяя внутренний объем, формирует характерный силуэт, который виден как из левобережной части города, так и с правого берега Оби.",
@@ -34,7 +35,8 @@
 			"qr": "",
 			"image": "events_available_images/offline/Sibir-Arena.jpg",
 			"rating": "9.07",
-			"documents": ""
+			"documents": "",
+			"category": "Достопримечательности"
 		}
 	},
 	{
@@ -53,7 +55,8 @@
 			"qr": "",
 			"image": "events_available_images/offline/zoo1.jpg",
 			"rating": "0.08",
-			"documents": ""
+			"documents": "",
+			"category": "Достопримечательности"
 		}
 	},
 	{
@@ -72,7 +75,8 @@
 			"qr": "",
 			"image": "events_available_images/offline/photo_vokzal_stantsii_novosibirsk_glavnyy_detail_vokzal__G9bWrwC.jpg",
 			"rating": "0.09",
-			"documents": ""
+			"documents": "",
+			"category": "Достопримечательности"
 		}
 	},
 	{
@@ -91,7 +95,8 @@
 			"qr": "",
 			"image": "events_available_images/offline/photo_teatr_globus_detail_teatr_globus.jpg",
 			"rating": "-0.01",
-			"documents": ""
+			"documents": "",
+			"category": "Достопримечательности"
 		}
 	},
 	{
@@ -110,7 +115,8 @@
 			"qr": "",
 			"image": "events_available_images/offline/kraevedcheskiy_muzey.jpg",
 			"rating": "0.10",
-			"documents": ""
+			"documents": "",
+			"category": "Достопримечательности"
 		}
 	},
 	{
@@ -129,7 +135,8 @@
 			"qr": "",
 			"image": "events_available_images/offline/photo_muzey_sssr_muzey_sibirskaya_beresta_detail_img_4065.jpg",
 			"rating": "1.50",
-			"documents": ""
+			"documents": "",
+			"category": "Достопримечательности"
 		}
 	}
 ]

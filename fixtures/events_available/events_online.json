@@ -17,7 +17,8 @@
 			"qr": "",
 			"image": "events_available_images/online/money-credit_Jxm5nqB.jpg",
 			"events_admin": "Иванов Иван Иванович",
-			"documents": ""
+			"documents": "",
+			"category": "Онлайн"
 		}
 	},
 	{
@@ -26,7 +27,7 @@
 		"fields": {
 			"name": "FINOPOLIS 2024 пройдет в Сочи",
 			"slug": "finopolis-2024-projdet-v-sochi",
-			"date": "2024-04-08",
+			"date": "2024-01-08",
 			"time_start": "11:00:00",
 			"time_end": "16:00:00",
 			"description": "Форум инновационных финансовых технологий FINOPOLIS в этом году вернется в Сочи. Он пройдет с 6 по 8 ноября на территории Образовательного центра «Сириус».FINOPOLIS традиционно станет площадкой для обсуждения тенденций и возможностей современных технологий в финансовом секторе. На форуме будет представлена широкая деловая программа с пленарными и секционными дискуссиями, а также выставочная зона с передовыми сервисами, инновационными технологическими решениями, мастер-классами и различными интерактивными мероприятиями от партнеров.Кроме того, лучшие команды региональных кейс-чемпионатов Молодежной программы FINOPOLIS.365 покажут экспертам финансового рынка свои проекты и поборются за звание суперфиналиста и денежный приз.\",",
@@ -38,7 +39,8 @@
 			"qr": "",
 			"image": "events_available_images/online/finopolis_GFwsYEf.jpg",
 			"events_admin": "Иванов Иван ИвановичСергеев Сергей Сергеевич",
-			"documents": ""
+			"documents": "",
+			"category": "Онлайн"
 		}
 	},
 	{
@@ -59,7 +61,8 @@
 			"qr": "",
 			"image": "events_available_images/online/monitoring_nW45OWq.jpg",
 			"events_admin": "Иванов Иван Иванович",
-			"documents": ""
+			"documents": "",
+			"category": "Онлайн"
 		}
 	},
 	{
@@ -80,7 +83,8 @@
 			"qr": "",
 			"image": "events_available_images/online/dolg_G8UK988.jpg",
 			"events_admin": "Иванов Иван Иванович",
-			"documents": ""
+			"documents": "",
+			"category": "Онлайн"
 		}
 	},
 	{
@@ -101,7 +105,8 @@
 			"qr": "",
 			"image": "events_available_images/online/bankRF_aNtLGKh.jpg",
 			"events_admin": "Моисеева Ксения АлександровнаНовикова Валерия ДанииловнаЛюбимова Александра МарковнаОзерова Яна Арту",
-			"documents": ""
+			"documents": "",
+			"category": "Онлайн"
 		}
 	},
 	{
@@ -122,7 +127,8 @@
 			"qr": "",
 			"image": "events_available_images/online/graphs_F9vmzzQ.jpg",
 			"events_admin": "Иванов Иван Иванович",
-			"documents": ""
+			"documents": "",
+			"category": "Онлайн"
 		}
 	},
 	{
@@ -143,7 +149,8 @@
 			"qr": "",
 			"image": "events_available_images/online/2d1bbvahqzoi6pghqhwyatfac9aicipt.jpg",
 			"events_admin": "Воронцова Василиса Тимуровна",
-			"documents": ""
+			"documents": "",
+			"category": "Онлайн"
 		}
 	}
 ]

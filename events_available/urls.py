@@ -4,14 +4,22 @@ from events_available import views
 app_name = 'events_available'
 
 urlpatterns = [
+	path('search/online', views.online, name='search_online'),
+	path('search/offline', views.offline, name='search_offline'),
+
 	path('online/<int:page>/', views.online, name='online'),
 	path('online/', views.online, name='online'),
+	path('online/<slug:event_slug>/', views.online_card, name='online_card'),
+	
     
 	# path('online/<int:event_id>/', views.online_card, name='online_card'),
-	path('online/<slug:event_slug>/', views.online_card, name='online_card'),
-
+	path('offline/<int:page>/', views.online, name='offline'),
 	path('offline/', views.offline, name='offline'),
+	path('offline/<slug:event_slug>/', views.offline_card, name='offline_card'),
+	
+	
+
 	# path('offline/<int:page>/', views.offline, name='offline'),
 	# path('offline/<int:event_id>/', views.offline_card, name='offline_card'),
-	path('offline/<slug:event_slug>/', views.offline_card, name='offline_card'),
+	
 ]

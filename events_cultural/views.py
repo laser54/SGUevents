@@ -1,12 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
 from events_cultural.models import Attractions, Events_for_visiting
+from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
 
 def attractions(request):
 	page = request.GET.get('page',1)
-	attractions_content= Attractions.objects.all()
+	f_attractions = request.GET.get('f_attractions', None)
+	order_by = request.GET.get('order_by', None)
+	query = request.GET.get('q', None)
 	
-	paginator = Paginator(attractions_content, 2)
+	if not query:
+		events_cultural = Attractions.objects.order_by('time_start')
+	else:
+		events_cultural = q_search_attractions(query)
+
+	if f_attractions:
+		events_cultural = events_cultural.filter(date__month = 1)
+	
+	if order_by and order_by != "default":
+		events_cultural = events_cultural.order_by(order_by)
+
+	
+	paginator = Paginator(events_cultural, 3)
 	current_page = paginator.page(int(page))
 	
 	context: dict[str, str] = {
@@ -31,13 +46,26 @@ def attractions_card(request, event_slug=False, event_id=False):
 
 def events_for_visiting(request):
 	page = request.GET.get('page',1)
-	events_for_visiting_content = Events_for_visiting.objects.all()
+	f_events_for_visiting = request.GET.get('f_events_for_visiting', None)
+	order_by = request.GET.get('order_by', None)
+	query = request.GET.get('q', None)
 
-	paginator = Paginator(events_for_visiting_content, 2)
+	if not query:
+		events_cultural = Events_for_visiting.objects.order_by('time_start')
+	else:
+		events_cultural = q_search_events_for_visiting(query)
+
+	if f_events_for_visiting:
+		events_cultural = events_cultural.filter(date__month = 1)
+	
+	if order_by and order_by != "default":
+		events_cultural = events_cultural.order_by(order_by)
+
+	paginator = Paginator(events_cultural, 3)
 	current_page = paginator.page(int(page))
 
 	context: dict[str, str] = {
-		'name_page': 'Доступно к посещению',
+		'name_page': 'Доступные к посещению',
 		'event_card_views': current_page,
 	}
 	return render(request, 'events_cultural/events_for_visiting.html', context)

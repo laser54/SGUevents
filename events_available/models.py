@@ -17,7 +17,7 @@ class Events_online(models.Model):
     events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Онлайн'
-    category = models.CharField(default=const_category, max_length=15, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
+    category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
 
     class Meta:
         db_table = 'Events_online'
@@ -53,7 +53,8 @@ class Events_offline(models.Model):
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
     events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
-    category = "Оффлайн"
+    const_category = 'Оффлайн'
+    category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     
     class Meta:
         db_table = 'Events_offline'

@@ -80,8 +80,16 @@
 						</li>
 
 					</ul>
-					<form class="d-flex" role="search">
-						<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+					
+					{% comment %} <form class="d-flex" role="search" action="{% url 
+					"{% if event_card_views.category == 'Онлайн' %} 
+						events_available:search_online 
+					{% elif event_card_views.category == 'Оффлайн' %} 
+						events_available:search_offline 
+					{% endif %}" %}" 
+					method="get"> {% endcomment %}
+					<form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% endif %}" method="get">
+						<input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
 						<button class="btn btn-outline-success" type="submit">
 							<img src="{% static "general/icons/search.svg" %}" alt="S">
 						</button>
@@ -98,199 +106,7 @@
 				<div class="col-lg-1"></div>
 		
 				<div class="col-lg-10">
-					<div class="row filter-events-row mt-2">
-						<div class="col-lg-2">
-							<div class="row">
-								<div class="dropdown">
-									<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Дата
-									</button>
-									<form action="{% url "events_available:online" %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-										<div class="form-check text-white mx-3">
-											<input class="form-check-input" type="checkbox" name="f_online" id="flexCheckDefault" value="on" 
-											{% if request.GET.f_online == 'on' %}checked{% endif %}>
-											{% comment %} <input type="hidden" name="q" value="request.GET.q"> {% endcomment %}
-											<label class="form-check-label" for="flexCheckDefault">
-												Онлайн
-											</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default"
-												{% if not request.GET.order_by or request.GET.order_by == 'default' %}checked{% endif %}>
-												<label class="form-check-label" for="flexRadioDefault1">
-														По умолчанию
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="-date" 
-												{% if request.GET.order_by == '-date' %}checked{% endif %}>
-												<label class="form-check-label" for="flexRadioDefault2">
-														Сначала новые
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="date" 
-												{% if request.GET.order_by == 'date' %}checked{% endif %}>
-												<label class="form-check-label" for="flexRadioDefault3">
-														Сначала старые
-												</label>
-										</div>
-										<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
-									</form>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-2">
-							<div class="row">
-								<div class="dropdown">
-									<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Тема
-									</button>
-									<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
-												<label class="form-check-label" for="flexRadioDefault1">
-														По умолчанию
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="">
-												<label class="form-check-label" for="flexRadioDefault2">
-														Сначала новые
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="">
-												<label class="form-check-label" for="flexRadioDefault3">
-														Сначала старые
-												</label>
-										</div>
-										<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
-									</form>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-2">
-							<div class="row">
-								<div class="dropdown">
-									<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Место проведения
-									</button>
-									<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
-												<label class="form-check-label" for="flexRadioDefault1">
-														По умолчанию
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="">
-												<label class="form-check-label" for="flexRadioDefault2">
-														Сначала новые
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="">
-												<label class="form-check-label" for="flexRadioDefault3">
-														Сначала старые
-												</label>
-										</div>
-										<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
-									</form>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-2">
-							<div class="row">
-								<div class="dropdown">
-									<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Спикеры
-									</button>
-									<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
-												<label class="form-check-label" for="flexRadioDefault1">
-														По умолчанию
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="">
-												<label class="form-check-label" for="flexRadioDefault2">
-														Сначала новые
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="">
-												<label class="form-check-label" for="flexRadioDefault3">
-														Сначала старые
-												</label>
-										</div>
-										<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
-									</form>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-2">
-							<div class="row">
-								<div class="dropdown">
-									<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Теги
-									</button>
-									<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
-												<label class="form-check-label" for="flexRadioDefault1">
-														По умолчанию
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="">
-												<label class="form-check-label" for="flexRadioDefault2">
-														Сначала новые
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="">
-												<label class="form-check-label" for="flexRadioDefault3">
-														Сначала старые
-												</label>
-										</div>
-										<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
-									</form>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-2">
-							<div class="row">
-								<div class="dropdown">
-									<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Еще
-									</button>
-									<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
-												<label class="form-check-label" for="flexRadioDefault1">
-														По умолчанию
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="">
-												<label class="form-check-label" for="flexRadioDefault2">
-														Сначала новые
-												</label>
-										</div>
-										<div class="form-check text-white mx-3">
-												<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="">
-												<label class="form-check-label" for="flexRadioDefault3">
-														Сначала старые
-												</label>
-										</div>
-										<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
+					{% block filters %}{% endblock filters %}
 		
 					<div class="row mt-3 mb-3 name-for-events">
 						<div class="col-lg-12">
@@ -326,7 +142,7 @@
 													{% url "events_available:offline_card" events.slug %}
 												{% elif events.category  == 'Достопримечательности' %}
 													{% url "events_cultural:attractions_card" events.slug %}
-												{% elif events.category  == 'Доступно к посещению' %}
+												{% elif events.category  == 'Доступные к посещению' %}
 													{% url "events_cultural:events_for_visiting_card" events.slug %}
 												{% endif %}">{{ events.name }}</a></h5>
 											<h6 class="card-date"> 

@@ -14,7 +14,8 @@ class Attractions(models.Model):
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
     rating = models.DecimalField(default=0.00, max_digits=4, decimal_places=2, blank=False, null=False, verbose_name='Рейтинг 1-10')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
-    category = "Достопримечательности"
+    const_category = 'Достопримечательности'
+    category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
 
     class Meta:
         db_table = 'attractions'
@@ -27,10 +28,10 @@ class Attractions(models.Model):
     def display_id(self):
         return f'{self.id:05}'
     
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.category = "Достопримечательности"
-        super(Attractions, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.pk:
+    #         self.category = "Достопримечательности"
+    #     super(Attractions, self).save(*args, **kwargs)
 
 
 class Events_for_visiting(models.Model):
@@ -49,9 +50,9 @@ class Events_for_visiting(models.Model):
     events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     place_limit = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество мест')
     place_free = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество свободных мест')
-    category = "Доступные к посещению"
-
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
+    const_category = 'Доступные к посещению'
+    category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     
     class Meta:
         db_table = 'Events_for_visiting'
@@ -64,7 +65,7 @@ class Events_for_visiting(models.Model):
     def display_id(self):
         return f'{self.id:05}'
     
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.category = "Доступные к посещению"
-        super(Events_for_visiting, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.pk:
+    #         self.category = "Доступные к посещению"
+    #     super(Events_for_visiting, self).save(*args, **kwargs)
