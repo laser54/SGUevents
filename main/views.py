@@ -31,7 +31,7 @@ def index(request):
 		events_all = events_all.order_by(order_by)
 
 	
-	paginator = Paginator(all_content, 4)
+	paginator = Paginator(all_content, 10)
 	current_page = paginator.page(int(page))
 	context: dict[str, str] = {
 		'name_page': 'Все мероприятия',

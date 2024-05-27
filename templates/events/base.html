@@ -135,7 +135,10 @@
 										{% else %} 
 											<img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
 										{% endif %}
-										<button type="button" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt=""></button>
+										<form action="{% url 'bookmarks:favorites' events.slug %}" method="POST" class="mx-3">
+											{% csrf_token %}
+											<button type="submit" id="favourite" name="events.slug" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt="" value="{{ events.slug }}"></button>
+										</form>
 										<div class="card-img-info">
 											<p> id: {{ events.display_id }} </p>
 											<p> category: {{ events.category }} </p>
@@ -244,6 +247,37 @@
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+
+
+{% block javascript_files %}
+
+<script>
+    $(document).ready(function(event){
+      $(document).on('click', '#favourite', function(event){
+        event.preventDefault();
+        var slug = $(this).attr('value');
+        $.ajax({
+          type: 'POST',
+		  url: "{% url 'bookmarks:favorites'%}",
+
+          data: {
+            'slug':slug, 
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          dataType: 'json',
+          success: function(response){
+            $('#favourite-section').html(response['form'])
+          },
+          error: function(rs, e){
+            console.log(rs.responseText);
+          },
+        });
+      });
+    });
+  </script>
+
+{% endblock javascript_files %} 
 </body>
 
 </html>
