@@ -17,7 +17,7 @@ def notify_user_on_status_change(sender, instance, **kwargs):
 
     if previous_instance and previous_instance.status == 'pending' and instance.status != 'pending':
         if instance.status == 'granted':
-            message = f"Ваш запрос на админские права был одобрен. Причина: {instance.response}"
+            message = f"Ваш запрос на админские права был одобрен. Комментарий: {instance.response}"
         elif instance.status == 'denied':
             message = f"Ваш запрос на админские права был отклонен. Причина: {instance.response}"
 
