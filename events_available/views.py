@@ -34,8 +34,8 @@ def online(request):
 		date_end_formatted = datetime.strptime(date_end, '%Y-%m-%d').date()
 		events_available = events_available.filter(date__lt = date_end_formatted)
 
-	if time_to_start:
-		events_available = events_available.filter(time_start__time__gte = time_to_start)
+	# if time_to_start:
+	# 	events_available = events_available.filter(time_start__time__gte = time_to_start)
 
 	
 	# event = Events_online.objects.get(id=events_id)
@@ -68,29 +68,53 @@ def online_card(request, event_slug=False, event_id=False):
 
 
 def offline(request):
-	page = request.GET.get('page',1)
+	address = request.GET.get('address', None)
+	page = request.GET.get('page', 1)
 	f_offline = request.GET.get('f_offline', None)
 	order_by = request.GET.get('order_by', None)
 	query = request.GET.get('q', None)
-    
+	date_start = request.GET.get('date_start', None)
+	date_end = request.GET.get('date_end', None)
+
+	events_available = Events_offline.objects.all()
+
+    # if address:
+		# 	events_available = Events_offline.objects.filter(town__icontains=address) | Events_offline.objects.filter(street__icontains=address) | Events_offline.objects.filter(cabinet__icontains=address)
+
+			
+        # events_available = Events_offline.objects.filter(address__icontains=address)[:5]  # Получаем первые 5 подходящих адресов
+        # results = [events_available.address for address in events_available]
+        # return JsonResponse(results, safe=False)
+
 	if not query:
-		events_available = Events_offline.objects.order_by('time_start')
+		events_available = events_available.order_by('time_start')
 	else:
 		events_available = q_search_offline(query)
-
+        
+	if address:
+		events_available = events_available.filter(town__icontains=address) | Events_offline.objects.filter(street__icontains=address) | Events_offline.objects.filter(cabinet__icontains=address)
+    
 	if f_offline:
-		events_available = events_available.filter(date__month = 1)
-	
+		events_available = events_available.filter(date__month=1)
+    
 	if order_by and order_by != "default":
 		events_available = events_available.order_by(order_by)
+
+	if date_start:
+		date_start_formatted = datetime.strptime(date_start, '%Y-%m-%d').date()
+		events_available = events_available.filter(date__gt = date_start_formatted)
+
+	if date_end:
+		date_end_formatted = datetime.strptime(date_end, '%Y-%m-%d').date()
+		events_available = events_available.filter(date__lt = date_end_formatted)
 
 	paginator = Paginator(events_available, 3)
 	current_page = paginator.page(int(page))
 
-	context: dict[str, str] = {
-        'name_page': 'Оффлайн',
-		'event_card_views': current_page,
-    }
+	context = {
+		'name_page': 'Оффлайн',
+    	'event_card_views': current_page,
+ 	}
 	return render(request, 'events_available/offline_events.html', context)
 
 

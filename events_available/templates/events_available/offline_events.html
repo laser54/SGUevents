@@ -38,9 +38,9 @@
 				<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false"> 
 					Дата
 				</button>
-				<form action="{% if request.GET.q %}{% url "events_available:search_offline" %}{% else %}{% url "events_available:offline" %}{% endif %}" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
+				<form action="{% if request.GET.q %}{% url "events_available:search_offline" %}{% else %}{% url "events_available:offline" %}{% endif %}" method="get" class="dropdown-menu bg-dark ca" data-bs-theme="dark" style="">
 					<div class="form-check text-white mx-3">
-						<input class="form-check-input" type="checkbox" name="f_offline" id="flexCheckDefault" value="on" 
+						<input class="form-check-input" type="checkbox" name="f_online" id="flexCheckDefault" value="on" 
 						{% if request.GET.f_offline == 'on' %}checked{% endif %}>
 						{% if request.GET.q %}
 							<input type="hidden" name="q" value="{{ request.GET.q }}"> 
@@ -49,6 +49,20 @@
 							Январь
 						</label>
 					</div>
+					
+					<div class="form-check text-white">
+						Дата начала  <br/>							
+						<label class="form-check-label" for="flexCheckDefault">
+							<input type="date" id="date_start" name="date_start" value="date_low">
+						</label>
+					</div>
+					<div class="form-check text-white">	
+						Дата окончания <br/>
+						<label class="form-check-label" for="flexCheckDefault">
+							<input type="date" id="date_end" name="date_end" value="date_last">
+						</label>
+					</div>
+					
 					<div class="form-check text-white mx-3">
 							<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default"
 							{% if not request.GET.order_by or request.GET.order_by == 'default' %}checked{% endif %}>
@@ -70,6 +84,7 @@
 									Сначала старые
 							</label>
 					</div>
+					
 					<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
 				</form>
 			</div>
@@ -113,22 +128,34 @@
 				</button>
 				<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
 					<div class="form-check text-white mx-3">
-							<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
-							<label class="form-check-label" for="flexRadioDefault1">
-									По умолчанию
-							</label>
-					</div>
-					<div class="form-check text-white mx-3">
-							<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="">
-							<label class="form-check-label" for="flexRadioDefault2">
-									Сначала новые
-							</label>
-					</div>
-					<div class="form-check text-white mx-3">
-							<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="">
-							<label class="form-check-label" for="flexRadioDefault3">
-									Сначала старые
-							</label>
+						<input type="text" id="address-input" name="address" placeholder="Введите адрес">
+						<div id="address-list"></div>
+
+						<script>
+								$(document).ready(function() {
+										$('#address-input').on('input', function() {
+												var inputText = $(this).val();
+												if (inputText.length >= 3) { // Минимальная длина ввода для начала поиска
+													$.ajax({
+														url: '/events_available/offline/',
+														method: 'GET',
+														data: { term: inputText },
+														success: function(data) {
+																$('#town').val(data.town);
+																$('#street').val(data.street);
+																$('#cabinet').val(data.cabinet);
+														}
+														},
+														error: function(xhr, status, error) {
+																console.error(error); // Печать ошибки в консоль для отладки
+														}
+												});
+												} else {
+														$('#address-list').empty();
+												}
+										});
+								});
+						</script>
 					</div>
 					<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
 				</form>
