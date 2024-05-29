@@ -8,6 +8,8 @@ from datetime import datetime
 def online(request):
 	page = request.GET.get('page',1)
 	f_online = request.GET.get('f_online', None)
+	f_speakers = request.GET.get('f_speakers', None)
+	f_tags = request.GET.get('f_tags', None)
 	order_by = request.GET.get('order_by', None)
 	date_start = request.GET.get('date_start', None)
 	date_end = request.GET.get('date_end', None)
@@ -22,6 +24,12 @@ def online(request):
 
 	if f_online:
 		events_available = events_available.filter(date__month = 1)
+
+	if f_speakers:
+		events_available = Events_online.objects.filter(speakers=f_speakers)
+	
+	if f_tags:
+		events_available = Events_online.objects.filter(tags=f_tags)
 	
 	if order_by and order_by != "default":
 		events_available = events_available.order_by(order_by)
@@ -71,6 +79,8 @@ def offline(request):
 	address = request.GET.get('address', None)
 	page = request.GET.get('page', 1)
 	f_offline = request.GET.get('f_offline', None)
+	f_speakers = request.GET.get('f_speakers', None)	
+	f_tags = request.GET.get('f_tags', None)
 	order_by = request.GET.get('order_by', None)
 	query = request.GET.get('q', None)
 	date_start = request.GET.get('date_start', None)
@@ -96,6 +106,12 @@ def offline(request):
     
 	if f_offline:
 		events_available = events_available.filter(date__month=1)
+
+	if f_speakers:
+		events_available = Events_offline.objects.filter(speakers=f_speakers)
+
+	if f_tags:
+		events_available = Events_offline.objects.filter(tags=f_tags)
     
 	if order_by and order_by != "default":
 		events_available = events_available.order_by(order_by)

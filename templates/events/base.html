@@ -185,14 +185,9 @@
 											</p>
 
 											<p>
-												{% if events.town %}{{ events.town }}{% endif %}
+												{% if events.town %}{{ events.town }}{% endif %} {% if events.street %}{{ events.street }}{% endif %} {% if events.cabinet %}{{ events.cabinet }}{% endif %}
 											</p>
-											<p>
-												{% if events.street %}{{ events.street }}{% endif %}
-											</p>
-											<p>
-												{% if events.cabinet %}{{ events.cabinet }}{% endif %}
-											</p>
+											
 											{% block content %}{% endblock %}
 
 										</div>
