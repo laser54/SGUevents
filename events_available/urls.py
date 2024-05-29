@@ -4,8 +4,8 @@ from events_available import views
 app_name = 'events_available'
 
 urlpatterns = [
-	path('search/online', views.online, name='search_online'),
-	path('search/offline', views.offline, name='search_offline'),
+	path('search/online/', views.online, name='search_online'),
+	path('search/offline/', views.offline, name='search_offline'),
 
 	path('online/<int:page>/', views.online, name='online'),
 	path('online/', views.online, name='online'),

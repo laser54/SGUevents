@@ -8,9 +8,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
+	<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
+	{% comment %} TIMEPEAKER {% endcomment %}
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 	<link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
 	<link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
+
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 	<title>Document</title>
 </head>
@@ -88,7 +93,7 @@
 						events_available:search_offline 
 					{% endif %}" %}" 
 					method="get"> {% endcomment %}
-					<form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% endif %}" method="get">
+					<form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">
 						<input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
 						<button class="btn btn-outline-success" type="submit">
 							<img src="{% static "general/icons/search.svg" %}" alt="S">
@@ -114,7 +119,13 @@
 						</div>
 					</div>
 
-					
+					{% if request.GET.q %}
+						<h3 class="mt-4">Результаты поиска по запросу {{ request.GET.q }}</h3>
+						{% if not event_card_views %}
+							{% comment %} <link rel="stylesheet" href="{% static "deps/css/my_footer_css.css" %}"> {% endcomment %}
+							<h2 class="mt-4">По запросу ничего не найдено</h2>
+						{% endif %}
+					{% endif %}
 					{% for events in event_card_views %}
 					<div class="row mt-2 event_cards">
 						<div class="col-lg-12">
@@ -126,7 +137,10 @@
 										{% else %} 
 											<img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
 										{% endif %}
-										<button type="button" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt=""></button>
+										<form action="{% url 'bookmarks:favorites' events.slug %}" method="POST" class="mx-3">
+											{% csrf_token %}
+											<button type="submit" id="favourite" name="events.slug" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt="" value="{{ events.slug }}"></button>
+										</form>
 										<div class="card-img-info">
 											<p> id: {{ events.display_id }} </p>
 											<p> category: {{ events.category }} </p>
@@ -144,20 +158,40 @@
 													{% url "events_cultural:attractions_card" events.slug %}
 												{% elif events.category  == 'Доступные к посещению' %}
 													{% url "events_cultural:events_for_visiting_card" events.slug %}
-												{% endif %}">{{ events.name }}</a></h5>
+												{% endif %}">
+												{% autoescape off %}
+													{% if events.headline %}{{ events.headline }}{% else %}{{ events.name }}{% endif %}
+												{% endautoescape %}
+											</a></h5>
 											<h6 class="card-date"> 
 												<split class="card-day"><b>{{ events.date }}</b></split> 
 												<split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
 											<h6 class="event-place"> {{ events.place }} </h6>
 											<h6 class="event-place"> {{ events.speakers }} </h6>
+											{% autoescape off %}
+												{% if events.bodyline %}
+													{{ events.bodyline }}
+												{% else %}
+													<p class="card-text">{{ events.description|truncatechars:625 }}</p>
+												{% endif %}
+											{% endautoescape %}
 											
-											<p class="card-text">{{ events.description|truncatechars:615 }}</p>
 											<p class="card-text">
 												<small class="text-muted">{% if events.tags %} 
 													{{ events.tags }}
 													{% else %}
 													{% endif %}
 												</small>
+											</p>
+
+											<p>
+												{% if events.town %}{{ events.town }}{% endif %}
+											</p>
+											<p>
+												{% if events.street %}{{ events.street }}{% endif %}
+											</p>
+											<p>
+												{% if events.cabinet %}{{ events.cabinet }}{% endif %}
 											</p>
 											{% block content %}{% endblock %}
 
@@ -180,40 +214,84 @@
 	</section>
 
 	<pagination>
-		<nav aria-label="Page navigation example" >
-			<ul class="pagination justify-content-center">
-				<li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
-					<a class="page-link" href="
-					{% if event_card_views.has_previous %}  
-						?{% change_params page=event_card_views.previous_page_number %}
-					{% else %} 
-						#
-					{% endif %}">Назад </a>
-				</li>
+		{% if event_card_views %}
+			<nav aria-label="Page navigation example" >
+				<ul class="pagination justify-content-center">
+					<li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
+						<a class="page-link" href="
+						{% if event_card_views.has_previous %}  
+							?{% change_params page=event_card_views.previous_page_number %}
+						{% else %} 
+							#
+						{% endif %}">Назад </a>
+					</li>
 
-				{% for page in event_card_views.paginator.page_range %}		
-					{% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
-						<li class="page-item {% if event_card_views.number == page %} active {% endif %}">
-							<a class="page-link" href="
-							?{% change_params page=page %}">
-							{{ page }}</a>
-						</li>
-					{% endif %}		
-				{% endfor %}
-				
-				<li class="page-item {% if not event_card_views.has_next %} disabled {% else %}{% endif %}">
-					<a class="page-link" href="
-					{% if event_card_views.has_next %}
-						?{% change_params page=event_card_views.next_page_number %}
-					{% else %} 
-						#
-					{% endif %}">Следующая </a>
-				</li>
-			</ul>
-		</nav>
+					{% for page in event_card_views.paginator.page_range %}		
+						{% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
+							<li class="page-item {% if event_card_views.number == page %} active {% endif %}">
+								<a class="page-link" href="
+								?{% change_params page=page %}">
+								{{ page }}</a>
+							</li>
+						{% endif %}		
+					{% endfor %}
+					
+					<li class="page-item {% if not event_card_views.has_next %} disabled {% else %}{% endif %}">
+						<a class="page-link" href="
+						{% if event_card_views.has_next %}
+							?{% change_params page=event_card_views.next_page_number %}
+						{% else %} 
+							#
+						{% endif %}">Следующая </a>
+					</li>
+				</ul>
+			</nav>
+		{% endif %}
 	</pagination>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+	<script src={% static "js/bootstrap-datepicker.min.js" %}></script>
+	<script src={% static "js/bootstrap-datepicker.ru.min.js" %}></script>
+	<script>
+	</script>
+
+	{% comment %} TIMEPEAKER {% endcomment %}
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	
+
+{% block javascript_files %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function(event){
+      $(document).on('click', '#favourite', function(event){
+        event.preventDefault();
+        var slug = $(this).attr('value');
+        $.ajax({
+          type: 'POST',
+		  url: "{% url 'bookmarks:favorites'%}",
+
+          data: {
+            'slug':slug, 
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          dataType: 'json',
+          success: function(response){
+            $('#favourite-section').html(response['form'])
+          },
+          error: function(rs, e){
+            console.log(rs.responseText);
+          },
+        });
+      });
+    });
+  </script>
+
+{% endblock javascript_files %} 
 
 </body>
 
