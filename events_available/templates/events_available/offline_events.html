@@ -141,26 +141,21 @@
 				<button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 					Спикеры
 				</button>
-				<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-					<div class="form-check text-white mx-3">
-							<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default" checked>
-							<label class="form-check-label" for="flexRadioDefault1">
-									По умолчанию
-							</label>
+				<form>
+					<div class="form-group">
+						<label for="speakerFilter">Select a Speaker:</label>
+						<div class="dropdown">
+							<button class="btn btn-secondary dropdown-toggle" type="button" id="speakerDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Select Speaker
+							</button>
+							<div class="dropdown-menu" aria-labelledby="speakerDropdown">
+								{% for speaker in event_card_views.speakers %}
+									<a class="dropdown-item" href="#">{{ speaker }}</a>
+								{% endfor %}
+							</div>
+						</div>
 					</div>
-					<div class="form-check text-white mx-3">
-							<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="">
-							<label class="form-check-label" for="flexRadioDefault2">
-									Сначала новые
-							</label>
-					</div>
-					<div class="form-check text-white mx-3">
-							<input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="">
-							<label class="form-check-label" for="flexRadioDefault3">
-									Сначала старые
-							</label>
-					</div>
-					<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
+					<button type="submit" class="btn btn-primary">Submit</button>
 				</form>
 			</div>
 		</div>
