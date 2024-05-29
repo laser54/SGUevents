@@ -25,9 +25,6 @@ DEV_BOT_NAME = os.getenv('DEV_BOT_NAME')
 def home(request):
     return render(request, 'users/home.html')
 
-def success(request):
-    login_method = request.session.get('login_method', 'Неизвестный способ входа')
-    return render(request, 'users/success.html', {'login_method': login_method})
 
 def register(request):
     if request.method == "POST":
@@ -69,7 +66,7 @@ def login_view(request):
         if user:
             auth_login(request, user)
             request.session['login_method'] = 'Через логин и пароль'
-            return redirect('users:success')
+            return redirect('users:profile')
         else:
             messages.error(request, "Неверный логин или пароль.")
     context = {
@@ -86,7 +83,7 @@ def telegram_auth(request):
         if user:
             auth_login(request, user)
             request.session['login_method'] = 'Через Telegram'
-            return JsonResponse({'success': True, 'redirect_url': '/success'})
+            return JsonResponse({'success': True, 'redirect_url': '/profile'})
         else:
             return JsonResponse({'success': False, 'error': 'User not registered. Please register.', 'redirect_url': '/register'})
     else:
@@ -131,6 +128,15 @@ def request_admin_rights(request):
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'error': 'Ошибка в формате данных.'})
     return JsonResponse({'success': False, 'error': 'Недопустимый запрос.'})
+
+@login_required
+def profile(request):
+    user = request.user
+    login_method = request.session.get('login_method', 'Неизвестный способ входа')
+    department_name = user.department.department_name if user.department else 'Не указан'
+    return render(request, 'users/profile.html', {'user': user, 'login_method': login_method, 'department_name': department_name})
+
+
 
 def general(request):
     return render(request, 'main/index.html')
