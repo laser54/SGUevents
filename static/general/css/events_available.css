@@ -1,42 +1,42 @@
 /* Карточка */
 .d-flex .form-control {
-    width: 300px;
-}
-
-.event_cards {
-    box-shadow: 1px 1px 4px 1px #3e3c3c;
+	width: 300px;
 }
 
 .event_cards {
 	box-shadow: 1px 1px 4px 1px #3e3c3c;
 }
 
- /* Поле фотографии */	
+.event_cards {
+	box-shadow: 1px 1px 4px 1px #3e3c3c;
+}
+
+/* Поле фотографии */
 .img-fluid {
 	height: 17rem;
 	width: 40rem;
 }
 
- .btn-favorites {
+.btn-favorites {
 	position: absolute;
 	border-radius: 50%;
 	background-color: white;
 	top: 0.4rem;
 	left: 0.5rem;
 }
-	
+
 .btn-favorites>img {
 	width: 1rem;
 }
 
-	/* Информация под фотографией */
+/* Информация под фотографией */
 .card-img-info p {
 	font-weight: bold;
 }
 
 .card-img-info {
-    display: inline-block;
-    text-align: justify;
+	display: inline-block;
+	text-align: justify;
 }
 
 .card-title {
@@ -46,23 +46,26 @@
 
 
 
-    /* Область карточки с описанием */
+/* Область карточки с описанием */
 
-	/* Заголовок */
+/* Заголовок */
 .card-body .card-title {
 	color: #dc3545;
 	font-weight: bold;
 }
-	/* Дата */
+
+/* Дата */
 .col-md-8 .card-date {
 	font-size: 0.85rem;
 }
-	/* Время */
+
+/* Время */
 .col-md-8 .card-date .card-time {
 	padding-left: 0.5rem;
 	font-size: 0.7rem;
 }
-	/* Кнопки */
+
+/* Кнопки */
 .btn-registration {
 	position: absolute;
 	bottom: 20px;

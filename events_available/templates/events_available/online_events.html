@@ -28,8 +28,8 @@
 				</button>
 				<form action="{% if request.GET.q %}{% url "events_available:search_online" %}{% else %}{% url "events_available:online" %}{% endif %}" method="get" class="dropdown-menu bg-dark ca" data-bs-theme="dark" style="">
 					<div class="form-check text-white mx-3">
-						<input class="form-check-input" type="checkbox" name="f_online" id="flexCheckDefault" value="on" 
-						{% if request.GET.f_online == 'on' %}checked{% endif %}>
+						<input class="form-check-input" type="checkbox" name="f_date" id="flexCheckDefault" value="on" 
+						{% if request.GET.f_date == 'on' %}checked{% endif %}>
 						{% if request.GET.q %}
 							<input type="hidden" name="q" value="{{ request.GET.q }}"> 
 						{% endif %}
@@ -133,14 +133,14 @@
 				</button>
 				<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark" style="max-height: 200px; overflow-y: auto;">
 					<div class="form-check text-white mx-3">
-						{% for events in event_card_views %}
-							<input class="form-check-input" type="checkbox" name="f_speakers" id="flexCheckDefault{{ forloop.counter }}" value="{{ events.speakers }}" 
-							{% if request.GET.f_online == events.speakers %}checked{% endif %}>
+						{% for speaker in speakers %}
+							<input class="form-check-input" type="checkbox" name="f_speakers" id="flexCheckDefault{{ forloop.counter }}" value="{{ speaker }}" 
+							{% if request.GET.f_date == "{{ speaker }}" %}checked{% endif %}>
 							{% if request.GET.q %}
 								<input type="hidden" name="q" value="{{ request.GET.q }}"> 
 							{% endif %}
 							<label class="form-check-label" for="flexCheckDefault{{ forloop.counter }}">
-								{{ events.speakers }}
+								{{ speaker }}
 							</label>
 							<br>
 						{% endfor %}
@@ -159,14 +159,14 @@
 				</button>
 				<form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark" style="max-height: 200px; overflow-y: auto;">
 					<div class="form-check text-white mx-3">
-						{% for events in event_card_views %}
-							<input class="form-check-input" type="checkbox" name="f_tags" id="flexCheckDefault{{ forloop.counter }}" value="{{ events.tags }}" 
-							{% if request.GET.f_online == events.tags %}checked{% endif %}>
+						{% for tag in tags %}
+							<input class="form-check-input" type="checkbox" name="f_tags" id="flexCheckDefault{{ forloop.counter }}" value ="{{ tag }}" 
+							{% if request.GET.f_date == tag %}checked{% endif %}>
 							{% if request.GET.q %}
 								<input type="hidden" name="q" value="{{ request.GET.q }}"> 
 							{% endif %}
 							<label class="form-check-label" for="flexCheckDefault{{ forloop.counter }}">
-								{{ events.tags }}
+								{{ tag }}
 							</label>
 							<br>
 						{% endfor %}
@@ -175,6 +175,17 @@
 					<button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
 				</form>
 			</div>
+		</div>
+	</div>
+	<div class="col-lg-2">
+		<div class="row">
+			<form action="{% url "events_available:online" %}">
+				<button class="btn btn-primary"  type="reset" data-bs-toggle="dropdown" aria-expanded="false" >
+					сбросить
+				</button>
+			</form>
+			
+	
 		</div>
 	</div>
 </div>
