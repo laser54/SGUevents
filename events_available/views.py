@@ -52,8 +52,8 @@ def online(request):
 		date_end_formatted = datetime.strptime(date_end, '%Y-%m-%d').date()
 		events_available = events_available.filter(date__lt = date_end_formatted)
 
-	if time_to_start:
-		events_available = events_available.filter(time_start__time__gte = time_to_start)
+	# if time_to_start:
+	# 	events_available = events_available.filter(time_start__time__gte = time_to_start)
 
 	
 	# event = Events_online.objects.get(id=events_id)
@@ -111,7 +111,7 @@ def offline(request):
 		events_available = q_search_name_offline(query_name)
 
 	if not query:
-		events_available = Events_offline.objects.order_by('time_start')
+		events_available = events_available.order_by('time_start')
 	else:
 		events_available = q_search_offline(query)
 
@@ -136,6 +136,14 @@ def offline(request):
 	
 	if order_by and order_by != "default":
 		events_available = events_available.order_by(order_by)
+
+	if date_start:
+		date_start_formatted = datetime.strptime(date_start, '%Y-%m-%d').date()
+		events_available = events_available.filter(date__gt = date_start_formatted)
+
+	if date_end:
+		date_end_formatted = datetime.strptime(date_end, '%Y-%m-%d').date()
+		events_available = events_available.filter(date__lt = date_end_formatted)
 
 	paginator = Paginator(events_available, 3)
 	current_page = paginator.page(int(page))
