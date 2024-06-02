@@ -17,14 +17,27 @@
             padding: 20px;
             margin-top: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .profile-header {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             margin-bottom: 15px;
         }
         .profile-detail {
-            font-size: 1.2rem;
+            font-size: 1rem;
             margin-bottom: 10px;
+        }
+        .profile-detail strong {
+            display: inline-block;
+            width: 150px;
+        }
+        .btn-group {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -32,7 +45,7 @@
 <div class="container mt-5">
     {% if request.user.is_authenticated %}
     <div class="profile-card">
-        <div class="profile-header">
+        <div class="profile-header text-center">
             Профиль пользователя
         </div>
         <div class="profile-detail">
@@ -50,11 +63,15 @@
         <div class="profile-detail">
             <strong>Метод входа:</strong> {{ login_method }}
         </div>
-        <div class="mt-4">
+        <div class="profile-detail">
+            <strong>Статус:</strong> <!-- Пока пустое поле -->
+        </div>
+        <div class="btn-group">
             <button class="btn btn-warning" onclick="requestPasswordChange()">Сменить пароль</button>
+            <button class="btn btn-info" onclick="contactSupport()">Связаться с поддержкой</button>
         </div>
         <div class="mt-4">
-            <h2>Запрос админских прав</h2>
+            <h2 class="h5">Запрос админских прав</h2>
             <input type="text" id="reason" class="form-control" placeholder="Обоснование запроса">
             <button class="btn btn-primary mt-2" onclick="requestAdminRights()">Отправить запрос</button>
         </div>
@@ -103,6 +120,10 @@ function requestAdminRights() {
         console.error('Ошибка:', error);
         alert('Произошла ошибка при отправке запроса на админские права.');
     });
+}
+
+function contactSupport() {
+    alert('Связаться с поддержкой.'); // Пока просто выводим сообщение
 }
 </script>
 </body>
