@@ -103,6 +103,15 @@ class AdminRightRequest(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.status}"
 
+    class SupportRequest(models.Model):
+        user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
+        question = models.TextField(verbose_name="Вопрос")
+        created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+        is_resolved = models.BooleanField(default=False, verbose_name="Решен")
+
+        def __str__(self):
+            return f"Запрос от {self.user.username} - {self.created_at}"
+
     class Meta:
         verbose_name = "Запрос на админские права"
         verbose_name_plural = "Запросы на админские права"

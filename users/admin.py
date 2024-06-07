@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import User, Department, AdminRightRequest
+from .models import User, Department, AdminRightRequest, SupportRequest
 
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('department_id', 'department_name')
@@ -35,7 +35,13 @@ class AdminRightRequestAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__email', 'reason', 'response')
     raw_id_fields = ('user',)  # Это позволяет более удобно работать с ForeignKey полями
 
-admin.site.register(User, UserAdmin)
-admin.site.register(Department)
-admin.site.register(AdminRightRequest, AdminRightRequestAdmin)
+class SupportRequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'question', 'created_at', 'is_resolved')
+    list_filter = ('is_resolved', 'created_at')
+    search_fields = ('user__username', 'user__email', 'question')
+    raw_id_fields = ('user',)  # Это позволяет более удобно работать с ForeignKey полями
 
+admin.site.register(User, UserAdmin)
+admin.site.register(Department, DepartmentAdmin)
+admin.site.register(AdminRightRequest, AdminRightRequestAdmin)
+admin.site.register(SupportRequest, SupportRequestAdmin)
