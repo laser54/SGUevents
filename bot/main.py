@@ -99,8 +99,12 @@ dp.include_router(support_router)
 
 # Функция запуска бота
 async def run_bot():
-    setup_django_environment()
-    await dp.start_polling(bot)
+    try:
+        await dp.start_polling(bot)
+    finally:
+        await bot.close()
+
 
 if __name__ == "__main__":
+    setup_django_environment()
     asyncio.run(run_bot())
