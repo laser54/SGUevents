@@ -36,10 +36,10 @@ class AdminRightRequestAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)  # Это позволяет более удобно работать с ForeignKey полями
 
 class SupportRequestAdmin(admin.ModelAdmin):
-    list_display = ('user', 'question', 'created_at', 'is_resolved')
+    list_display = ('user', 'question', 'answer', 'created_at', 'is_resolved')
     list_filter = ('is_resolved', 'created_at')
-    search_fields = ('user__username', 'user__email', 'question')
-    raw_id_fields = ('user',)  # Это позволяет более удобно работать с ForeignKey полями
+    search_fields = ('user__username', 'user__email', 'question', 'answer')
+    raw_id_fields = ('user',)
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Department, DepartmentAdmin)
