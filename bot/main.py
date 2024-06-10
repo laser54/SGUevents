@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO)
 # Initialize bot
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 storage = MemoryStorage()
-dp = Dispatcher(storage=storage)
+dp = Dispatcher()
 
 class SupportRequestForm(StatesGroup):
     waiting_for_question = State()
