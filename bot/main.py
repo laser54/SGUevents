@@ -18,7 +18,6 @@ from bot.django_initializer import setup_django_environment
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from users.models import SupportRequest
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot
@@ -82,6 +81,7 @@ async def help_request(message: types.Message, state: FSMContext):
 
 @dp.message(SupportRequestForm.waiting_for_question)
 async def receive_question(message: types.Message, state: FSMContext):
+    from users.models import SupportRequest
     user = await get_user_profile(message.from_user.id)
     if user:
         # Сохраняем вопрос в базе данных
