@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-
+from django.contrib import auth
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as auth_login
@@ -9,6 +9,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 
@@ -66,7 +67,7 @@ def login_view(request):
         if user:
             auth_login(request, user)
             request.session['login_method'] = 'Через логин и пароль'
-            return redirect('users:profile')
+            return redirect('main:index')
         else:
             messages.error(request, "Неверный логин или пароль.")
     context = {
@@ -136,7 +137,10 @@ def profile(request):
     department_name = user.department.department_name if user.department else 'Не указан'
     return render(request, 'users/profile.html', {'user': user, 'login_method': login_method, 'department_name': department_name})
 
-
+@login_required
+def logout(request):
+    auth.logout(request)
+    return redirect(reverse('main:index'))
 
 def general(request):
     return render(request, 'main/index.html')
