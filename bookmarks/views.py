@@ -5,7 +5,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from bookmarks.models import Product
 from events_available.models import Events_online
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def events_attended(request):
 	context: dict[str, str] = {
         'name_page': 'Посещенные мероприятия',
@@ -25,6 +27,7 @@ def events_attended(request):
 	
 	return render(request, 'bookmarks/events_attended.html', context)
 
+@login_required
 def favorites(request, event_slug=False):
     product = get_object_or_404(Product, slug=event_slug)
     added_to_favourite = False
@@ -75,5 +78,6 @@ class AddToFavourite(LoginRequiredMixin, ListView):
 
 		# return render(request, 'bookmarks/events_attended.html', context)
 
+@login_required
 def index(request):
 	return render(request, 'bookmarks/index.html')

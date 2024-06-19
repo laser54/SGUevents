@@ -2,7 +2,9 @@ from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
 from events_cultural.models import Attractions, Events_for_visiting
 from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def attractions(request):
 	page = request.GET.get('page',1)
 	f_attractions = request.GET.get('f_attractions', None)
@@ -30,6 +32,7 @@ def attractions(request):
 	}
 	return render(request, 'events_cultural/attractions.html', context)
 
+@login_required
 def attractions_card(request, event_slug=False, event_id=False):
 	event = Attractions.objects.all()
 
@@ -44,6 +47,7 @@ def attractions_card(request, event_slug=False, event_id=False):
 
 	return render(request, 'events_cultural/card.html', context=context)
 
+@login_required
 def events_for_visiting(request):
 	page = request.GET.get('page',1)
 	f_events_for_visiting = request.GET.get('f_events_for_visiting', None)
@@ -70,6 +74,7 @@ def events_for_visiting(request):
 	}
 	return render(request, 'events_cultural/events_for_visiting.html', context)
 
+@login_required
 def for_visiting_card(request, event_slug=False, event_id=False):
 	event = Events_for_visiting.objects.all()
 	
@@ -84,12 +89,14 @@ def for_visiting_card(request, event_slug=False, event_id=False):
 
 	return render(request, 'events_cultural/card.html', context=context)
 
+@login_required
 def events_registered(request):
 	context: dict[str, str] = {
 			'name_page': 'Зарегистрированные мероприятия',
 	}
 	return render(request, 'events_cultural/events_registered.html', context)
 
+@login_required
 def index(request):
 	return render(request, 'events_cultural/index.html')
 
