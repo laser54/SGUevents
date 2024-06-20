@@ -5,6 +5,7 @@ from events_cultural.models import *
 from main.models import AllEvents
 from main.utils import q_search_all
 from itertools import chain
+from django.contrib.auth.decorators import login_required
 
 def index(request):
 	available=  Events_online.objects.order_by('date')

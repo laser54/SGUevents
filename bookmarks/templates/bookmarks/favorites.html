@@ -1,149 +1,90 @@
-{% extends 'events/base.html' %} {% load static %} {% block title %} Главная
-страница {% endblock %} {% block content %}
-<!-- Контент на странице -->
+{% extends 'events/base.html' %}
+{% load static %}
+{% block title %} Избранное {% endblock %}
+{% block content %}
 <div class="container-fluid">
-	<div class="row">
-		<div class="col-lg-1"></div>
-
-		<div class="col-lg-10">
-			<div class="row filter-events-row mt-2">
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Дата</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Тема</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">
-							Место проведения
-						</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Спикеры</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Теги</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row"></div>
-				</div>
-			</div>
-
-			<div class="row mt-3 mb-3 name-for-events">
-				<div class="col-lg-12">
-					<h2> {{ name_page }} </h2>
-				</div>
-			</div>
-
-			<div class="row mt-2 event_cards">
-				<div class="col-lg-12">
-					<div class="card mb-3">
-						<div class="row g-0">
-							<div class="col-md-4">
-								<img src="{% static "general/images/img.png" %}"
-								class="img-fluid rounded-start" alt="...">
-							</div>
-							<div class="col-md-8">
-								<div class="card-body">
-									<h5 class="card-title">{{ 1_favorites_title }}</h5>
-									<h6 class="card-date"> 
-										<split class="card-day"><b>01.03.2024</b></split> 
-										<split class="card-time">14:00 - 18:00</split> </h6> 
-									<p class="card-text">{{ 1_favorites_info }}</p>
-									<p class="card-text">
-										<small class="text-muted">Тег</small>
-									</p>
-									<p class="card-text">
-										<button type="button" class="btn btn-danger btn-registration">Оставить отзыв </button>
-						
-										<button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="row mt-2 event_cards">
-				<div class="col-lg-12">
-					<div class="card mb-3">
-						<div class="row g-0">
-							<div class="col-md-4">
-								<img src="{% static "general/images/img.png" %}"
-								class="img-fluid rounded-start" alt="...">
-							</div>
-							<div class="col-md-8">
-								<div class="card-body">
-									<h5 class="card-title">{{ 2_favorites_title }}</h5>
-									<h6 class="card-date"> 
-										<split class="card-day"><b>01.03.2024</b></split> 
-										<split class="card-time">14:00 - 18:00</split> </h6> 
-									<p class="card-text">{{ 2_favorites_info }}</p>
-									<p class="card-text">
-										<small class="text-muted">Тег</small>
-									</p>
-									<p class="card-text">
-										<button type="button" class="btn btn-danger btn-registration">Оставить отзыв </button>
-						
-										<button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-
-			<div class="row mt-2 event_cards">
-				<div class="col-lg-12">
-					<div class="card mb-3">
-						<div class="row g-0">
-							<div class="col-md-4">
-								<img src="{% static "general/images/img.png" %}"
-								class="img-fluid rounded-start" alt="...">
-							</div>
-							<div class="col-md-8">
-								<div class="card-body">
-									<h5 class="card-title">{{ 3_favorites_title }}</h5>
-									<h6 class="card-date"> 
-										<split class="card-day"><b>01.03.2024</b></split> 
-										<split class="card-time">14:00 - 18:00</split> </h6> 
-									<p class="card-text">{{ 3_favorites_info }}</p>
-									<p class="card-text">
-										<small class="text-muted">Тег</small>
-									</p>
-									<p class="card-text">
-										<button type="button" class="btn btn-danger btn-registration">Оставить отзыв </button>
-						
-										<button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-
-
-
-
-
-		</div>
-
-		<div class="col-lg-1"></div>
-	</div>
+    <div class="row">
+        <div class="col-lg-1"></div>
+        <div class="col-lg-10">
+            <div class="row mt-3 mb-3 name-for-events">
+                <div class="col-lg-12">
+                    <h2>Избранное</h2>
+                </div>
+            </div>
+            {% for favorite in favorites %}
+            <div class="row mt-2 event_cards">
+                <div class="col-lg-12">
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                {% if favorite.event_online %}
+                                    {% if favorite.event_online.image %}
+                                        <img src="{{ favorite.event_online.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.event_online.name }}">
+                                    {% else %}
+                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.event_online.name }}">
+                                    {% endif %}
+                                {% else %}
+                                    {% if favorite.event_offline.image %}
+                                        <img src="{{ favorite.event_offline.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.event_offline.name }}">
+                                    {% else %}
+                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.event_offline.name }}">
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        {% if favorite.event_online %}
+                                            <a href="{% url 'events_available:online_card' favorite.event_online.slug %}">
+                                                {{ favorite.event_online.name }}
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'events_available:offline_card' favorite.event_offline.slug %}">
+                                                {{ favorite.event_offline.name }}
+                                            </a>
+                                        {% endif %}
+                                    </h5>
+                                    <h6 class="card-date">
+                                        <split class="card-day">
+                                            <b>{% if favorite.event_online %}{{ favorite.event_online.date }}{% else %}{{ favorite.event_offline.date }}{% endif %}</b>
+                                        </split>
+                                        <split class="card-time">
+                                            {% if favorite.event_online %}
+                                                {{ favorite.event_online.time_start }} - {{ favorite.event_online.time_end }}
+                                            {% else %}
+                                                {{ favorite.event_offline.time_start }} - {{ favorite.event_offline.time_end }}
+                                            {% endif %}
+                                        </split>
+                                    </h6>
+                                    <p class="card-text">
+                                        {% if favorite.event_online %}
+                                            {{ favorite.event_online.description|truncatechars:625 }}
+                                        {% else %}
+                                            {{ favorite.event_offline.description|truncatechars:625 }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="card-text">
+                                        <small class="text-muted">{% if favorite.event_online %}{{ favorite.event_online.tags }}{% else %}{{ favorite.event_offline.tags }}{% endif %}</small>
+                                    </p>
+                                    <p class="card-text">
+                                        {% if favorite.event_online %}
+                                            {{ favorite.event_online.speakers }}
+                                        {% else %}
+                                            {{ favorite.event_offline.speakers }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="card-text">
+                                        <button type="button" class="btn btn-danger btn-registration">Удалить из избранного</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-lg-1"></div>
+    </div>
 </div>
-{% endblock content %}
+{% endblock %}
