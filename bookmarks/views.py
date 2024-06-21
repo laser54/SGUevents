@@ -29,23 +29,24 @@ def events_attended(request):
 
 @login_required
 def favorites(request, event_slug=False):
-    product = get_object_or_404(Product, slug=event_slug)
-    added_to_favourite = False
-    if product.favourite.filter(id=request.user.id).exists():
-        product.favourite.remove(request.user)
-        added_to_favourite = False
-    else:
-        product.favourite.add(request.user)
-        added_to_favourite = True
+    # product = get_object_or_404(Product, slug=event_slug)
+    # added_to_favourite = False
+    # if product.favourite.filter(id=request.user.id).exists():
+    #     product.favourite.remove(request.user)
+    #     added_to_favourite = False
+    # else:
+    #     product.favourite.add(request.user)
+    #     added_to_favourite = True
 
-    context = {
-        'object': product,
-        'added_to_favourite': added_to_favourite,
+    # context = {
+    #     'object': product,
+    #     'added_to_favourite': added_to_favourite,
         
-    }
-    if request.is_ajax():
-        html = render_to_string('favorites.html', context, request=request) # type: ignore
-        return JsonResponse({'form': html})
+    # }
+    # if request.is_ajax():
+    #     html = render_to_string('favorites.html', context, request=request) # type: ignore
+    #     return JsonResponse({'form': html})
+    return render(request, 'bookmarks/favorites.html')
 
 
 class AddToFavourite(LoginRequiredMixin, ListView):

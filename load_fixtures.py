@@ -7,7 +7,7 @@ fixtures = [
     'fixtures/events_available/events_offline.json',
     'fixtures/events_available/events_online.json',
     'fixtures/events_cultural/attractions.json',
-    'fixtures/events_available/events_for_visiting.json',
+    'fixtures/events_cultural/events_for_visiting.json',
 ]
 
 def load_fixtures():
