@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-from bookmarks.models import Product
+from bookmarks.models import Favorite
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-	prepopulated_fields = {'slug': ('favourite',)}
+admin.site.register(Favorite)

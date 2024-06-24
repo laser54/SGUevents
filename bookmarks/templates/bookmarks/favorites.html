@@ -1,149 +1,133 @@
-{% extends 'events/base.html' %} {% load static %} {% block title %} Главная
-страница {% endblock %} {% block content %}
+{% extends 'events/base.html' %} {% load static %} {% load bookmarks_tags %}{% user_favorites request as event_card_views %}{% block title %} Главная страница {% endblock %} {% block content %}
 <!-- Контент на странице -->
 <div class="container-fluid">
-	<div class="row">
-		<div class="col-lg-1"></div>
+    <div class="row">
+        <div class="col-lg-1"></div>
 
-		<div class="col-lg-10">
-			<div class="row filter-events-row mt-2">
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Дата</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Тема</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">
-							Место проведения
-						</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Спикеры</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row">
-						<button type="button" class="btn btn-outline-dark">Теги</button>
-					</div>
-				</div>
-				<div class="col-lg-2 mx-1">
-					<div class="row"></div>
-				</div>
-			</div>
+        <div class="col-lg-10">
+            <div class="row filter-events-row mt-2">
+                <div class="col-lg-2 mx-1">
+                    <div class="row">
+                        <button type="button" class="btn btn-outline-dark">Дата</button>
+                    </div>
+                </div>
+                <div class="col-lg-2 mx-1">
+                    <div class="row">
+                        <button type="button" class="btn btn-outline-dark">Тема</button>
+                    </div>
+                </div>
+                <div class="col-lg-2 mx-1">
+                    <div class="row">
+                        <button type="button" class="btn btn-outline-dark">Место проведения</button>
+                    </div>
+                </div>
+                <div class="col-lg-2 mx-1">
+                    <div class="row">
+                        <button type="button" class="btn btn-outline-dark">Спикеры</button>
+                    </div>
+                </div>
+                <div class="col-lg-2 mx-1">
+                    <div class="row">
+                        <button type="button" class="btn btn-outline-dark">Теги</button>
+                    </div>
+                </div>
+                <div class="col-lg-2 mx-1">
+                    <div class="row"></div>
+                </div>
+            </div>
 
-			<div class="row mt-3 mb-3 name-for-events">
-				<div class="col-lg-12">
-					<h2> {{ name_page }} </h2>
-				</div>
-			</div>
+            <div class="row mt-3 mb-3 name-for-events">
+                <div class="col-lg-12">
+                    <h2>{{ name_page }}</h2>
+                </div>
+            </div>
 
-			<div class="row mt-2 event_cards">
-				<div class="col-lg-12">
-					<div class="card mb-3">
-						<div class="row g-0">
-							<div class="col-md-4">
-								<img src="{% static "general/images/img.png" %}"
-								class="img-fluid rounded-start" alt="...">
-							</div>
-							<div class="col-md-8">
-								<div class="card-body">
-									<h5 class="card-title">{{ 1_favorites_title }}</h5>
-									<h6 class="card-date"> 
-										<split class="card-day"><b>01.03.2024</b></split> 
-										<split class="card-time">14:00 - 18:00</split> </h6> 
-									<p class="card-text">{{ 1_favorites_info }}</p>
-									<p class="card-text">
-										<small class="text-muted">Тег</small>
-									</p>
-									<p class="card-text">
-										<button type="button" class="btn btn-danger btn-registration">Оставить отзыв </button>
-						
-										<button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+            <div class="row mt-2 event_cards">
+                <div class="col-lg-12">
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4"><img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start" alt="..."></div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ 1_favorites_title }}</h5>
+                                    <h6 class="card-date">
+                                        <split class="card-day"><b>01.03.2024</b></split>
+                                        <split class="card-time">14:00 - 18:00</split>
+                                    </h6>
+                                    <p class="card-text">{{ 1_favorites_info }}</p>
+                                    <p class="card-text">
+                                        <small class="text-muted">Тег</small>
+                                    </p>
+                                    <p class="card-text">
+                                        <button type="button" class="btn btn-danger btn-registration">Оставить отзыв</button>
 
-			<div class="row mt-2 event_cards">
-				<div class="col-lg-12">
-					<div class="card mb-3">
-						<div class="row g-0">
-							<div class="col-md-4">
-								<img src="{% static "general/images/img.png" %}"
-								class="img-fluid rounded-start" alt="...">
-							</div>
-							<div class="col-md-8">
-								<div class="card-body">
-									<h5 class="card-title">{{ 2_favorites_title }}</h5>
-									<h6 class="card-date"> 
-										<split class="card-day"><b>01.03.2024</b></split> 
-										<split class="card-time">14:00 - 18:00</split> </h6> 
-									<p class="card-text">{{ 2_favorites_info }}</p>
-									<p class="card-text">
-										<small class="text-muted">Тег</small>
-									</p>
-									<p class="card-text">
-										<button type="button" class="btn btn-danger btn-registration">Оставить отзыв </button>
-						
-										<button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+                                        <button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="row mt-2 event_cards">
+                <div class="col-lg-12">
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4"><img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start" alt="..."></div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ 2_favorites_title }}</h5>
+                                    <h6 class="card-date">
+                                        <split class="card-day"><b>01.03.2024</b></split>
+                                        <split class="card-time">14:00 - 18:00</split>
+                                    </h6>
+                                    <p class="card-text">{{ 2_favorites_info }}</p>
+                                    <p class="card-text">
+                                        <small class="text-muted">Тег</small>
+                                    </p>
+                                    <p class="card-text">
+                                        <button type="button" class="btn btn-danger btn-registration">Оставить отзыв</button>
 
-			<div class="row mt-2 event_cards">
-				<div class="col-lg-12">
-					<div class="card mb-3">
-						<div class="row g-0">
-							<div class="col-md-4">
-								<img src="{% static "general/images/img.png" %}"
-								class="img-fluid rounded-start" alt="...">
-							</div>
-							<div class="col-md-8">
-								<div class="card-body">
-									<h5 class="card-title">{{ 3_favorites_title }}</h5>
-									<h6 class="card-date"> 
-										<split class="card-day"><b>01.03.2024</b></split> 
-										<split class="card-time">14:00 - 18:00</split> </h6> 
-									<p class="card-text">{{ 3_favorites_info }}</p>
-									<p class="card-text">
-										<small class="text-muted">Тег</small>
-									</p>
-									<p class="card-text">
-										<button type="button" class="btn btn-danger btn-registration">Оставить отзыв </button>
-						
-										<button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+                                        <button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="row mt-2 event_cards">
+                <div class="col-lg-12">
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4"><img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start" alt="..."></div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ 3_favorites_title }}</h5>
+                                    <h6 class="card-date">
+                                        <split class="card-day"><b>01.03.2024</b></split>
+                                        <split class="card-time">14:00 - 18:00</split>
+                                    </h6>
+                                    <p class="card-text">{{ 3_favorites_info }}</p>
+                                    <p class="card-text">
+                                        <small class="text-muted">Тег</small>
+                                    </p>
+                                    <p class="card-text">
+                                        <button type="button" class="btn btn-danger btn-registration">Оставить отзыв</button>
 
+                                        <button type="button" class="btn btn-light btn-canel-registration">Удалить</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-
-
-
-		</div>
-
-		<div class="col-lg-1"></div>
-	</div>
+        <div class="col-lg-1"></div>
+    </div>
 </div>
 {% endblock content %}

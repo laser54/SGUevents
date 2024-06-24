@@ -2,33 +2,37 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.list import ListView
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from bookmarks.models import Product
+from bookmarks.models import Favorite
 from events_available.models import Events_online
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 
 @login_required
-def events_attended(request):
-	context: dict[str, str] = {
-        'name_page': 'Посещенные мероприятия',
-		'1_event_attended_title': 'Первое название посещенного мероприятия',
-		'1_event_attended_info': 'Информация про посещенные мероприятия',
-		'2_event_attended_title': 'Второе название посещенного мероприятия',
-		'2_event_attended_info': 'Информация про посещенные мероприятия',
-		'3_event_attended_title': 'Третье название посещенного мероприятия',
-		'3_event_attended_info': 'Информация про посещенные мероприятия',
-		'4_event_attended_title': 'Четвёртое название посещенного мероприятия',
-		'4_event_attended_info': 'Информация про посещенные мероприятия',
-		'5_event_attended_title': 'Пятое название посещенного мероприятия',
-		'5_event_attended_info': 'Информация про посещенные мероприятия',
-		'6_event_attended_title': 'Шестое название посещенного мероприятия',
-		'6_event_attended_info': 'Информация про посещенные мероприятия'
-    }
-	
-	return render(request, 'bookmarks/events_attended.html', context)
+def events_attended(request, event_slug):
+    events = Events_online.objects.get(slug=event_slug)
+
+    if request.user.is_authenticated:
+        events_f = Favorite.objects.filter(user=request.user, online=events)
+        Favorite.objects.create(user=request.user, online=events)
+        # if events_f.exists():
+        #     events_f = events_f.first()
+        #     if cart:
+        #         cart.quantity += 1
+        #         cart.save()
+        # else:
+            
+	# context: dict[str, str] = {
+       
+    # }
+    return redirect(request.META['HTTP_REFERER'])
 
 @login_required
 def favorites(request, event_slug=False):
+    # events = Favorite.objects.all()
+    # context = { 
+    #     'event_card_views': events,
+    
+    # }
     # product = get_object_or_404(Product, slug=event_slug)
     # added_to_favourite = False
     # if product.favourite.filter(id=request.user.id).exists():
@@ -41,23 +45,27 @@ def favorites(request, event_slug=False):
     # context = {
     #     'object': product,
     #     'added_to_favourite': added_to_favourite,
+    # context = {
+    #     'object': product,
+    #     'added_to_favourite': added_to_favourite,
         
     # }
     # if request.is_ajax():
     #     html = render_to_string('favorites.html', context, request=request) # type: ignore
     #     return JsonResponse({'form': html})
+    
     return render(request, 'bookmarks/favorites.html')
 
 
 class AddToFavourite(LoginRequiredMixin, ListView):
     template_name = "AddToFavourite.html"
-    model = Product
-    queryset = Product.objects.all()
+    model = Favorite
+    queryset = Favorite.objects.all()
     context_object_name = 'product_list'
     
     def get_context_data(self, **kwargs):
         context = super(AddToFavourite, self).get_context_data(**kwargs)
-        product_item = get_object_or_404(Product, slug=self.kwargs['event_slug']) # how to pass slug of each product item here?
+        product_item = get_object_or_404(Favorite, slug=self.kwargs['event_slug']) # how to pass slug of each product item here?
 
         added_to_favourite = False
         if product_item.cart.filter(id=self.request.user.id).exists():
