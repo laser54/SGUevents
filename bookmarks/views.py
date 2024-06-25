@@ -21,13 +21,15 @@ def events_attended(request, event_slug):
         #         cart.save()
         # else:
             
-	# context: dict[str, str] = {
+	# context: dict[str, str] = 
        
     # }
     return redirect(request.META['HTTP_REFERER'])
 
 @login_required
 def favorites(request, event_slug=False):
+    favorites = Favorite.objects.filter(user=request.user)
+    context = {'favorites': favorites}
     # events = Favorite.objects.all()
     # context = { 
     #     'event_card_views': events,
@@ -54,7 +56,7 @@ def favorites(request, event_slug=False):
     #     html = render_to_string('favorites.html', context, request=request) # type: ignore
     #     return JsonResponse({'form': html})
     
-    return render(request, 'bookmarks/favorites.html')
+    return render(request, 'bookmarks/favorites.html', context)
 
 
 class AddToFavourite(LoginRequiredMixin, ListView):
