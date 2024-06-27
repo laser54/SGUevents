@@ -5,7 +5,7 @@ from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
 
 @login_required
-def events_attended(request, event_slug):
+def events_add(request, event_slug):
     try:
         event = Events_online.objects.get(slug=event_slug)
         event_type = 'online'
@@ -42,3 +42,7 @@ def favorites(request):
     favorites = Favorite.objects.filter(user=request.user)
     context = {'favorites': favorites}
     return render(request, 'bookmarks/favorites.html', context)
+
+def events_attended(request):
+    pass
+    return render(request, "bookmarks/events_attended.html")
