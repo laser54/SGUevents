@@ -106,6 +106,13 @@ if DJANGO_ENV == 'development':
                     'PORT': os.getenv('LOCAL_DB_PORT', '5432'),
     }
     }
+elif DJANGO_ENV == 'devo':
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 else:
     DATABASES = {
         'default': {

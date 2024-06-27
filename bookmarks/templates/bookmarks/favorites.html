@@ -1,90 +1,270 @@
 {% extends 'events/base.html' %}
 {% load static %}
-{% block title %} Избранное {% endblock %}
-{% block content %}
+{% load bookmarks_tags %}
+{% user_favorites request as event_card_views %}
+{% block favorite %}
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-1"></div>
-        <div class="col-lg-10">
-            <div class="row mt-3 mb-3 name-for-events">
-                <div class="col-lg-12">
-                    <h2>Избранное</h2>
-                </div>
-            </div>
-            {% for favorite in favorites %}
-            <div class="row mt-2 event_cards">
-                <div class="col-lg-12">
-                    <div class="card mb-3">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                {% if favorite.event_online %}
-                                    {% if favorite.event_online.image %}
-                                        <img src="{{ favorite.event_online.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.event_online.name }}">
+    <h2>Избранные мероприятия</h2>
+    <ul>
+        {% for favorite in favorites %}
+            {% if favorite.online %}
+                <div class="row mt-2 event_cards">
+                    <div class="col-lg-12">
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if favorite.online.image %}
+                                    <img src="{{ favorite.online.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.online.name }}">
                                     {% else %}
-                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.event_online.name }}">
+                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.online.name }}">
                                     {% endif %}
-                                {% else %}
-                                    {% if favorite.event_offline.image %}
-                                        <img src="{{ favorite.event_offline.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.event_offline.name }}">
-                                    {% else %}
-                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.event_offline.name }}">
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        {% if favorite.event_online %}
-                                            <a href="{% url 'events_available:online_card' favorite.event_online.slug %}">
-                                                {{ favorite.event_online.name }}
+                                    <div class="card-img-info">
+                                        <p>id: {{ favorite.online.display_id }}</p>
+                                        <p>category: {{ favorite.online.category }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{% url 'events_available:online_card' favorite.online.slug %}">
+                                                {% autoescape off %}
+                                                {% if favorite.online.headline %}{{ favorite.online.headline }}{% else %}{{ favorite.online.name }}{% endif %}
+                                                {% endautoescape %}
                                             </a>
+                                        </h5>
+                                        <h6 class="card-date">
+                                            <split class="card-day"><b>{{ favorite.online.date }}</b></split>
+                                            <split class="card-time">{{ favorite.online.time_start }} - {{ favorite.online.time_end }}</split>
+                                        </h6>
+                                        <h6 class="event-place">{{ favorite.online.place }}</h6>
+                                        <h6 class="event-place">{{ evfavorite.onlineents.speakers }}</h6>
+                                        {% autoescape off %}
+                                        {% if favorite.online.bodyline %}
+                                        {{ favorite.online.bodyline }}
                                         {% else %}
-                                            <a href="{% url 'events_available:offline_card' favorite.event_offline.slug %}">
-                                                {{ favorite.event_offline.name }}
-                                            </a>
+                                        <p class="card-text">{{ favorite.online.description|truncatechars:625 }}</p>
                                         {% endif %}
-                                    </h5>
-                                    <h6 class="card-date">
-                                        <split class="card-day">
-                                            <b>{% if favorite.event_online %}{{ favorite.event_online.date }}{% else %}{{ favorite.event_offline.date }}{% endif %}</b>
-                                        </split>
-                                        <split class="card-time">
-                                            {% if favorite.event_online %}
-                                                {{ favorite.event_online.time_start }} - {{ favorite.event_online.time_end }}
-                                            {% else %}
-                                                {{ favorite.event_offline.time_start }} - {{ favorite.event_offline.time_end }}
-                                            {% endif %}
-                                        </split>
-                                    </h6>
-                                    <p class="card-text">
-                                        {% if favorite.event_online %}
-                                            {{ favorite.event_online.description|truncatechars:625 }}
-                                        {% else %}
-                                            {{ favorite.event_offline.description|truncatechars:625 }}
-                                        {% endif %}
-                                    </p>
-                                    <p class="card-text">
-                                        <small class="text-muted">{% if favorite.event_online %}{{ favorite.event_online.tags }}{% else %}{{ favorite.event_offline.tags }}{% endif %}</small>
-                                    </p>
-                                    <p class="card-text">
-                                        {% if favorite.event_online %}
-                                            {{ favorite.event_online.speakers }}
-                                        {% else %}
-                                            {{ favorite.event_offline.speakers }}
-                                        {% endif %}
-                                    </p>
-                                    <p class="card-text">
-                                        <button type="button" class="btn btn-danger btn-registration">Удалить из избранного</button>
-                                    </p>
+                                        {% endautoescape %}
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                {% if favorite.online.tags %}
+                                                {{ favorite.online.tags }}
+                                                {% else %}
+                                                {% endif %}
+                                            </small>
+                                        </p>
+                                        <p>
+                                            {% if favorite.online.town %}{{ favorite.online.town }}{% endif %} {% if favorite.online.street %}{{ evefavorite.onlinents.street }}{% endif %} {% if favorite.online.cabinet %}{{ favorite.online.cabinet }}{% endif %}
+                                        </p>
+                                        <p>{{ speakers }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-        </div>
-        <div class="col-lg-1"></div>
-    </div>
+            {% endif %}
+            {% if favorite.offline %}
+                <div class="row mt-2 event_cards">
+                    <div class="col-lg-12">
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if favorite.offline.image %}
+                                    <img src="{{ favorite.offline.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.offline.name }}">
+                                    {% else %}
+                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.offline.name }}">
+                                    {% endif %}
+                                    <div class="card-img-info">
+                                        <p>id: {{ favorite.offline.display_id }}</p>
+                                        <p>category: {{ favorite.offline.category }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{% url 'events_available:offline_card' favorite.offline.slug %}">
+                                                {% autoescape off %}
+                                                {% if favorite.offline.headline %}{{ favorite.offline.headline }}{% else %}{{ favorite.offline.name }}{% endif %}
+                                                {% endautoescape %}
+                                            </a>
+                                        </h5>
+                                        <h6 class="card-date">
+                                            <split class="card-day"><b>{{ favorite.offline.date }}</b></split>
+                                            <split class="card-time">{{ favorite.offline.time_start }} - {{ favorite.offline.time_end }}</split>
+                                        </h6>
+                                        <h6 class="event-place">{{ favorite.offline.place }}</h6>
+                                        <h6 class="event-place">{{ evfavorite.offline.speakers }}</h6>
+                                        {% autoescape off %}
+                                        {% if favorite.offline.bodyline %}
+                                        {{ favorite.offline.bodyline }}
+                                        {% else %}
+                                        <p class="card-text">{{ favorite.offline.description|truncatechars:625 }}</p>
+                                        {% endif %}
+                                        {% endautoescape %}
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                {% if favorite.offline.tags %}
+                                                {{ favorite.offline.tags }}
+                                                {% else %}
+                                                {% endif %}
+                                            </small>
+                                        </p>
+                                        <p>
+                                            {% if favorite.offline.town %}{{ favorite.offline.town }}{% endif %} {% if favorite.offline.street %}{{ evefavorite.offline.street }}{% endif %} {% if favorite.offline.cabinet %}{{ favorite.offline.cabinet }}{% endif %}
+                                        </p>
+                                        <p>{{ speakers }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if favorite.attractions %}
+                <div class="row mt-2 event_cards">
+                    <div class="col-lg-12">
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if favorite.attractions.image %}
+                                    <img src="{{ favorite.attractions.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.attractions.name }}">
+                                    {% else %}
+                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.attractions.name }}">
+                                    {% endif %}
+                                    <div class="card-img-info">
+                                        <p>id: {{ favorite.attractions.display_id }}</p>
+                                        <p>category: {{ favorite.onliattractionsne.category }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{% url 'events_cultural:attractions_card' favorite.attractions.slug %}">
+                                                {% autoescape off %}
+                                                {% if favorite.attractions.headline %}{{ favorite.attractions.headline }}{% else %}{{ favorite.attractions.name }}{% endif %}
+                                                {% endautoescape %}
+                                            </a>
+                                        </h5>
+                                        <h6 class="card-date">
+                                            <split class="card-day"><b>{{ favorite.attractions.date }}</b></split>
+                                            <split class="card-time">{{ favorite.attractions.time_start }} - {{ favorite.attractions.time_end }}</split>
+                                        </h6>
+                                        <h6 class="event-place">{{ favorite.attractions.place }}</h6>
+                                        <h6 class="event-place">{{ evfavorite.attractions.speakers }}</h6>
+                                        {% autoescape off %}
+                                        {% if favorite.attractions.bodyline %}
+                                        {{ favorite.attractions.bodyline }}
+                                        {% else %}
+                                        <p class="card-text">{{ favorite.attractions.description|truncatechars:625 }}</p>
+                                        {% endif %}
+                                        {% endautoescape %}
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                {% if favorite.attractions.tags %}
+                                                {{ favorite.attractions.tags }}
+                                                {% else %}
+                                                {% endif %}
+                                            </small>
+                                        </p>
+                                        <p>
+                                            {% if favorite.attractions.town %}{{ favorite.attractions.town }}{% endif %} {% if favorite.attractions.street %}{{ evefavorite.attractions.street }}{% endif %} {% if favorite.attractions.cabinet %}{{ favorite.attractions.cabinet }}{% endif %}
+                                        </p>
+                                        <p>{{ speakers }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if favorite.for_visiting %}
+                <div class="row mt-2 event_cards">
+                    <div class="col-lg-12">
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if favorite.for_visiting.image %}
+                                    <img src="{{ favorite.for_visiting.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.for_visiting.name }}">
+                                    {% else %}
+                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.for_visiting.name }}">
+                                    {% endif %}
+                                    <div class="card-img-info">
+                                        <p>id: {{ favorite.for_visiting.display_id }}</p>
+                                        <p>category: {{ favorite.for_visiting.category }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{% url 'events_cultural:events_for_visiting_card' favorite.for_visiting.slug %}">
+                                                {% autoescape off %}
+                                                {% if favorite.for_visiting.headline %}{{ favorite.for_visiting.headline }}{% else %}{{ favorite.for_visiting.name }}{% endif %}
+                                                {% endautoescape %}
+                                            </a>
+                                        </h5>
+                                        <h6 class="card-date">
+                                            <split class="card-day"><b>{{ favorite.for_visiting.date }}</b></split>
+                                            <split class="card-time">{{ favorite.for_visiting.time_start }} - {{ favorite.for_visiting.time_end }}</split>
+                                        </h6>
+                                        <h6 class="event-place">{{ favorite.for_visiting.place }}</h6>
+                                        <h6 class="event-place">{{ evfavorite.for_visiting.speakers }}</h6>
+                                        {% autoescape off %}
+                                        {% if favorite.for_visiting.bodyline %}
+                                        {{ favorite.for_visiting.bodyline }}
+                                        {% else %}
+                                        <p class="card-text">{{ favorite.for_visiting.description|truncatechars:625 }}</p>
+                                        {% endif %}
+                                        {% endautoescape %}
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                {% if favorite.for_visiting.tags %}
+                                                {{ favorite.for_visiting.tags }}
+                                                {% else %}
+                                                {% endif %}
+                                            </small>
+                                        </p>
+                                        <p>
+                                            {% if favorite.for_visiting.town %}{{ favorite.for_visiting.town }}{% endif %} {% if favorite.for_visiting.street %}{{ evefavorite.for_visiting.street }}{% endif %} {% if favorite.for_visiting.cabinet %}{{ favorite.for_visiting.cabinet }}{% endif %}
+                                        </p>
+                                        <p>{{ speakers }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </ul>
 </div>
-{% endblock %}
+{% endblock favorite %}
+
+{% comment %} <li>
+			{% if favorite.online %}
+			
+			<a href="{% url "events_available:online_card" favorite.online.slug %}"><h3>{{ favorite.online.name }}</h3></a>
+			<p>{{ favorite.online.description }}</p>
+			<p>Дата: {{ favorite.online.date }}</p>
+			<p>Время: {{ favorite.online.time_start }} - {{ favorite.online.time_end }}</p>
+			<p>Спикеры: {{ favorite.online.speakers }}</p>
+			<p>Участники: {{ favorite.online.member }}</p>
+			<p>Теги: {{ favorite.online.tags }}</p>
+			<p>Платформа: {{ favorite.online.platform }}</p>
+			<p>Ссылка: <a href="{{ favorite.online.link }}">{{ favorite.online.link }}</a></p>
+			{% if favorite.online.qr %}
+			<img src="{{ favorite.online.qr.url }}" alt="QR код" />
+			{% endif %} {% if favorite.online.image %}
+			<img src="{{ favorite.online.image.url }}" alt="{{ favorite.online.name }}" />
+			{% endif %}
+			<p>Администратор: {{ favorite.online.events_admin }}</p>
+			{% if favorite.online.documents %}
+			<p><a href="{{ favorite.online.documents.url }}">Документы</a></p>
+			{% endif %} {% endif %}
+		</li> {% endcomment %}
+
+
+        {% comment %} <form action="{% url 'bookmarks:favorites' events.slug %}" method="POST" class="mx-3">
+											{% csrf_token %}
+											<button type="submit" id="favourite" name="events.slug" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt="" value="{{ events.slug }}"></button>
+										</form> {% endcomment %}
