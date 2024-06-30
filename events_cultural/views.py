@@ -91,6 +91,7 @@ def for_visiting_card(request, event_slug=False, event_id=False):
 
 @login_required
 def events_registered(request):
+  
 	context: dict[str, str] = {
 			'name_page': 'Зарегистрированные мероприятия',
 	}
