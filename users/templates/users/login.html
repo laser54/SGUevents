@@ -105,7 +105,7 @@ function getCookie(name) {
 
 function onTelegramAuth(user) {
     console.log(user);
-    fetch('/telegram-auth/', {
+    fetch('/users/telegram-auth/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
