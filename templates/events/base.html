@@ -48,7 +48,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
-                                <li><a class="dropdown-item" href={% url "events_cultural:events_registered" %}>Зарегистрированные</a></li>
+                                
                                 <li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
                             </ul>
                         </li>
@@ -62,6 +62,15 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный кабинет</a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href={% url "bookmarks:registered" %}>Зарегистрированные</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
+                                </li>
                                 {% if user.is_admin or user.is_superuser %}
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
@@ -73,6 +82,7 @@
                                 </li>
                             </ul>
                         </li>
+                        
                         {% endif %}
                     </ul>
                     <form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">

@@ -89,13 +89,13 @@ def for_visiting_card(request, event_slug=False, event_id=False):
 
 	return render(request, 'events_cultural/card.html', context=context)
 
-@login_required
-def events_registered(request):
+# @login_required
+# def events_registered(request):
   
-	context: dict[str, str] = {
-			'name_page': 'Зарегистрированные мероприятия',
-	}
-	return render(request, 'events_cultural/events_registered.html', context)
+# 	context: dict[str, str] = {
+# 			'name_page': 'Зарегистрированные мероприятия',
+# 	}
+# 	return render(request, 'events_cultural/events_registered.html', context)
 
 @login_required
 def index(request):

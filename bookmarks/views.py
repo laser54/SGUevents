@@ -84,4 +84,4 @@ def events_registered(request, event_slug):
 def registered(request):
     registered = Registered.objects.filter(user=request.user)
     context = {'favorites': registered}
-    return render(request, 'events_cultural/events_registered.html', context)
+    return render(request, 'bookmarks/registered.html', context)
