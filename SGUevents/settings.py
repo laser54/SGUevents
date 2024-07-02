@@ -98,32 +98,30 @@ ACTIVE_TELEGRAM_BOT_TOKEN = TELEGRAM_DEV_BOT_TOKEN if DJANGO_ENV == 'development
 if DJANGO_ENV == 'development':
     DATABASES = {
         'default': {
-                    'ENGINE': 'django.db.backends.postgresql',
-                    'NAME': os.getenv('LOCAL_DB_NAME'),
-                    'USER': os.getenv('LOCAL_DB_USER'),
-                    'PASSWORD': os.getenv('LOCAL_DB_PASSWORD'),
-                    'HOST': os.getenv('LOCAL_DB_HOST', 'localhost'),
-                    'PORT': os.getenv('LOCAL_DB_PORT', '5432'),
-    }
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('LOCAL_DB_NAME'),
+            'USER': os.getenv('LOCAL_DB_USER'),
+            'PASSWORD': os.getenv('LOCAL_DB_PASSWORD'),
+            'HOST': os.getenv('LOCAL_DB_HOST', 'localhost'),
+            'PORT': os.getenv('LOCAL_DB_PORT', '5432'),
+        }
     }
 elif DJANGO_ENV == 'devo':
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 else:
     DATABASES = {
         'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'NAME': BASE_DIR / 'db.sqlite3',
-                    'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
-                    'NAME': os.getenv('DB_NAME'),
-                    'USER': os.getenv('POSTGRES_USER'),
-                    'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-                    'HOST': os.getenv('DB_HOST', default='db'),
-                    'PORT': os.getenv('DB_PORT'),
+            'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+            'HOST': os.getenv('DB_HOST', default='db'),
+            'PORT': os.getenv('DB_PORT'),
         }
     }
 
@@ -163,6 +161,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_URL = 'users:login'
+
+
 AUTH_USER_MODEL = 'users.User'
 
 # Static files (CSS, JavaScript, Images)
@@ -177,7 +178,7 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = 'media/'
 
-LOGIN_URL = '/login/'
+
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -191,5 +192,4 @@ INTERNAL_IPS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
