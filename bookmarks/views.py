@@ -38,6 +38,14 @@ def events_add(request, event_slug):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required
+def events_remove(request, event_id):
+
+    event = Favorite.objects.get(id=event_id)
+    event.delete()
+    
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
 def favorites(request):
     favorites = Favorite.objects.filter(user=request.user)
     context = {'favorites': favorites}
