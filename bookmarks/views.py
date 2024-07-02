@@ -42,7 +42,7 @@ def events_remove(request, event_id):
 
     event = Favorite.objects.get(id=event_id)
     event.delete()
-    
+
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required
@@ -87,6 +87,14 @@ def events_registered(request, event_slug):
             Registered.objects.get_or_create(user=request.user, for_visiting=event)
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def registered_remove(request, event_id):
+    event = Registered.objects.get(id=event_id)
+    event.delete()
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
 
 @login_required
 def registered(request):

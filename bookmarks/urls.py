@@ -17,6 +17,8 @@ urlpatterns = [
  
     path('events_registered/', views.events_registered, name='events_registered'),
     path('events_registered/<slug:event_slug>/', views.events_registered, name='events_registered'),
+    path('registered_remove/<int:event_id>/', views.registered_remove, name='registered_remove'),
+	
     path('registered/', views.registered, name='registered'),
     path('registered/<slug:event_slug>/', views.registered, name='registered'),
     
