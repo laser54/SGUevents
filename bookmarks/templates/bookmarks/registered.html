@@ -21,6 +21,7 @@
                                     <a href="{% url 'bookmarks:registered_remove' favorite.id %}" class="btn add-to-cart">
                                         <img class="mx-1" src="{% static "general/icons/heart.svg" %}" alt="Catalog Icon" width="32" height="32">
                                     </a>
+                                    
                                     <div class="card-img-info">
                                         <p>id: {{ favorite.online.display_id }}</p>
                                         <p>category: {{ favorite.online.category }}</p>
@@ -250,6 +251,69 @@
         {% endfor %}
     </ul>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.remove-from-registered').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventId = this.getAttribute('data-event-id');
+                const buttonElement = this;
+    
+                fetch(`/bookmarks/registered_remove/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'id': eventId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.removed) {
+                        buttonElement.closest('.event_cards').remove();
+                    } else {
+                        console.error('Ошибка:', data.error);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    
+        document.querySelectorAll('.register-event').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventSlug = this.getAttribute('data-event-slug');
+                const buttonElement = this;
+    
+                fetch(`/bookmarks/events_registered/${eventSlug}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'slug': eventSlug })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.registered) {
+                        buttonElement.textContent = "Зарегистрировано";
+                        buttonElement.classList.remove('btn-danger');
+                        buttonElement.classList.add('btn-success');
+                    } else if (data.unregistered) {
+                        buttonElement.textContent = "Регистрация";
+                        buttonElement.classList.remove('btn-success');
+                        buttonElement.classList.add('btn-danger');
+                    } else {
+                        console.error('Ошибка:', data.error);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    });
+    </script>
+
 {% endblock favorite %}
 
 {% comment %} <li>

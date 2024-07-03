@@ -142,8 +142,11 @@
 {% endblock filters %}
 {% block content %}
 <!-- Контент на странице -->
-<a href="{% url 'bookmarks:events_registered' events.slug %}" class="btn btn-danger btn-sent_app">
-    Регистрация
+<a href="{% url 'bookmarks:events_registered' events.slug %}" class="btn btn-danger btn-sent_app" data-event-slug="{{ events.slug }}">
+    Регистрация1
 </a>
+{% comment %} <a href="{% url 'bookmarks:events_registered' events.slug %}" class="btn btn-danger btn-sent_app">
+    Регистрация
+</a> {% endcomment %}
 <button type="button" class="btn btn-light btn-canel-app">Отмена регистрации</button>
 {% endblock content %}

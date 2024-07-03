@@ -129,9 +129,9 @@
 										{% else %} 
 											<img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
 										{% endif %}
-										<a href="{% url 'bookmarks:events_add' events.slug %}" class="btn add-to-cart">
-											<img class="mx-1" src="{% static "general/icons/heart.svg" %}" alt="Catalog Icon" width="32" height="32">
-										</a>
+										<a href="{% url 'bookmarks:events_add' events.slug %}" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
  									
 										{% comment %} <form action="{% url 'bookmarks:favorites' events.slug %}" method="POST" class="mx-3">
 											{% csrf_token %}
@@ -274,7 +274,62 @@
 			});
 		});
 	</script>
-	
+    {% comment %} ДОБАВЛЕНИЕ {% endcomment %}
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.add-to-cart').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const eventSlug = this.getAttribute('data-event-slug');
+                    const icon = this.querySelector('.heart-icon');
+        
+                    fetch(`{% url 'bookmarks:events_add' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ 'slug': eventSlug })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.added) {
+                            icon.src = "{% static 'general/icons/heart_red.svg' %}";
+                        } else {
+                            icon.src = "{% static 'general/icons/heart.svg' %}";
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
+    {% comment %} REGISTER {% endcomment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-sent_app').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const eventSlug = this.getAttribute('data-event-slug');
+                    
+        
+                    fetch(`{% url 'bookmarks:events_registered' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ 'slug': eventSlug })
+                    })
+                    .then(response => response.json())
+                    
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
+
+        
 	
     {% endblock javascript_files %}
 </body>
