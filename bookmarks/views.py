@@ -152,6 +152,7 @@ def registered_remove(request, event_id):
     return JsonResponse({'removed': False, 'error': 'Invalid request method'}, status=400)
 
 
+
 @login_required
 def registered(request):
     registered = Registered.objects.filter(user=request.user)

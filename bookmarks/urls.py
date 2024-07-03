@@ -21,6 +21,5 @@ urlpatterns = [
     path('registered/', views.registered, name='registered'),
     path('registered/<slug:event_slug>/', views.registered, name='registered'),
     
- 
 
 ]
