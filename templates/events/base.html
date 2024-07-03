@@ -252,29 +252,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     {% block javascript_files %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-		$(document).ready(function(event){
-			$(document).on('click', '#favourite', function(event){
-				event.preventDefault();
-				var slug = $(this).attr('value');
-				$.ajax({
-					type: 'POST',
-					url: "/bookmarks/favorites/" + slug + "/",
-					data: {
-						'csrfmiddlewaretoken': '{{ csrf_token }}'
-					},
-					dataType: 'json',
-					success: function(response){
-						$('#favourite-section').html(response['form'])
-					},
-					error: function(rs, e){
-						console.log(rs.responseText);
-					},
-				});
-			});
-		});
-	</script>
-    {% comment %} ДОБАВЛЕНИЕ {% endcomment %}
+
+
+{% comment %} ДОБАВЛЕНИЕ В ИЗБРАННЫЕ{% endcomment %}
 	<script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.add-to-cart').forEach(function(button) {
@@ -304,7 +284,37 @@
             });
         });
     </script>
-    {% comment %} REGISTER {% endcomment %}
+{% comment %} УДАЛЕНИЕ ИЗ ИЗБРАННЫХ{% endcomment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.remove-from-favorites').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const eventId = this.getAttribute('data-event-id');
+                    const buttonElement = this;
+        
+                    fetch(`/bookmarks/events_remove/${eventId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ 'id': eventId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.removed) {
+                            buttonElement.closest('.event_cards').remove(); // Удалить карточку события
+                        } else {
+                            console.error('Ошибка:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Ошибка:', error));
+                });
+            });
+        });
+    </script>
+{% comment %} REGISTER {% endcomment %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.btn-sent_app').forEach(function(button) {
@@ -328,7 +338,36 @@
             });
         });
     </script>
+{% comment %} УДАЛЕНИЕ {% endcomment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-remove_app').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const eventId = this.getAttribute('data-event-id');
+                    const buttonElement = this;
 
+                    fetch(`/bookmarks/registered_remove/${eventId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ 'id': eventId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.removed) {
+                            buttonElement.closest('.event_cards').remove(); // Удалить карточку события
+                        } else {
+                            console.error('Ошибка:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Ошибка:', error));
+                });
+            });
+        });
+    </script>
         
 	
     {% endblock javascript_files %}
