@@ -1,4 +1,5 @@
 from django.shortcuts import get_list_or_404, get_object_or_404, render
+from bookmarks.models import Favorite
 from events_available.models import Events_offline, Events_online
 from django.core.paginator import Paginator
 from events_available.utils import q_search_offline, q_search_online, q_search_name_offline
@@ -55,18 +56,24 @@ def online(request):
 
 	# if time_to_start:
 	# 	events_available = events_available.filter(time_start__time__gte = time_to_start)
+    
 
 	
 	# event = Events_online.objects.get(id=events_id)
 
+
 	paginator = Paginator(events_available, 3)
 	current_page = paginator.page(int(page))
+
+	favorites = Favorite.objects.filter(user=request.user, online__in=current_page).values_list('online_id', flat=True)
+
 
 	context: dict[str, str] = {
 			'name_page': 'Онлайн',
             'event_card_views': current_page,
 			'speakers': speakers,
 			'tags': tags,
+			'favorites': list(favorites),
 						
 			# 'slug_url': event_slug
 	}

@@ -253,37 +253,91 @@
     {% block javascript_files %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-
+<!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ-->
+<div id="favoriteNotification" class="notification" style="display: none;">
+    <p></p>
+</div>
 {% comment %} ДОБАВЛЕНИЕ В ИЗБРАННЫЕ{% endcomment %}
-	<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.add-to-cart').forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const eventSlug = this.getAttribute('data-event-slug');
-                    const icon = this.querySelector('.heart-icon');
-        
-                    fetch(`{% url 'bookmarks:events_add' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({ 'slug': eventSlug })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.added) {
-                            icon.src = "{% static 'general/icons/heart_red.svg' %}";
-                        } else {
-                            icon.src = "{% static 'general/icons/heart.svg' %}";
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                });
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.add-to-cart').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventSlug = this.getAttribute('data-event-slug');
+                const icon = this.querySelector('.heart-icon');
+
+                fetch(`{% url 'bookmarks:events_add' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'slug': eventSlug })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.added) {
+                        icon.src = "{% static 'general/icons/heart_red.svg' %}";
+                        showNotification("Добавлено в избранное");
+                    } else {
+                        icon.src = "{% static 'general/icons/heart.svg' %}";
+                        showNotification("Удалено из избранного");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             });
         });
-    </script>
+    });
+
+    function showNotification(message) {
+        const notification = document.getElementById('favoriteNotification');
+        notification.querySelector('p').textContent = message;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.classList.add('fade-in');
+        }, 10); // Slight delay to trigger transition
+
+        setTimeout(function() {
+            notification.classList.remove('fade-in');
+            notification.classList.add('fade-out');
+
+            setTimeout(function() {
+                notification.style.display = 'none';
+                notification.classList.remove('fade-out');
+            }, 1000);
+        }, 2000);
+    }
+</script>
+
+<style>
+    .notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        width: auto;
+        max-width: 300px;
+        padding: 15px;
+        background-color: #4caf50;
+        color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        z-index: 1000;
+    }
+    .notification p {
+        margin: 0;
+    }
+    .notification.fade-in {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    .notification.fade-out {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+</style>
 {% comment %} УДАЛЕНИЕ ИЗ ИЗБРАННЫХ{% endcomment %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
