@@ -145,10 +145,11 @@ def events_registered(request, event_slug):
 
 @login_required
 def registered_remove(request, event_id):
-    event = Registered.objects.get(id=event_id)
-    event.delete()
-
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    if request.method == 'POST':
+        event = get_object_or_404(Registered, id=event_id, user=request.user)
+        event.delete()
+        return JsonResponse({'removed': True})
+    return JsonResponse({'removed': False, 'error': 'Invalid request method'}, status=400)
 
 
 @login_required

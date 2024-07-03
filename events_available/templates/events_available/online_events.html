@@ -148,5 +148,8 @@
 {% comment %} <a href="{% url 'bookmarks:events_registered' events.slug %}" class="btn btn-danger btn-sent_app">
     Регистрация
 </a> {% endcomment %}
-<button type="button" class="btn btn-light btn-canel-app">Отмена регистрации</button>
+<a href="{% url 'bookmarks:registered_remove' events.id %}" class="btn btn-light btn-remove_app" data-event-slug="{{ events.id }}">
+    Отмена регистрации1
+</a>
+{% comment %} <button type="button" class="btn btn-light btn-canel-app">Отмена регистрации</button> {% endcomment %}
 {% endblock content %}
