@@ -11,7 +11,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for 
+# Quick-start development settings - unsuitable for
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -89,11 +89,12 @@ DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development')
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_DEV_BOT_TOKEN = os.getenv("TELEGRAM_DEV_BOT_TOKEN")
 ADMIN_TG_NAME = os.getenv("ADMIN_TG_NAME")
-
+DEV_SUPPORT_CHAT_ID = os.getenv("DEV_SUPPORT_CHAT_ID")
+SUPPORT_CHAT_ID = os.getenv("SUPPORT_CHAT_ID")
 
 # Выбор активного токена на основе окружения
 ACTIVE_TELEGRAM_BOT_TOKEN = TELEGRAM_DEV_BOT_TOKEN if DJANGO_ENV == 'development' else TELEGRAM_BOT_TOKEN
-
+ACTIVE_TELEGRAM_SUPPORT_CHAT_ID = DEV_SUPPORT_CHAT_ID if DJANGO_ENV == 'development' else SUPPORT_CHAT_ID
 
 if DJANGO_ENV == 'development':
     DATABASES = {
