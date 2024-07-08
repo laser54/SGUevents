@@ -45,9 +45,11 @@ def events_add(request, event_slug):
         else:
             added = True
 
-        return JsonResponse({'added': added})
+        return JsonResponse({'added': added, 'event_id': favorite.id})
 
     return JsonResponse({'error': 'Event not found or user not authenticated'}, status=400)
+
+
 
 # @login_required
 # def events_add(request, event_slug):
@@ -85,10 +87,11 @@ def events_add(request, event_slug):
 @login_required
 def events_remove(request, event_id):
     if request.method == 'POST':
-        event = get_object_or_404(Favorite, id=event_id, user=request.user)
-        event.delete()
+        favorite = get_object_or_404(Favorite, id=event_id, user=request.user)
+        favorite.delete()
         return JsonResponse({'removed': True})
     return JsonResponse({'removed': False, 'error': 'Invalid request method'}, status=400)
+
 
 @login_required
 def favorites(request):

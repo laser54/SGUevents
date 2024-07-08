@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
+from bookmarks.models import Favorite
 from events_cultural.models import Attractions, Events_for_visiting
 from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
 from django.contrib.auth.decorators import login_required
@@ -25,10 +26,14 @@ def attractions(request):
 	
 	paginator = Paginator(events_cultural, 3)
 	current_page = paginator.page(int(page))
+	# Получаем список избранных мероприятий для текущего пользователя
+	# favorites = Favorite.objects.filter(user=request.user, offline__in=current_page).values_list('offline_id', flat=True)
+
 	
 	context: dict[str, str] = {
 		'name_page': 'Достопримечательности',
         'event_card_views': current_page,
+		# 'favorites': list(favorites),
 	}
 	return render(request, 'events_cultural/attractions.html', context)
 
@@ -67,10 +72,13 @@ def events_for_visiting(request):
 
 	paginator = Paginator(events_cultural, 3)
 	current_page = paginator.page(int(page))
+	# Получаем список избранных мероприятий для текущего пользователя
+	# favorites = Favorite.objects.filter(user=request.user, offline__in=current_page).values_list('offline_id', flat=True)
 
 	context: dict[str, str] = {
 		'name_page': 'Доступные к посещению',
 		'event_card_views': current_page,
+		# 'favorites': list(favorites),
 	}
 	return render(request, 'events_cultural/events_for_visiting.html', context)
 

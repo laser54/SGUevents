@@ -17,3 +17,7 @@ def change_params(context, **kwargs):
     query = context['request'].GET.dict()
     query.update(kwargs)
     return urlencode(query)
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
