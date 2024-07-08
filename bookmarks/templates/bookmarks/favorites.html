@@ -19,7 +19,7 @@
                                     <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.online.name }}">
                                     {% endif %}
                                     <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
                                     </a>
                                     <div class="card-img-info">
                                         <p>id: {{ favorite.online.display_id }}</p>
@@ -79,7 +79,7 @@
                                     <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.offline.name }}">
                                     {% endif %}
                                     <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
                                     </a>
                                     <div class="card-img-info">
                                         <p>id: {{ favorite.offline.display_id }}</p>
@@ -139,7 +139,7 @@
                                     <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.attractions.name }}">
                                     {% endif %}
                                     <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
                                     </a>
                                     <div class="card-img-info">
                                         <p>id: {{ favorite.attractions.display_id }}</p>
@@ -199,7 +199,7 @@
                                     <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.for_visiting.name }}">
                                     {% endif %}
                                     <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
                                     </a>
                                     <div class="card-img-info">
                                         <p>id: {{ favorite.for_visiting.display_id }}</p>
