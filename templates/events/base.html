@@ -339,7 +339,6 @@
     });
 </script>
 
-
 <style>
     .notification {
         position: fixed;
@@ -370,93 +369,95 @@
     }
 </style>
 
+<!-- УДАЛЕНИЕ ИЗ ИЗБРАННЫХ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.remove-from-favorites').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventId = this.getAttribute('data-event-id');
+                const buttonElement = this;
+                const icon = this.querySelector('.heart-icon');
 
-
-
-{% comment %} УДАЛЕНИЕ ИЗ ИЗБРАННЫХ{% endcomment %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.remove-from-favorites').forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const eventId = this.getAttribute('data-event-id');
-                    const buttonElement = this;
-        
-                    fetch(`/bookmarks/events_remove/${eventId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({ 'id': eventId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.removed) {
-                            buttonElement.closest('.event_cards').remove(); // Удалить карточку события
-                        } else {
-                            console.error('Ошибка:', data.error);
-                        }
-                    })
-                    .catch(error => console.error('Ошибка:', error));
-                });
+                fetch(`/bookmarks/events_remove/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'id': eventId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.removed) {
+                        icon.src = "{% static 'general/icons/heart.svg' %}";
+                        buttonElement.classList.remove('remove-from-favorites');
+                        buttonElement.classList.add('add-to-cart');
+                        buttonElement.removeAttribute('data-event-id');
+                        showNotification("Удалено из избранного");
+                    } else {
+                        console.error('Ошибка:', data.error);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
             });
         });
-    </script>
-{% comment %} REGISTER {% endcomment %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.btn-sent_app').forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const eventSlug = this.getAttribute('data-event-slug');
-                    
-        
-                    fetch(`{% url 'bookmarks:events_registered' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({ 'slug': eventSlug })
-                    })
-                    .then(response => response.json())
-                    
-                    .catch(error => console.error('Error:', error));
-                });
-            });
-        });
-    </script>
-{% comment %} УДАЛЕНИЕ {% endcomment %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.btn-remove_app').forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const eventId = this.getAttribute('data-event-id');
-                    const buttonElement = this;
+    });
+</script>
 
-                    fetch(`/bookmarks/registered_remove/${eventId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({ 'id': eventId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.removed) {
-                            buttonElement.closest('.event_cards').remove(); // Удалить карточку события
-                        } else {
-                            console.error('Ошибка:', data.error);
-                        }
-                    })
-                    .catch(error => console.error('Ошибка:', error));
-                });
+<!-- REGISTER -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-sent_app').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventSlug = this.getAttribute('data-event-slug');
+
+                fetch(`{% url 'bookmarks:events_registered' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'slug': eventSlug })
+                })
+                .then(response => response.json())
+                .catch(error => console.error('Error:', error));
             });
         });
-    </script>
+    });
+</script>
+
+<!-- УДАЛЕНИЕ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-remove_app').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventId = this.getAttribute('data-event-id');
+                const buttonElement = this;
+
+                fetch(`/bookmarks/registered_remove/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'id': eventId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.removed) {
+                        buttonElement.closest('.event_cards').remove(); // Удалить карточку события
+                    } else {
+                        console.error('Ошибка:', data.error);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    });
+</script>
         
 	
     {% endblock javascript_files %}

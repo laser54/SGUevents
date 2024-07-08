@@ -6,14 +6,6 @@ from events_available.utils import q_search_offline, q_search_online, q_search_n
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 
-from django.shortcuts import get_list_or_404, get_object_or_404, render
-from bookmarks.models import Favorite
-from events_available.models import Events_offline, Events_online
-from django.core.paginator import Paginator
-from events_available.utils import q_search_offline, q_search_online, q_search_name_offline
-from datetime import datetime
-from django.contrib.auth.decorators import login_required
-
 @login_required
 def online(request):
     page = request.GET.get('page', 1)
@@ -78,22 +70,17 @@ def online(request):
     }
     return render(request, 'events_available/online_events.html', context=context)
 
-
-
 @login_required
 def online_card(request, event_slug=False, event_id=False):
-	# event = Events_online.objects.all()
-	# event = Events_online.objects.get(id=events_id)
-	if event_id:
-		event = Events_online.objects.get(id=event_id)
-	else:
-		event = Events_online.objects.get(slug=event_slug)
+    if event_id:
+        event = Events_online.objects.get(id=event_id)
+    else:
+        event = Events_online.objects.get(slug=event_slug)
 
-	context: dict[str, str] = {
-			'event': event,
-	}
-
-	return render(request, 'events_available/card.html', context=context)
+    context = {
+        'event': event,
+    }
+    return render(request, 'events_available/card.html', context=context)
 
 @login_required
 def offline(request):
@@ -171,21 +158,14 @@ def offline(request):
     }
     return render(request, 'events_available/offline_events.html', context=context)
 
-
 @login_required
 def offline_card(request, event_slug=False, event_id=False):
-	# event = Events_offline.objects.all()
-	# event = Events_online.objects.get(id=events_id)
-	if event_id:
-		event = Events_offline.objects.get(id=event_id)
-	else:
-		event = Events_offline.objects.get(slug=event_slug)
+    if event_id:
+        event = Events_offline.objects.get(id=event_id)
+    else:
+        event = Events_offline.objects.get(slug=event_slug)
 
-	context: dict[str, str] = {
-			'event': event,
-	}
-
-	return render(request, 'events_available/card.html', context=context)
-
-
-    
+    context = {
+        'event': event,
+    }
+    return render(request, 'events_available/card.html', context=context)
