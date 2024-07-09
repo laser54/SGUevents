@@ -9,8 +9,12 @@
 	<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
 	<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
 	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+	<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
+	<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 	<link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
 	<link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<title>Document</title>
 </head>
@@ -208,6 +212,27 @@
 				</nav>
 			{% endif %}
 		{% endif %}
+		{% if user.is_authenticated %}
+			{% if event_card_views %}
+				<nav aria-label="Page navigation example">
+					<ul class="pagination justify-content-center">
+						<li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
+							<a class="page-link" href="{% if event_card_views.has_previous %}?{% change_params page=event_card_views.previous_page_number %}{% else %}#{% endif %}">Назад</a>
+						</li>
+						{% for page in event_card_views.paginator.page_range %}
+							{% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
+								<li class="page-item {% if event_card_views.number == page %} active {% endif %}">
+									<a class="page-link" href="?{% change_params page=page %}">{{ page }}</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+						<li class="page-item {% if not event_card_views.has_next %} disabled {% endif %}">
+							<a class="page-link" href="{% if event_card_views.has_next %}?{% change_params page=event_card_views.next_page_number %}{% else %}#{% endif %}">Следующая</a>
+						</li>
+					</ul>
+				</nav>
+			{% endif %}
+		{% endif %}
 	</pagination>
 
 	<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -225,3 +250,4 @@
 	{% endblock javascript_files %}
 </body>
 </html>
+

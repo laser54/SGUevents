@@ -1,5 +1,6 @@
 {% load static %}
 {% load events_available_tags %}
+{% load main_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
     <link rel="stylesheet" href="daterangepicker/daterangepicker.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
     <link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
     <link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -118,83 +119,118 @@
 							<h2 class="mt-4">По запросу ничего не найдено</h2>
 						{% endif %}
 					{% endif %}
-					{% for events in event_card_views %}
-					<div class="row mt-2 event_cards">
-						<div class="col-lg-12">
-							<div class="card mb-3">
-								<div class="row g-0">
-									<div class="col-md-4">
-										{% if events.image %}
-											<img src="{{ events.image.url }}" class="img-fluid rounded-start " alt="{{ events.name }}">
-										{% else %} 
-											<img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
-										{% endif %}
-										<a href="{% url 'bookmarks:events_add' events.slug %}" class="btn add-to-cart">
-											<img class="mx-1" src="{% static "general/icons/heart.svg" %}" alt="Catalog Icon" width="32" height="32">
-										</a>
- 									
-										{% comment %} <form action="{% url 'bookmarks:favorites' events.slug %}" method="POST" class="mx-3">
-											{% csrf_token %}
-											<button type="submit" id="favourite" name="events.slug" class="btn btn-outline-danger btn-sm btn-favorites"><img src="{% static "general/icons/heart.svg" %}" alt="" value="{{ events.slug }}"></button>
-										</form> {% endcomment %}
-										<div class="card-img-info">
-											<p> id: {{ events.display_id }} </p>
-											<p> category: {{ events.category }} </p>
-										</div>
-									</div>
-									<div class="col-md-8">
-										<div class="card-body">
-											<h5 class="card-title">
-												<a href="
-												{% if events.category  == 'Онлайн' %}
-													{% url "events_available:online_card" events.slug %}
-												{% elif events.category  == 'Оффлайн' %}
-													{% url "events_available:offline_card" events.slug %}
-												{% elif events.category  == 'Достопримечательности' %}
-													{% url "events_cultural:attractions_card" events.slug %}
-												{% elif events.category  == 'Доступные к посещению' %}
-													{% url "events_cultural:events_for_visiting_card" events.slug %}
-												{% endif %}">
-												{% autoescape off %}
-													{% if events.headline %}{{ events.headline }}{% else %}{{ events.name }}{% endif %}
-												{% endautoescape %}
-											</a></h5>
-											<h6 class="card-date"> 
-												<split class="card-day"><b>{{ events.date }}</b></split> 
-												<split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
-											<h6 class="event-place"> {{ events.place }} </h6>
-											<h6 class="event-place"> {{ events.speakers }} </h6>
-											{% autoescape off %}
-												{% if events.bodyline %}
-													{{ events.bodyline }}
-												{% else %}
-													<p class="card-text">{{ events.description|truncatechars:625 }}</p>
-												{% endif %}
-											{% endautoescape %}
-											
-											<p class="card-text">
-												<small class="text-muted">{% if events.tags %} 
-													{{ events.tags }}
-													{% else %}
-													{% endif %}
-												</small>
-											</p>
-											<p>
-												{% if events.town %}{{ events.town }}{% endif %} {% if events.street %}{{ events.street }}{% endif %} {% if events.cabinet %}{{ events.cabinet }}{% endif %}
-											</p>
-											<p>
-												{{ speakers }}
-											</p> 
-                                            {% block content %}{% endblock content %}
-											
+                    {% for events in event_card_views %}
+                        <div class="row mt-2 event_cards">
+                            <div class="col-lg-12">
+                                <div class="card mb-3">
+                                    <div class="row g-0">
+                                        <div class="col-md-4">
+                                            {% if events.image %}
+                                                <img src="{{ events.image.url }}" class="img-fluid rounded-start " alt="{{ events.name }}">
+                                            {% else %} 
+                                                <img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
+                                            {% endif %}
+                                            {% if name_page != "Главная" %}
+                                                {% if events.id in favorites %}
+                                                    <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites|get_item:events.id }}">
+                                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                                    </a>
+                                                {% else %}
+                                                    <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
+                                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                                    </a>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if events|model_name == 'Events_online' %}
+                                                    {% if events.id in favorites.online %}
+                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.online|get_item:events.id }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% endif %}
+                                                {% elif events|model_name == 'Events_offline' %}
+                                                    {% if events.id in favorites.offline %}
+                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.offline|get_item:events.id }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% endif %}
+                                                {% elif events|model_name == 'Attractions' %}
+                                                    {% if events.id in favorites.attractions %}
+                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.attractions|get_item:events.id }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% endif %}
+                                                {% elif events|model_name == 'Events_for_visiting' %}
+                                                    {% if events.id in favorites.for_visiting %}
+                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.for_visiting|get_item:events.id }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
+                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                                        </a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endif %}
+                                            <div class="card-img-info">
+                                                <p>id: {{ events.display_id }}</p>
+                                                <p>category: {{ events.category }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title">
+                                                    <a href="{% url 'events_available:online_card' events.slug %}">
+                                                    {% autoescape off %}
+                                                        {% if events.headline %}{{ events.headline }}{% else %}{{ events.name }}{% endif %}
+                                                    {% endautoescape %}
+                                                </a></h5>
+                                                <h6 class="card-date"> 
+                                                    <split class="card-day"><b>{{ events.date }}</b></split> 
+                                                    <split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
+                                                <h6 class="event-place"> {{ events.place }} </h6>
+                                                <h6 class="event-place"> {{ events.speakers }} </h6>
+                                                {% autoescape off %}
+                                                    {% if events.bodyline %}
+                                                        {{ events.bodyline }}
+                                                    {% else %}
+                                                        <p class="card-text">{{ events.description|truncatechars:625 }}</p>
+                                                    {% endif %}
+                                                {% endautoescape %}
+                                                
+                                                <p class="card-text">
+                                                    <small class="text-muted">{% if events.tags %} 
+                                                        {{ events.tags }}
+                                                        {% else %}
+                                                        {% endif %}
+                                                    </small>
+                                                </p>
+                                                <p>
+                                                    {% if events.town %}{{ events.town }}{% endif %} {% if events.street %}{{ events.street }}{% endif %} {% if events.cabinet %}{{ events.cabinet }}{% endif %}
+                                                </p>
+                                                <p>
+                                                    {{ speakers }}
+                                                </p> 
+                                                {% block content %}{% endblock content %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
 
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					{% endfor %}
                     
                     {% block favorite %}{% endblock favorite %}
 					
@@ -206,6 +242,7 @@
 		</div>
 		{% endif %}
     </section>
+   
     <pagination>
         {% if user.is_authenticated %}
             {% if event_card_views %}
@@ -242,39 +279,190 @@
         {% endif %}
     </pagination>
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src={% static "js/bootstrap-datepicker.min.js" %}></script>
-    <script src={% static "js/bootstrap-datepicker.ru.min.js" %}></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src={% static "js/moment.min.js" %}></script>
+    
     {% block javascript_files %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-		$(document).ready(function(event){
-			$(document).on('click', '#favourite', function(event){
-				event.preventDefault();
-				var slug = $(this).attr('value');
-				$.ajax({
-					type: 'POST',
-					url: "/bookmarks/favorites/" + slug + "/",
-					data: {
-						'csrfmiddlewaretoken': '{{ csrf_token }}'
-					},
-					dataType: 'json',
-					success: function(response){
-						$('#favourite-section').html(response['form'])
-					},
-					error: function(rs, e){
-						console.log(rs.responseText);
-					},
-				});
-			});
-		});
-	</script>
-	
+
+<!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ И УДАЛЕНИЕ -->
+<div id="favoriteNotification" class="notification" style="display: none;">
+    <p></p>
+</div>
+
+<script>
+    function initializeFavoriteButtons() {
+        document.querySelectorAll('.add-to-cart').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventSlug = this.getAttribute('data-event-slug');
+                const icon = this.querySelector('.heart-icon');
+                const buttonElement = this;
+
+                fetch(`/bookmarks/events_add/${eventSlug}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'slug': eventSlug })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.added) {
+                        icon.src = "{% static 'general/icons/heart_red.png' %}";
+                        buttonElement.classList.remove('add-to-cart');
+                        buttonElement.classList.add('remove-from-favorites');
+                        buttonElement.setAttribute('data-event-id', data.event_id);
+                        showNotification("Добавлено в избранное");
+                    } else {
+                        console.error('Ошибка при добавлении:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+
+        document.querySelectorAll('.remove-from-favorites').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventId = this.getAttribute('data-event-id');
+                const buttonElement = this;
+                const icon = this.querySelector('.heart-icon');
+
+                fetch(`/bookmarks/events_remove/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'id': eventId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.removed) {
+                        icon.src = "{% static 'general/icons/heart.svg' %}";
+                        buttonElement.classList.remove('remove-from-favorites');
+                        buttonElement.classList.add('add-to-cart');
+                        buttonElement.removeAttribute('data-event-id');
+                        showNotification("Удалено из избранного");
+                    } else {
+                        console.error('Ошибка при удалении:', data.error);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    }
+
+    function showNotification(message) {
+        const notification = document.getElementById('favoriteNotification');
+        notification.querySelector('p').textContent = message;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.classList.add('fade-in');
+        }, 10); // Slight delay to trigger transition
+
+        setTimeout(function() {
+            notification.classList.remove('fade-in');
+            notification.classList.add('fade-out');
+
+            setTimeout(function() {
+                notification.style.display = 'none';
+                notification.classList.remove('fade-out');
+            }, 1000);
+        }, 2000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeFavoriteButtons();
+    });
+</script>
+
+
+<style>
+    .notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        width: auto;
+        max-width: 300px;
+        padding: 15px;
+        background-color: #4caf50;
+        color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        z-index: 1000;
+    }
+    .notification p {
+        margin: 0;
+    }
+    .notification.fade-in {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    .notification.fade-out {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+</style>
+
+
+<!-- REGISTER -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-sent_app').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventSlug = this.getAttribute('data-event-slug');
+
+                fetch(`{% url 'bookmarks:events_registered' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'slug': eventSlug })
+                })
+                .then(response => response.json())
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+
+<!-- УДАЛЕНИЕ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-remove_app').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const eventId = this.getAttribute('data-event-id');
+                const buttonElement = this;
+
+                fetch(`/bookmarks/registered_remove/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ 'id': eventId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.removed) {
+                        buttonElement.closest('.event_cards').remove(); // Удалить карточку события
+                    } else {
+                        console.error('Ошибка:', data.error);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    });
+</script>
+        
 	
     {% endblock javascript_files %}
 </body>
