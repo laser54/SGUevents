@@ -130,7 +130,7 @@
                                             {% else %} 
                                                 <img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
                                             {% endif %}
-                                            {% if name_page == "" %}
+                                            {% if name_page != "Главная" %}
                                                 {% if events.id in favorites %}
                                                     <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites|get_item:events.id }}">
                                                         <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">

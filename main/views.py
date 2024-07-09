@@ -56,7 +56,7 @@ def index(request):
     }
 
     context = {
-        'name_page': 'Все мероприятия',
+        'name_page': 'Главная',
         'event_card_views': current_page,
         'favorites': favorites_dict,
         'check': 1,
