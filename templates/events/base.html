@@ -191,7 +191,16 @@
                                         <div class="col-md-8">
                                             <div class="card-body">
                                                 <h5 class="card-title">
-                                                    <a href="{% url 'events_available:online_card' events.slug %}">
+                                                    <a href="
+                                                    {% if events.category  == 'Онлайн' %}
+                                                        {% url "events_available:online_card" events.slug %}
+                                                    {% elif events.category  == 'Оффлайн' %}
+                                                        {% url "events_available:offline_card" events.slug %}
+                                                    {% elif events.category  == 'Достопримечательности' %}
+                                                        {% url "events_cultural:attractions_card" events.slug %}
+                                                    {% elif events.category  == 'Доступные к посещению' %}
+                                                        {% url "events_cultural:events_for_visiting_card" events.slug %}
+                                                    {% endif %}">
                                                     {% autoescape off %}
                                                         {% if events.headline %}{{ events.headline }}{% else %}{{ events.name }}{% endif %}
                                                     {% endautoescape %}
