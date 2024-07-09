@@ -73,4 +73,5 @@ jobs:
             echo "DJANGO_ENV=${{ secrets.DJANGO_ENV }}" >> .env
             echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
             echo "ADMIN_TG_NAME=${{ secrets.ADMIN_TG_NAME }}" >> .env
+            echo "SUPPORT_CHAT_ID=${{ secrets.SUPPORT_CHAT_ID }}" >> .env
             sudo docker-compose up -d

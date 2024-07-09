@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:14.5  # Updated to latest version
+    image: postgres:14.5 # Updated to latest version
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     restart: always
@@ -24,14 +24,14 @@ services:
     image: la5er/events:latest
     command: python /code/bot/main.py
     restart: always
-    working_dir: /code/bot  # Specified working directory
+    working_dir: /code/bot # Specified working directory
     depends_on:
       - db
     env_file:
       - ./.env
 
   nginx:
-    image: nginx:1.21.6  # Updated to latest version
+    image: nginx:1.21.6 # Updated to latest version
     ports:
       - "80:80"
       - "443:443"

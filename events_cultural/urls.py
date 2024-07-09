@@ -12,7 +12,7 @@ urlpatterns = [
 	path('attractions/', views.attractions, name='attractions'),
 	path('attractions/<slug:event_slug>/', views.attractions_card, name='attractions_card'),
 
-	path('events_registered/', views.events_registered, name='events_registered'),
+	# path('events_registered/', views.events_registered, name='events_registered'),
 	# path('events_registered/<int:event_id>', views.events_registered_, name='events_registered_card'),
 	# path('events_registered/event/<slug:event_slug>/', views.events_registered, name='events_registered_card'),
 

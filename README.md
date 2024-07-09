@@ -54,13 +54,22 @@
 
 ## Заполнение БД:
 
-1. Запустить скрипт 
-   - Для Windows: python .\setup_and_run_windows.py
-   - Для Linux: python3 ./setup_and_run_linux.py
+- На windows вместо `python3` записывается просто `python`, вместо `/` используется `\`. При первой установке лучше удалить файл db.sqlite3 и все миграции в проекте (Пример: events_available/migrations/0001_initial.py)
 
-   Автоматически создаётся superuser. 
-   - Логин "Admin"
-   - Пароль "root"
+1. Создаём миграцию для определения модели БД:
+   - Выполнить команду: `python manage.py makemigrations`
+2. Применяем созданную миграцию:
+   - Выполнить команду: `python3 manage.py migrate`
+3. Если удалялся файл db.sqlite3, то необходимо создать пользователя:
+   - Выполнить команду: `python3 manage.py createsuperuser`
+4. Загружаем информацию для страницы онлайн мероприятий:
+   - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_online.json`
+5. Загружаем информацию для страницы оффлайн мероприятий:
+   - Выполнить команду: `python3 manage.py loaddata fixtures/events_available/events_offline.json`
+6. Загружаем информацию для страницы достопримечательности:
+   - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/attractions.json`
+7. Загружаем информацию для страницы доступные к посещению:
+   - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/events_for_visiting.json`
 
 ## При запуске на сервере:
 1. Из каталога с файлом docker-compose.yml:
@@ -73,5 +82,4 @@
    - `DROP SCHEMA public CASCADE;`
    - `CREATE SCHEMA public;`
    - Для выхода из psql используйте команду \q, и для выхода из оболочки контейнера используйте exit.
-   - Далее миграции, superuser и fixtures
-
+   - Далее миграции, superuser и fixtures.

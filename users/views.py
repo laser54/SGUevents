@@ -84,9 +84,9 @@ def telegram_auth(request):
         if user:
             auth_login(request, user)
             request.session['login_method'] = 'Через Telegram'
-            return JsonResponse({'success': True, 'redirect_url': '/profile'})
+            return JsonResponse({'success': True, 'redirect_url': '/users/profile'})
         else:
-            return JsonResponse({'success': False, 'error': 'User not registered. Please register.', 'redirect_url': '/register'})
+            return JsonResponse({'success': False, 'error': 'User not registered. Please register.', 'redirect_url': '/users/register'})
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request'})
 

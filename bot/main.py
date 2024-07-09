@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import sys
+import requests
 
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F, Router
@@ -22,6 +23,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Initialize bot
 TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
+SUPPORT_CHAT_ID = settings.ACTIVE_TELEGRAM_SUPPORT_CHAT_ID
 storage = MemoryStorage()
 dp = Dispatcher()
 
@@ -89,11 +91,25 @@ async def receive_question(message: types.Message, state: FSMContext):
             user=user,
             question=message.text
         )
+        # Отправляем вопрос в чат поддержки
+        support_message = f"Новый вопрос от пользователя {user.username}:\n\n{message.text}"
+        send_message_to_support_chat(support_message)
         await message.answer("Ваш вопрос отправлен в техподдержку. Спасибо!")
     else:
         await message.answer("Вы не зарегистрированы на портале.")
     await state.clear()
-
+def send_message_to_support_chat(text):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    payload = {
+        'chat_id': SUPPORT_CHAT_ID,
+        'text': text
+    }
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    if response.status_code != 200:
+        print(f"Failed to send message: {response.status_code}, {response.text}")
 # Функция запуска бота
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
