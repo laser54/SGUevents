@@ -9,12 +9,8 @@
 	<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
 	<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
 	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-	<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
-	<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
-	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 	<link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
 	<link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
-	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<title>Document</title>
 </head>
@@ -101,117 +97,10 @@
     </header>
 
 	<section>
-		{% if user.is_authenticated %}
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-1"></div>
-				<div class="col-lg-10">
-					{% block filters %}{% endblock filters %}
-					<div class="row mt-3 mb-3 name-for-events">
-						<div class="col-lg-12">
-							<h2> {{ name_page }} </h2>
-						</div>
-					</div>
-					{% if request.GET.q %}
-						<h3 class="mt-4">Результаты поиска по запросу {{ request.GET.q }}</h3>
-						{% if not event_card_views %}
-							<h2 class="mt-4">По запросу ничего не найдено</h2>
-						{% endif %}
-					{% endif %}
-					{% for events in event_card_views %}
-					<div class="row mt-2 event_cards">
-						<div class="col-lg-12">
-							<div class="card mb-3">
-								<div class="row g-0">
-									<div class="col-md-4">
-										{% if events.image %}
-											<img src="{{ events.image.url }}" class="img-fluid rounded-start" alt="{{ events.name }}">
-										{% else %}
-											<img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ events.name }}">
-										{% endif %}
-										<form action="{% url 'bookmarks:toggle_favorite' events.slug %}" method="POST" class="mx-3">
-											{% csrf_token %}
-											<button type="submit" id="favourite" name="events.slug" class="btn btn-outline-danger btn-sm btn-favorites">
-												<img src="{% static 'general/icons/heart.svg' %}" alt="" value="{{ events.slug }}">
-											</button>
-										</form>
-										<div class="card-img-info">
-											<p>id: {{ events.display_id }}</p>
-											<p>category: {{ events.category }}</p>
-										</div>
-									</div>
-									<div class="col-md-8">
-										<div class="card-body">
-											<h5 class="card-title">
-												<a href="{% if events.category == 'Онлайн' %}
-															{% url 'events_available:online_card' events.slug %}
-														 {% elif events.category == 'Оффлайн' %}
-															{% url 'events_available:offline_card' events.slug %}
-														 {% elif events.category == 'Достопримечательности' %}
-															 {% url 'events_cultural:attractions_card' events.slug %}
-														 {% elif events.category == 'Доступные к посещению' %}
-															{% url 'events_cultural:events_for_visiting_card' events.slug %}
-														 {% endif %}">
-													{% autoescape off %}
-														{% if events.headline %}{{ events.headline }}{% else %}{{ events.name }}{% endif %}
-													{% endautoescape %}
-												</a>
-											</h5>
-											<h6 class="card-date">
-												<split class="card-day"><b>{{ events.date }}</b></split>
-												<split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split>
-											</h6>
-											<h6 class="event-place">{{ events.place }}</h6>
-											<h6 class="event-place">{{ events.speakers }}</h6>
-											{% autoescape off %}
-												{% if events.bodyline %}
-													{{ events.bodyline }}
-												{% else %}
-													<p class="card-text">{{ events.description|truncatechars:625 }}</p>
-												{% endif %}
-											{% endautoescape %}
-											<p class="card-text">
-												<small class="text-muted">{% if events.tags %}{{ events.tags }}{% endif %}</small>
-											</p>
-											<p>{% if events.town %}{{ events.town }}{% endif %} {% if events.street %}{{ events.street }}{% endif %} {% if events.cabinet %}{{ events.cabinet }}{% endif %}</p>
-											<p>{{ speakers }}</p>
-											{% block content %}{% endblock %}
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					{% endfor %}
-				</div>
-				<div class="col-lg-1"></div>
-			</div>
-		</div>
-		{% endif %}
+		{% block content %}{% endblock content %}
 	</section>
 
 	<pagination>
-		{% if user.is_authenticated %}
-			{% if event_card_views %}
-				<nav aria-label="Page navigation example">
-					<ul class="pagination justify-content-center">
-						<li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
-							<a class="page-link" href="{% if event_card_views.has_previous %}?{% change_params page=event_card_views.previous_page_number %}{% else %}#{% endif %}">Назад</a>
-						</li>
-						{% for page in event_card_views.paginator.page_range %}
-							{% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
-								<li class="page-item {% if event_card_views.number == page %} active {% endif %}">
-									<a class="page-link" href="?{% change_params page=page %}">{{ page }}</a>
-								</li>
-							{% endif %}
-						{% endfor %}
-						<li class="page-item {% if not event_card_views.has_next %} disabled {% endif %}">
-							<a class="page-link" href="{% if event_card_views.has_next %}?{% change_params page=event_card_views.next_page_number %}{% else %}#{% endif %}">Следующая</a>
-						</li>
-					</ul>
-				</nav>
-			{% endif %}
-		{% endif %}
 		{% if user.is_authenticated %}
 			{% if event_card_views %}
 				<nav aria-label="Page navigation example">
@@ -250,4 +139,3 @@
 	{% endblock javascript_files %}
 </body>
 </html>
-

@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
-from bookmarks.models import Favorite
+from bookmarks.models import Favorite, Registered
 from events_cultural.models import Attractions, Events_for_visiting
 from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
 from django.contrib.auth.decorators import login_required
@@ -70,16 +70,21 @@ def events_for_visiting(request):
     paginator = Paginator(events_cultural, 3)
     current_page = paginator.page(int(page))
 
-    # Получаем список избранных мероприятий для текущего пользователя
+    # Получаем список избранных и зарегистрированных мероприятий для текущего пользователя
     favorites = Favorite.objects.filter(user=request.user, for_visiting__in=current_page)
     favorites_dict = {favorite.for_visiting.id: favorite.id for favorite in favorites}
+
+    registered = Registered.objects.filter(user=request.user, for_visiting__in=current_page)
+    registered_dict = {reg.for_visiting.id: reg.id for reg in registered}
 
     context = {
         'name_page': 'Доступные к посещению',
         'event_card_views': current_page,
         'favorites': favorites_dict,
+        'registered': registered_dict,
     }
     return render(request, 'events_cultural/events_for_visiting.html', context)
+
 
 @login_required
 def for_visiting_card(request, event_slug=False, event_id=False):

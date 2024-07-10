@@ -8,7 +8,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
-    <link rel="stylesheet" href="daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
     <link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
     <link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
@@ -191,7 +190,16 @@
                                         <div class="col-md-8">
                                             <div class="card-body">
                                                 <h5 class="card-title">
-                                                    <a href="{% url 'events_available:online_card' events.slug %}">
+                                                    <a href="
+                                                    {% if events.category  == 'Онлайн' %}
+                                                        {% url "events_available:online_card" events.slug %}
+                                                    {% elif events.category  == 'Оффлайн' %}
+                                                        {% url "events_available:offline_card" events.slug %}
+                                                    {% elif events.category  == 'Достопримечательности' %}
+                                                        {% url "events_cultural:attractions_card" events.slug %}
+                                                    {% elif events.category  == 'Доступные к посещению' %}
+                                                        {% url "events_cultural:events_for_visiting_card" events.slug %}
+                                                    {% endif %}">
                                                     {% autoescape off %}
                                                         {% if events.headline %}{{ events.headline }}{% else %}{{ events.name }}{% endif %}
                                                     {% endautoescape %}
@@ -279,23 +287,25 @@
         {% endif %}
     </pagination>
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src={% static "js/moment.min.js" %}></script>
-    
+    <script src={% static "js/bootstrap-datepicker.min.js" %}></script>
+    <script src={% static "js/bootstrap-datepicker.ru.min.js" %}></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     {% block javascript_files %}
 
-<!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ И УДАЛЕНИЕ -->
+<!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ И УДАЛЕНИЕ ИЗ ИЗБРАННЫХ -->
 <div id="favoriteNotification" class="notification" style="display: none;">
     <p></p>
 </div>
 
 <script>
     function initializeFavoriteButtons() {
+        // Обработчик для добавления в избранное
         document.querySelectorAll('.add-to-cart').forEach(function(button) {
             button.addEventListener('click', function(event) {
                 event.preventDefault();
                 const eventSlug = this.getAttribute('data-event-slug');
                 const icon = this.querySelector('.heart-icon');
-                const buttonElement = this;
+                const button = this;
 
                 fetch(`/bookmarks/events_add/${eventSlug}/`, {
                     method: 'POST',
@@ -309,18 +319,23 @@
                 .then(data => {
                     if (data.added) {
                         icon.src = "{% static 'general/icons/heart_red.png' %}";
-                        buttonElement.classList.remove('add-to-cart');
-                        buttonElement.classList.add('remove-from-favorites');
-                        buttonElement.setAttribute('data-event-id', data.event_id);
+                        button.classList.remove('add-to-cart');
+                        button.classList.add('remove-from-favorites');
+                        button.setAttribute('data-event-id', data.event_id);
                         showNotification("Добавлено в избранное");
                     } else {
-                        console.error('Ошибка при добавлении:', data.error);
+                        icon.src = "{% static 'general/icons/heart.svg' %}";
+                        button.classList.remove('remove-from-favorites');
+                        button.classList.add('add-to-cart');
+                        button.removeAttribute('data-event-id');
+                        showNotification("Удалено из избранного");
                     }
                 })
                 .catch(error => console.error('Error:', error));
             });
         });
 
+        // Обработчик для удаления из избранного
         document.querySelectorAll('.remove-from-favorites').forEach(function(button) {
             button.addEventListener('click', function(event) {
                 event.preventDefault();
@@ -345,7 +360,7 @@
                         buttonElement.removeAttribute('data-event-id');
                         showNotification("Удалено из избранного");
                     } else {
-                        console.error('Ошибка при удалении:', data.error);
+                        console.error('Ошибка:', data.error);
                     }
                 })
                 .catch(error => console.error('Ошибка:', error));
@@ -368,8 +383,8 @@
             setTimeout(function() {
                 notification.style.display = 'none';
                 notification.classList.remove('fade-out');
-            }, 1000);
-        }, 2000);
+            }, 700);
+        }, 1000);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -377,6 +392,106 @@
     });
 </script>
 
+
+<!-- Notification for Registration -->
+<div id="registrationNotification" class="notification" style="display: none;">
+    <p></p>
+</div>
+
+<script>
+    function initializeRegistrationButtons() {
+        document.querySelectorAll('.btn-sent_app').forEach(function(button) {
+            button.removeEventListener('click', handleRegister); // Remove previous event listeners
+            button.addEventListener('click', handleRegister); // Add new event listeners
+        });
+
+        document.querySelectorAll('.btn-remove_app').forEach(function(button) {
+            button.removeEventListener('click', handleUnregister); // Remove previous event listeners
+            button.addEventListener('click', handleUnregister); // Add new event listeners
+        });
+    }
+
+    function handleRegister(event) {
+        event.preventDefault();
+        const eventSlug = this.getAttribute('data-event-slug');
+        const buttonElement = this;
+
+        fetch(`/bookmarks/events_registered/${eventSlug}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ 'slug': eventSlug })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.registered) {
+                buttonElement.classList.remove('btn-sent_app');
+                buttonElement.classList.add('btn-remove_app');
+                buttonElement.innerHTML = 'Отмена регистрации';
+                buttonElement.setAttribute('data-event-id', data.event_id);
+                showRegistrationNotification("Зарегистрировано");
+                initializeRegistrationButtons(); // Re-initialize buttons
+            } else {
+                console.error('Ошибка при регистрации:', data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function handleUnregister(event) {
+        event.preventDefault();
+        const eventId = this.getAttribute('data-event-id');
+        const buttonElement = this;
+
+        fetch(`/bookmarks/registered_remove/${eventId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ 'id': eventId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.removed) {
+                buttonElement.classList.remove('btn-remove_app');
+                buttonElement.classList.add('btn-sent_app');
+                buttonElement.innerHTML = 'Регистрация';
+                buttonElement.removeAttribute('data-event-id');
+                showRegistrationNotification("Регистрация отменена");
+                initializeRegistrationButtons(); // Re-initialize buttons
+            } else {
+                console.error('Ошибка при отмене регистрации:', data.error);
+            }
+        })
+        .catch(error => console.error('Ошибка:', error));
+    }
+
+    function showRegistrationNotification(message) {
+        const notification = document.getElementById('registrationNotification');
+        notification.querySelector('p').textContent = message;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.classList.add('fade-in');
+        }, 10); // Slight delay to trigger transition
+
+        setTimeout(function() {
+            notification.classList.remove('fade-in');
+            notification.classList.add('fade-out');
+
+            setTimeout(function() {
+                notification.style.display = 'none';
+                notification.classList.remove('fade-out');
+            }, 700);
+        }, 1000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeRegistrationButtons();
+    });
+</script>
 
 <style>
     .notification {
@@ -408,61 +523,6 @@
     }
 </style>
 
-
-<!-- REGISTER -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.btn-sent_app').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const eventSlug = this.getAttribute('data-event-slug');
-
-                fetch(`{% url 'bookmarks:events_registered' 'EVENT_SLUG_PLACEHOLDER' %}`.replace('EVENT_SLUG_PLACEHOLDER', eventSlug), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ 'slug': eventSlug })
-                })
-                .then(response => response.json())
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    });
-</script>
-
-<!-- УДАЛЕНИЕ -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.btn-remove_app').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const eventId = this.getAttribute('data-event-id');
-                const buttonElement = this;
-
-                fetch(`/bookmarks/registered_remove/${eventId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ 'id': eventId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.removed) {
-                        buttonElement.closest('.event_cards').remove(); // Удалить карточку события
-                    } else {
-                        console.error('Ошибка:', data.error);
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            });
-        });
-    });
-</script>
-        
 	
     {% endblock javascript_files %}
 </body>

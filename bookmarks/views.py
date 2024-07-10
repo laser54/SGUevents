@@ -51,8 +51,6 @@ def events_add(request, event_slug):
 
 
 
-
-
 # @login_required
 # def events_add(request, event_slug):
 #     try:

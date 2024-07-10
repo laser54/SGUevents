@@ -1,5 +1,6 @@
 {% extends 'events/base.html' %}
 {% load static %}
+{% load events_available_tags %}
 {% block title %} Главная страница {% endblock %}
 {% block filters %}
 <div class="row filter-events-row mt-2">
@@ -142,7 +143,13 @@
 {% endblock filters %}
 {% block content %}
 <!-- Контент на странице -->
-<a href="{% url 'bookmarks:events_registered' events.slug %}" class="btn btn-danger btn-sent_app" data-event-slug="{{ events.slug }}">
+{% if events.id in registered %}
+<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+    Отмена регистрации
+</a>
+{% else %}
+<a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ events.slug }}">
     Регистрация
 </a>
+{% endif %}
 {% endblock content %}
