@@ -293,7 +293,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     {% block javascript_files %}
 
-<!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ -->
+<!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ И УДАЛЕНИЕ ИЗ ИЗБРАННЫХ -->
 <div id="favoriteNotification" class="notification" style="display: none;">
     <p></p>
 </div>
@@ -423,41 +423,6 @@
     }
 </style>
 
-<!-- УДАЛЕНИЕ ИЗ ИЗБРАННЫХ -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.remove-from-favorites').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const eventId = this.getAttribute('data-event-id');
-                const buttonElement = this;
-                const icon = this.querySelector('.heart-icon');
-
-                fetch(`/bookmarks/events_remove/${eventId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ 'id': eventId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.removed) {
-                        icon.src = "{% static 'general/icons/heart.svg' %}";
-                        buttonElement.classList.remove('remove-from-favorites');
-                        buttonElement.classList.add('add-to-cart');
-                        buttonElement.removeAttribute('data-event-id');
-                        showNotification("Удалено из избранного");
-                    } else {
-                        console.error('Ошибка:', data.error);
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            });
-        });
-    });
-</script>
 
 <!-- REGISTER -->
 <script>
