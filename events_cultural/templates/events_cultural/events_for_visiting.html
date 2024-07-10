@@ -1,5 +1,7 @@
-{% extends 'events/base.html' %} {% load static %} {% block title %} Главная
-страница {% endblock %} 
+{% extends 'events/base.html' %} 
+{% load static %} 
+{% load events_cultural_tags %} 
+{% block title %} Главная страница {% endblock %} 
 
 {% block filters %}
 <div class="row filter-events-row mt-2">
@@ -201,6 +203,13 @@
 
 {% block content %}
 <!-- Контент на странице -->
-<button type="button" class="btn btn-danger btn-sent_app">Регистрация</button>
-<button type="button" class="btn btn-light btn-canel-app">Отмена регистрации</button>
+{% if events.id in registered %}
+<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+	Отмена регистрации
+</a>
+{% else %}
+<a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ events.slug }}">
+	Регистрация
+</a>
+{% endif %}
 {% endblock content %}

@@ -1,5 +1,5 @@
 from django.shortcuts import get_list_or_404, get_object_or_404, render
-from bookmarks.models import Favorite
+from bookmarks.models import Favorite, Registered
 from events_available.models import Events_offline, Events_online
 from django.core.paginator import Paginator
 from events_available.utils import q_search_offline, q_search_online, q_search_name_offline
@@ -41,7 +41,7 @@ def online(request):
     tags = [event.tags for event in all_info]
 
     if f_tags:
-        events_available = Events_online.objects.filter(tags__icontains=f_tags)
+        events_available = events_available.filter(tags__icontains=f_tags)
 
     if order_by and order_by != "default":
         events_available = events_available.order_by(order_by)
@@ -57,9 +57,11 @@ def online(request):
     paginator = Paginator(events_available, 3)
     current_page = paginator.page(int(page))
 
-    # Получаем список избранных мероприятий для текущего пользователя
     favorites = Favorite.objects.filter(user=request.user, online__in=current_page)
     favorites_dict = {favorite.online.id: favorite.id for favorite in favorites}
+
+    registered = Registered.objects.filter(user=request.user, online__in=current_page)
+    registered_dict = {reg.online.id: reg.id for reg in registered}
 
     context = {
         'name_page': 'Онлайн',
@@ -67,8 +69,12 @@ def online(request):
         'speakers': speakers,
         'tags': tags,
         'favorites': favorites_dict,
+        'registered': registered_dict,
     }
     return render(request, 'events_available/online_events.html', context=context)
+
+
+
 
 @login_required
 def online_card(request, event_slug=False, event_id=False):
@@ -134,20 +140,14 @@ def offline(request):
     if order_by and order_by != "default":
         events_available = events_available.order_by(order_by)
 
-    if date_start:
-        date_start_formatted = datetime.strptime(date_start, '%Y-%m-%d').date()
-        events_available = events_available.filter(date__gt=date_start_formatted)
-
-    if date_end:
-        date_end_formatted = datetime.strptime(date_end, '%Y-%m-%d').date()
-        events_available = events_available.filter(date__lt=date_end_formatted)
-
     paginator = Paginator(events_available, 3)
     current_page = paginator.page(int(page))
 
-    # Получаем список избранных мероприятий для текущего пользователя
     favorites = Favorite.objects.filter(user=request.user, offline__in=current_page)
     favorites_dict = {favorite.offline.id: favorite.id for favorite in favorites}
+
+    registered = Registered.objects.filter(user=request.user, offline__in=current_page)
+    registered_dict = {reg.offline.id: reg.id for reg in registered}
 
     context = {
         'name_page': 'Оффлайн',
@@ -155,6 +155,7 @@ def offline(request):
         'speakers': speakers,
         'tags': tags,
         'favorites': favorites_dict,
+        'registered': registered_dict,
     }
     return render(request, 'events_available/offline_events.html', context=context)
 
