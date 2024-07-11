@@ -1,9 +1,12 @@
+import json
+from django.http import JsonResponse
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
 from bookmarks.models import Favorite, Registered
-from events_cultural.models import Attractions, Events_for_visiting
+from events_cultural.models import Attractions, Events_for_visiting, Review
 from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required
 def attractions(request):
@@ -97,6 +100,28 @@ def for_visiting_card(request, event_slug=False, event_id=False):
         'event': event,
     }
     return render(request, 'events_cultural/card.html', context=context)
+
+@login_required
+@csrf_exempt
+def submit_review(request, event_id):
+    if request.method == 'POST':
+        event = get_object_or_404(Events_for_visiting, id=event_id)
+        try:
+            data = json.loads(request.body)
+            comment = data.get('comment', '')
+            if comment:
+                review = Review.objects.create(user=request.user, event=event, comment=comment)
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Отзыв добавлен',
+                    'formatted_date': review.formatted_date()
+                })
+            else:
+                return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Некорректный формат данных'}, status=400)
+    return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
+
 
 @login_required
 def index(request):

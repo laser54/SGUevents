@@ -19,4 +19,6 @@ urlpatterns = [
 	path('events_for_visiting/<int:page>/', views.events_for_visiting, name='events_for_visiting'),
 	path('events_for_visiting/', views.events_for_visiting, name='events_for_visiting'),
 	path('events_for_visiting/<slug:event_slug>/', views.for_visiting_card, name='events_for_visiting_card'),
+
+	path('submit_review/<int:event_id>/', views.submit_review, name='submit_review'),
 ]

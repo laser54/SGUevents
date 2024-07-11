@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 class Attractions(models.Model):
     name = models.CharField(max_length=150, blank=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, verbose_name='URL')
@@ -69,3 +71,21 @@ class Events_for_visiting(models.Model):
     #     if not self.pk:
     #         self.category = "Доступные к посещению"
     #     super(Events_for_visiting, self).save(*args, **kwargs)
+
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    event = models.ForeignKey(Events_for_visiting, on_delete=models.CASCADE, verbose_name='Мероприятие')
+    comment = models.TextField(verbose_name='Комментарий')
+    date_submitted = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')
+
+    class Meta:
+        db_table = 'reviews'
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
+    def __str__(self):
+        return f'{self.date_submitted.strftime("%d.%m.%Y %H:%M")} Отзыв от {self.user.username} на {self.event.name}'
+
+    def formatted_date(self):
+        return self.date_submitted.strftime("%d.%m.%y %H:%M")
+

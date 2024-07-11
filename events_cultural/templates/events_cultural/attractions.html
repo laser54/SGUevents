@@ -172,8 +172,7 @@
 
 {% block content %}
 <!-- Контент на странице -->
-<button type="button" class="btn btn-danger btn-sent_app">
-	Оставить отзыв
+<button type="button" class="btn btn-danger btn-comment" data-event-id="{{ events.id }}" data-bs-toggle="modal" data-bs-target="#commentModal">
+    Оставить отзыв
 </button>
-<button type="button" class="btn btn-light btn-canel-app">Подробнее</button>
 {% endblock content %}
