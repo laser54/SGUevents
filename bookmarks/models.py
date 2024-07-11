@@ -3,7 +3,7 @@ from django.db import models
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
 from users.models import User
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from users.telegram_utils import send_message_to_user
 import logging

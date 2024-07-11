@@ -14,11 +14,13 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.storage.memory import MemoryStorage
 
 
+
 load_dotenv()
 from bot.django_initializer import setup_django_environment
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from bookmarks.models import Registered
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot
@@ -37,6 +39,24 @@ async def get_user_profile(telegram_id):
         return await sync_to_async(User.objects.get)(telegram_id=telegram_id)
     except User.DoesNotExist:
         return None
+
+async def get_user_events(user):
+    events = await sync_to_async(list)(Registered.objects.filter(user=user))
+    event_details = []
+    for event in events:
+        if await sync_to_async(lambda: event.online)():
+            event_name = await sync_to_async(lambda: event.online.name)()
+        elif await sync_to_async(lambda: event.offline)():
+            event_name = await sync_to_async(lambda: event.offline.name)()
+        elif await sync_to_async(lambda: event.attractions)():
+            event_name = await sync_to_async(lambda: event.attractions.name)()
+        elif await sync_to_async(lambda: event.for_visiting)():
+            event_name = await sync_to_async(lambda: event.for_visiting.name)()
+        else:
+            event_name = "Неизвестное мероприятие"
+        event_details.append(event_name)
+    return event_details
+
 
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
@@ -69,8 +89,19 @@ def get_department_name(user):
     return user.department.department_name if user.department else "Не указан"
 
 @dp.message(F.text == "\U0001F5D3 Мои мероприятия")
-async def without_puree(message: types.Message):
-    await message.answer("Функция 'Мои мероприятия' еще не реализована. Подождите немного!")
+async def my_events(message: types.Message):
+    user = await get_user_profile(message.from_user.id)
+    if user:
+        event_details = await get_user_events(user)
+        if event_details:
+            for event_name in event_details:
+                response_text = f"Мероприятие: {event_name}"
+                await message.answer(response_text)
+        else:
+            await message.answer("Вы не зарегистрированы на какие-либо мероприятия.")
+    else:
+        await message.answer("Вы не зарегистрированы на портале.")
+
 
 @dp.message(F.text == "\U00002754 Помощь")
 async def help_request(message: types.Message, state: FSMContext):
