@@ -231,6 +231,21 @@
                                                     {{ speakers }}
                                                 </p> 
                                                 {% block content %}{% endblock content %}
+                                                
+                                                {% for review in reviews %}
+                                                    {% if review %}
+                                                        <p>
+                                                            Отзыв от {{ review.user }}
+                                                        </p>
+                                                        <p>
+                                                            {{ review.user.first_name }}
+                                                            {{ review.user.last_name }}
+                                                        </p>
+                                                        <p>
+                                                            {{ review.comment }}
+                                                        </p>
+                                                    {% endif %}
+                                                {% endfor %}
                                             </div>
                                         </div>
                                     </div>

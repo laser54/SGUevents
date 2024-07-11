@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from bookmarks.models import Favorite, Registered
 from events_available.models import Events_online, Events_offline
-from events_cultural.models import Attractions, Events_for_visiting
+from events_cultural.models import Attractions, Events_for_visiting, Review
 
 
 @login_required
@@ -96,7 +96,11 @@ def events_remove(request, event_id):
 @login_required
 def favorites(request):
     favorites = Favorite.objects.filter(user=request.user)
-    context = {'favorites': favorites}
+    reviews = Review.objects.all()
+    context = {
+        'favorites': favorites,
+        'reviews': reviews,         
+    }
     return render(request, 'bookmarks/favorites.html', context)
 
 def events_attended(request):
@@ -158,6 +162,10 @@ def registered_remove(request, event_id):
 
 @login_required
 def registered(request):
+    reviews = Review.objects.all()
     registered = Registered.objects.filter(user=request.user)
-    context = {'favorites': registered}
+    context = {
+        'favorites': registered,
+        'reviews': reviews,
+        }
     return render(request, 'bookmarks/registered.html', context)

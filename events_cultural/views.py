@@ -32,11 +32,15 @@ def attractions(request):
     # Получаем список избранных мероприятий для текущего пользователя
     favorites = Favorite.objects.filter(user=request.user, attractions__in=current_page)
     favorites_dict = {favorite.attractions.id: favorite.id for favorite in favorites}
+
+    reviews = Review.objects.all()
+
     
     context = {
         'name_page': 'Достопримечательности',
         'event_card_views': current_page,
         'favorites': favorites_dict,
+        'reviews': reviews, 
     }
     return render(request, 'events_cultural/attractions.html', context)
 
