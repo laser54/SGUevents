@@ -14,9 +14,8 @@ six==1.16.0
 sqlparse==0.4.4
 transliterate==1.10.2
 urllib3==2.2.1
-aiogram==3.3.0
+aiogram==3.6.0
 sqlparse==0.4.4
 psycopg2-binary==2.9.9
 transliterate
 requests
-

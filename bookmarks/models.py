@@ -71,14 +71,3 @@ def notify_user_on_registration(sender, instance, created, **kwargs):
             send_message_to_user(user_telegram_id, message)
         else:
             logger.warning(f"У пользователя {instance.user.username} нет telegram_id")
-#пока не работает
-# @receiver(post_delete, sender=Registered)
-# def notify_user_on_unregistration(sender, instance, **kwargs):
-#     event_name = instance.online.name if instance.online else (instance.offline.name if instance.offline else (instance.attractions.name if instance.attractions else instance.for_visiting.name))
-#     message = f"Вы отменили регистрацию на мероприятие: {event_name}."
-#     user_telegram_id = instance.user.telegram_id
-#     if user_telegram_id:
-#         logger.info(f"Отправка сообщения об отмене регистрации пользователю {instance.user.username} с telegram_id: {user_telegram_id}")
-#         send_message_to_user(user_telegram_id, message)
-#     else:
-#         logger.warning(f"У пользователя {instance.user.username} нет telegram_id")
