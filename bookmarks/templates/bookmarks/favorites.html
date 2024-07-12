@@ -210,6 +210,7 @@
                                             {% if favorite.attractions.town %}{{ favorite.attractions.town }}{% endif %} {% if favorite.attractions.street %}{{ evefavorite.attractions.street }}{% endif %} {% if favorite.attractions.cabinet %}{{ favorite.attractions.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
+                                        {{ reviews }}
                                         {% if reviews %}
                                         <div class="reviews">
                                             {% if reviews|get_item:events.id %}

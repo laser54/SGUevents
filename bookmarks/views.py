@@ -97,7 +97,13 @@ def events_remove(request, event_id):
 @login_required
 def favorites(request):
     favorites = Favorite.objects.filter(user=request.user)
-    reviews = Review.objects.all()
+
+    events = Attractions.objects.all()
+
+    reviews = {}
+    for event in events:
+        reviews[event.id] = Review.objects.filter(event=event)
+        
     context = {
         'favorites': favorites,
         'reviews': reviews,         
