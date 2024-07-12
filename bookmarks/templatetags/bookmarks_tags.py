@@ -10,3 +10,7 @@ def user_favorites(request):
 @register.simple_tag()
 def user_registered(request):
   return Registered.objects.filter(user=request.user)
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
