@@ -1,6 +1,8 @@
+import uuid
 from django.db import models
 
 class Events_online(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
@@ -36,6 +38,7 @@ class Events_online(models.Model):
         super(Events_online, self).save(*args, **kwargs)
     
 class Events_offline(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )

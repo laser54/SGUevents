@@ -33,7 +33,12 @@ def attractions(request):
     favorites = Favorite.objects.filter(user=request.user, attractions__in=current_page)
     favorites_dict = {favorite.attractions.id: favorite.id for favorite in favorites}
 
-    reviews = Review.objects.all()
+    events = Attractions.objects.all()
+    
+    # Получение отзывов для каждого мероприятия
+    reviews = {}
+    for event in events:
+        reviews[event.id] = Review.objects.filter(event=event)
 
     
     context = {
@@ -105,14 +110,15 @@ def for_visiting_card(request, event_slug=False, event_id=False):
     }
     return render(request, 'events_cultural/card.html', context=context)
 
+from django.views.decorators.csrf import csrf_exempt
+
 @login_required
 @csrf_exempt
 def submit_review(request, event_id):
     if request.method == 'POST':
-        event = get_object_or_404(Events_for_visiting, id=event_id)
         try:
-            data = json.loads(request.body)
-            comment = data.get('comment', '')
+            event = get_object_or_404(Attractions, id=event_id)
+            comment = request.POST.get('comment', '')
             if comment:
                 review = Review.objects.create(user=request.user, event=event, comment=comment)
                 return JsonResponse({
@@ -122,8 +128,8 @@ def submit_review(request, event_id):
                 })
             else:
                 return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'message': 'Некорректный формат данных'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
     return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
 
 

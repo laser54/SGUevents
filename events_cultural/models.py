@@ -1,8 +1,10 @@
+import uuid
 from django.db import models
 
 from users.models import User
 
 class Attractions(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, blank=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, verbose_name='URL')
     date = models.DateField(max_length=10, blank=False, verbose_name='Дата' )
@@ -37,6 +39,7 @@ class Attractions(models.Model):
 
 
 class Events_for_visiting(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
@@ -74,7 +77,7 @@ class Events_for_visiting(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    event = models.ForeignKey(Events_for_visiting, on_delete=models.CASCADE, verbose_name='Мероприятие')
+    event = models.ForeignKey(Attractions, on_delete=models.CASCADE, verbose_name='Мероприятие')
     comment = models.TextField(verbose_name='Комментарий')
     date_submitted = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')
 

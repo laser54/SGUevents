@@ -232,20 +232,21 @@
                                                 </p> 
                                                 {% block content %}{% endblock content %}
                                                 
-                                                {% for review in reviews %}
-                                                    {% if review %}
-                                                        <p>
-                                                            Отзыв от {{ review.user }}
-                                                        </p>
-                                                        <p>
-                                                            {{ review.user.first_name }}
-                                                            {{ review.user.last_name }}
-                                                        </p>
-                                                        <p>
-                                                            {{ review.comment }}
-                                                        </p>
-                                                    {% endif %}
-                                                {% endfor %}
+                                                {% if reviews %}
+                                                    <div class="reviews">
+                                                        {% if reviews|get_item:events.id %}
+                                                            <ul>
+                                                                {% for review in reviews|get_item:events.id %}
+                                                                    <li>
+                                                                        <h5>Отзывы:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -538,6 +539,10 @@
     }
 </style>
 
+<!-- Notification -->
+<div id="reviewNotification" class="notification" style="display: none;">
+    <p></p>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
@@ -549,9 +554,10 @@
             </div>
             <div class="modal-body">
                 <form id="commentForm">
+                    <input type="hidden" id="eventId" name="event_id">
                     <div class="mb-3">
-                        <label for="commentText" class="form-label">Отзыв</label>
-                        <textarea class="form-control" id="commentText" rows="3" required></textarea>
+                        <label for="commentText" class="form-label">Ваш отзыв</label>
+                        <textarea class="form-control" id="commentText" name="comment" rows="3"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Отправить</button>
                 </form>
@@ -560,8 +566,33 @@
     </div>
 </div>
 
-
 <!-- Notification -->
+<div id="reviewNotification" class="notification" style="display: none;">
+    <p></p>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Оставить отзыв</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="commentForm">
+                    <input type="hidden" id="eventId" name="event_id">
+                    <div class="mb-3">
+                        <label for="commentText" class="form-label">Ваш отзыв</label>
+                        <textarea class="form-control" id="commentText" name="comment" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="reviewNotification" class="notification" style="display: none;">
     <p></p>
 </div>
@@ -572,31 +603,32 @@
         document.querySelectorAll('.btn-comment').forEach(function(button) {
             button.addEventListener('click', function() {
                 const eventId = this.getAttribute('data-event-id');
-                document.getElementById('commentForm').setAttribute('data-event-id', eventId);
+                document.getElementById('eventId').value = eventId;
+                const commentModal = new bootstrap.Modal(document.getElementById('commentModal'));
+                commentModal.show();
             });
         });
 
         document.getElementById('commentForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            const eventId = this.getAttribute('data-event-id');
-            const comment = document.getElementById('commentText').value;
+            const eventId = document.getElementById('eventId').value;
+            const formData = new FormData(this);
             const csrftoken = getCookie('csrftoken');
 
             fetch(`/events_cultural/submit_review/${eventId}/`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken
                 },
-                body: JSON.stringify({ comment: comment })
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     showNotification(`Отзыв добавлен: ${data.formatted_date}`);
                     document.getElementById('commentForm').reset();
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('commentModal'));
-                    modal.hide();
+                    const commentModal = bootstrap.Modal.getInstance(document.getElementById('commentModal'));
+                    commentModal.hide();
                 } else {
                     showNotification(data.message, true);
                 }
@@ -670,6 +702,7 @@
         transform: translateX(-50%) translateY(-20px);
     }
 </style>
+
 
     {% endblock javascript_files %}
 </body>
