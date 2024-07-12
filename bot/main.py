@@ -39,7 +39,7 @@ async def get_user_profile(telegram_id):
     except User.DoesNotExist:
         return None
 
-async def get_user_events(user)
+async def get_user_events(user):
     from bookmarks.models import Registered
     events = await sync_to_async(list)(Registered.objects.filter(user=user))
     event_details = []
