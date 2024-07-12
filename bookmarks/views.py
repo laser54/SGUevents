@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from bookmarks.models import Favorite, Registered
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting, Review
+from users.telegram_utils import send_message_to_user
 
 
 @login_required
@@ -137,7 +138,7 @@ def events_registered(request, event_slug):
             favorite, created = Registered.objects.get_or_create(user=request.user, attractions=event)
         elif event_type == 'for_visiting':
             favorite, created = Registered.objects.get_or_create(user=request.user, for_visiting=event)
-        
+
         if not created:
             favorite.delete()
             added = False
@@ -148,13 +149,20 @@ def events_registered(request, event_slug):
 
     return JsonResponse({'error': 'Event not found or user not authenticated'}, status=400)
 
-  
 
 @login_required
 def registered_remove(request, event_id):
     if request.method == 'POST':
         event = get_object_or_404(Registered, id=event_id, user=request.user)
+        event_name = str(event)  # Получите имя события для сообщения
         event.delete()
+
+        # Получите Telegram ID пользователя
+        telegram_id = request.user.telegram_id
+        if telegram_id:
+            message = f"Вы успешно отменили регистрацию на мероприятие: {event_name}"
+            send_message_to_user(telegram_id, message)
+
         return JsonResponse({'removed': True})
     return JsonResponse({'removed': False, 'error': 'Invalid request method'}, status=400)
 
