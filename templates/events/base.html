@@ -232,13 +232,14 @@
                                                 </p> 
                                                 {% block content %}{% endblock content %}
                                                 
+
                                                 {% if reviews %}
                                                     <div class="reviews">
                                                         {% if reviews|get_item:events.id %}
                                                             <ul>
                                                                 {% for review in reviews|get_item:events.id %}
                                                                     <li>
-                                                                        <h5>Отзывы:</h5>
+                                                                        <h5>Отзыв:</h5>
                                                                         <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
                                                                         <p>{{ review.comment }}</p>
                                                                     </li>
@@ -593,19 +594,14 @@
     </div>
 </div>
 
-<div id="reviewNotification" class="notification" style="display: none;">
-    <p></p>
-</div>
-
-<!-- Скрипт для отправки отзыва -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.btn-comment').forEach(function(button) {
             button.addEventListener('click', function() {
                 const eventId = this.getAttribute('data-event-id');
                 document.getElementById('eventId').value = eventId;
-                const commentModal = new bootstrap.Modal(document.getElementById('commentModal'));
-                commentModal.show();
+                const modal = new bootstrap.Modal(document.getElementById('commentModal'));
+                modal.show();
             });
         });
 
@@ -627,8 +623,8 @@
                 if (data.success) {
                     showNotification(`Отзыв добавлен: ${data.formatted_date}`);
                     document.getElementById('commentForm').reset();
-                    const commentModal = bootstrap.Modal.getInstance(document.getElementById('commentModal'));
-                    commentModal.hide();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('commentModal'));
+                    modal.hide();
                 } else {
                     showNotification(data.message, true);
                 }

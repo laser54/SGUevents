@@ -60,21 +60,24 @@
                                             {% if favorite.online.town %}{{ favorite.online.town }}{% endif %} {% if favorite.online.street %}{{ evefavorite.onlinents.street }}{% endif %} {% if favorite.online.cabinet %}{{ favorite.online.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
+                                    
                                         {% if reviews %}
-                                        <div class="reviews">
-                                            {% if reviews|get_item:events.id %}
-                                                <ul>
-                                                    {% for review in reviews|get_item:events.id %}
-                                                        <li>
-                                                            <h5>Отзывы:</h5>
-                                                            <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-                                                            <p>{{ review.comment }}</p>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </div>
+                                            <div class="reviews">
+                                                {% if reviews|get_item:favorite.online.id %}
+                                                    <ul>
+                                                        {% for review in reviews|get_item:favorite.online.id %}
+                                                            <li>
+                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                <p>{{ review.comment }}</p>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p>Отзывов пока нет.</p>
+                                                {% endif %}
+                                            </div>
                                         {% endif %}
+
                                     </div>
                                 </div>
                             </div>
@@ -135,20 +138,22 @@
                                             {% if favorite.offline.town %}{{ favorite.offline.town }}{% endif %} {% if favorite.offline.street %}{{ evefavorite.offline.street }}{% endif %} {% if favorite.offline.cabinet %}{{ favorite.offline.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
+                                        
                                         {% if reviews %}
-                                        <div class="reviews">
-                                            {% if reviews|get_item:events.id %}
-                                                <ul>
-                                                    {% for review in reviews|get_item:events.id %}
-                                                        <li>
-                                                            <h5>Отзывы:</h5>
-                                                            <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-                                                            <p>{{ review.comment }}</p>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </div>
+                                            <div class="reviews">
+                                                {% if reviews|get_item:favorite.offline.id %}
+                                                    <ul>
+                                                        {% for review in reviews|get_item:favorite.offline.id %}
+                                                            <li>
+                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                <p>{{ review.comment }}</p>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p>Отзывов пока нет.</p>
+                                                {% endif %}
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -210,21 +215,22 @@
                                             {% if favorite.attractions.town %}{{ favorite.attractions.town }}{% endif %} {% if favorite.attractions.street %}{{ evefavorite.attractions.street }}{% endif %} {% if favorite.attractions.cabinet %}{{ favorite.attractions.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
-                                        {{ reviews }}
+                                        
                                         {% if reviews %}
-                                        <div class="reviews">
-                                            {% if reviews|get_item:events.id %}
-                                                <ul>
-                                                    {% for review in reviews|get_item:events.id %}
-                                                        <li>
-                                                            <h5>Отзывы:</h5>
-                                                            <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-                                                            <p>{{ review.comment }}</p>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </div>
+                                            <div class="reviews">
+                                                {% if reviews|get_item:favorite.attractions.id %}
+                                                    <ul>
+                                                        {% for review in reviews|get_item:favorite.attractions.id %}
+                                                            <li>
+                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                <p>{{ review.comment }}</p>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p>Отзывов пока нет.</p>
+                                                {% endif %}
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -288,20 +294,22 @@
                                         <p>{{ speakers }}</p>
                                         
                                         {% if reviews %}
-                                        <div class="reviews">
-                                            {% if reviews|get_item:events.id %}
-                                                <ul>
-                                                    {% for review in reviews|get_item:events.id %}
-                                                        <li>
-                                                            <h5>Отзывы:</h5>
-                                                            <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-                                                            <p>{{ review.comment }}</p>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </div>
+                                            <div class="reviews">
+                                                {% if reviews|get_item:favorite.for_visiting.id %}
+                                                    <ul>
+                                                        {% for review in reviews|get_item:favorite.for_visiting.id %}
+                                                            <li>
+                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                <p>{{ review.comment }}</p>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p>Отзывов пока нет.</p>
+                                                {% endif %}
+                                            </div>
                                         {% endif %}
+
                                     </div>
                                 </div>
                             </div>
