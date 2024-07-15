@@ -20,7 +20,6 @@ from bot.django_initializer import setup_django_environment
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from bookmarks.models import Registered
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot
@@ -41,6 +40,7 @@ async def get_user_profile(telegram_id):
         return None
 
 async def get_user_events(user):
+    from bookmarks.models import Registered
     events = await sync_to_async(list)(Registered.objects.filter(user=user))
     event_details = []
     for event in events:
