@@ -123,13 +123,13 @@
 											/>
 											{% else %} <img src="{% static "general/images/img.png"
 											%}" class="img-fluid rounded-start " alt="{{ event.name}}"> {% endif %}
-											<button
+											{% comment %} <button
 												type="button"
 												class="btn btn-outline-danger btn-sm btn-favorites"
 											>
 												<img src="{% static "general/icons/heart.svg" %}"
 												alt="">
-											</button>
+											</button> {% endcomment %}
 											<div class="card-img-info">
 												<p>id: {{ event.display_id }}</p>
 											</div>

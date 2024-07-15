@@ -109,7 +109,8 @@ def favorites(request):
             events.append(fav.for_visiting)
     reviews = {}
     for event in events:
-        reviews[event.id] = Review.objects.filter(event=event)
+        if event == fav.attractions:
+            reviews[event.id] = Review.objects.filter(event=event)
 
     context = {
         'events': events,
