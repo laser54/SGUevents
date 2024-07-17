@@ -8,3 +8,4 @@ class MainConfig(AppConfig):
     def ready(self):
         from scheduler import start
         start()
+
