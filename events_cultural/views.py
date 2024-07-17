@@ -51,13 +51,23 @@ def attractions(request):
 
 @login_required
 def attractions_card(request, event_slug=False, event_id=False):
+    reviews = {}
     if event_id:
         event = Attractions.objects.get(id=event_id)
+        # reviews[event.id] = Review.objects.filter(event=event)
     else:
         event = Attractions.objects.get(slug=event_slug)
 
+    events = Attractions.objects.all()
+    
+    # Получение отзывов для каждого мероприятия
+    reviews = {}
+    for event_rew in events:
+        reviews[event_rew.id] = Review.objects.filter(event=event_rew)
+
     context = {
         'event': event,
+        'reviews': reviews, 
     }
     return render(request, 'events_cultural/card.html', context=context)
 
