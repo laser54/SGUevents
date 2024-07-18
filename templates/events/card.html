@@ -158,29 +158,21 @@
 												</p>
 												
 												{% if reviews %}
-												<p>111</p>
-												
-												{% for review in reviews|get_item:event.id %}
-												<li>
-													<h5>Отзыв:</h5>
-													<p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-													<p>{{ review.comment }}</p>
-												</li>
-												{% endfor %}
-                                                    <div class="reviews">
-                                                        {% if reviews|get_item:events.id %}
-                                                            <ul>
-                                                                {% for review in reviews|get_item:events.id %}
-                                                                    <li>
-                                                                        <h5>Отзыв:</h5>
-                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-                                                                        <p>{{ review.comment }}</p>
-                                                                    </li>
-                                                                {% endfor %}
-                                                            </ul>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endif %}
+													<div class="reviews">
+														<ul>
+															{% for review in reviews|get_item:event.unique_id %}
+																{% for i in reviews %}
+																	{% if event.unique_id == i %}
+																		<li>
+																			<p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+																			<p>{{ review.comment }}</p>
+																		</li>
+																	{% endif %}
+																{% endfor %}
+															{% endfor %}
+														</ul>
+													</div>
+												{% endif %}
 												{% block content %}{% endblock %}
 											</div>
 										</div>
