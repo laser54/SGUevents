@@ -1,13 +1,15 @@
 import uuid
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+
 
 class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
-    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
-    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала' )
-    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания' )
+    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
+    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
+    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
     description = models.TextField(unique=False, blank=False, null=False, verbose_name='Описание')
     speakers = models.CharField(max_length=250, unique=False, blank=False, null=False, verbose_name='Спикеры')
     member = models.TextField(unique=False, blank=False, null=False, verbose_name='Участники')
@@ -20,6 +22,7 @@ class Events_online(models.Model):
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Онлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
+    reviews = GenericRelation('events_cultural.Review', related_query_name='online_reviews')
 
     class Meta:
         db_table = 'Events_online'
@@ -41,15 +44,15 @@ class Events_offline(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
-    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата' )
-    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала' )
-    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания' )
+    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
+    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
+    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
     description = models.TextField(unique=False, blank=False, null=False, verbose_name='Описание')
     speakers = models.CharField(max_length=250, unique=False, blank=False, null=False, verbose_name='Спикеры')
     member = models.TextField(unique=False, blank=False, null=False, verbose_name='Участники')
     tags = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Теги')
     town = models.CharField(max_length=200, unique=False, blank=False, null=False, verbose_name='Город')
-    street= models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Улица')
+    street = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Улица')
     cabinet = models.CharField(max_length=50, unique=False, blank=False, null=False, verbose_name='Кабинет')
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
@@ -58,6 +61,7 @@ class Events_offline(models.Model):
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Оффлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
+    reviews = GenericRelation('events_cultural.Review', related_query_name='offline_reviews')
     
     class Meta:
         db_table = 'Events_offline'

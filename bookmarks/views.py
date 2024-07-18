@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from bookmarks.models import Favorite, Registered
@@ -109,9 +110,9 @@ def favorites(request):
             events.append(fav.for_visiting)
     reviews = {}
     for event in events:
-        if event == fav.attractions:
-            reviews[event.id] = Review.objects.filter(event=event)
-
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+        
     context = {
         'events': events,
         'reviews': reviews,

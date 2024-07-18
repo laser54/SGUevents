@@ -7,6 +7,7 @@ from events_cultural.models import Attractions, Events_for_visiting, Review
 from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.contenttypes.models import ContentType
 
 @login_required
 def attractions(request):
@@ -38,7 +39,8 @@ def attractions(request):
     # Получение отзывов для каждого мероприятия
     reviews = {}
     for event in events:
-        reviews[event.id] = Review.objects.filter(event=event)
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
     
     context = {
@@ -62,8 +64,13 @@ def attractions_card(request, event_slug=False, event_id=False):
     
     # Получение отзывов для каждого мероприятия
     reviews = {}
+
     for event_rew in events:
-        reviews[event_rew.id] = Review.objects.filter(event=event_rew)
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
+    # for event_rew in events:
+    #     reviews[event_rew.id] = Review.objects.filter(event=event_rew)
 
     context = {
         'event': event,
