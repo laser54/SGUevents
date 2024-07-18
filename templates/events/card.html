@@ -1,4 +1,6 @@
 {% load static %}
+{% load events_cultural_tags %}
+{% load events_available_tags %}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -123,13 +125,13 @@
 											/>
 											{% else %} <img src="{% static "general/images/img.png"
 											%}" class="img-fluid rounded-start " alt="{{ event.name}}"> {% endif %}
-											<button
+											{% comment %} <button
 												type="button"
 												class="btn btn-outline-danger btn-sm btn-favorites"
 											>
 												<img src="{% static "general/icons/heart.svg" %}"
 												alt="">
-											</button>
+											</button> {% endcomment %}
 											<div class="card-img-info">
 												<p>id: {{ event.display_id }}</p>
 											</div>
@@ -154,6 +156,31 @@
 														{% endif %}
 													</small>
 												</p>
+												
+												{% if reviews %}
+												<p>111</p>
+												
+												{% for review in reviews|get_item:event.id %}
+												<li>
+													<h5>Отзыв:</h5>
+													<p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
+													<p>{{ review.comment }}</p>
+												</li>
+												{% endfor %}
+                                                    <div class="reviews">
+                                                        {% if reviews|get_item:events.id %}
+                                                            <ul>
+                                                                {% for review in reviews|get_item:events.id %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
 												{% block content %}{% endblock %}
 											</div>
 										</div>
