@@ -6,6 +6,7 @@ class MainConfig(AppConfig):
     name = 'main'
 
     def ready(self):
-        from scheduler import start
-        start()
+        from django.db.models.signals import post_migrate
+        from scheduler_startup import check_tables_and_start_scheduler
+        post_migrate.connect(check_tables_and_start_scheduler, sender=self)
 

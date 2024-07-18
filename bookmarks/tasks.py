@@ -3,8 +3,12 @@ from django.utils import timezone
 from django.db.models import Q
 from bookmarks.models import Registered
 from users.telegram_utils import send_message_to_user
+import logging
+
+logger = logging.getLogger(__name__)
 
 def send_event_reminders():
+    logger.info("Starting send_event_reminders task.")
     now = timezone.now()
     one_hour_later = now + datetime.timedelta(hours=1)
     five_minutes_later = now + datetime.timedelta(minutes=5)
@@ -15,6 +19,8 @@ def send_event_reminders():
         Q(attractions__time_start__range=(one_hour_later.time(), five_minutes_later.time())) |
         Q(for_visiting__time_start__range=(one_hour_later.time(), five_minutes_later.time()))
     ).select_related('user', 'online', 'offline', 'attractions', 'for_visiting')
+
+    logger.info(f"Found {len(events)} events to send reminders for.")
 
     for event in events:
         if event.online:
@@ -28,3 +34,4 @@ def send_event_reminders():
 
         message = f"Напоминание: мероприятие '{event_obj.name}' начинается через час."
         send_message_to_user(event.user.telegram_id, message)
+        logger.info(f"Sent reminder to {event.user.username} for event {event_obj.name}.")
