@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:14.5 # Updated to latest version
+    image: postgres:14.5
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     restart: always
@@ -9,7 +9,7 @@ services:
 
   backend:
     image: la5er/events:latest
-    command: gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8887"
     restart: always
     volumes:
       - static_value:/code/staticfiles/
@@ -22,16 +22,16 @@ services:
 
   bot:
     image: la5er/events:latest
-    command: python /code/bot/main.py
+    command: sh -c "python manage.py migrate && python /code/bot/main.py"
     restart: always
-    working_dir: /code/bot # Specified working directory
+    working_dir: /code/bot
     depends_on:
       - db
     env_file:
       - ./.env
 
   nginx:
-    image: nginx:1.21.6 # Updated to latest version
+    image: nginx:1.21.6
     ports:
       - "80:80"
       - "443:443"

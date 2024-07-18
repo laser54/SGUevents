@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from datetime import datetime
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
@@ -7,6 +8,9 @@ class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
+    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
+    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
+    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
     time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
     time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
@@ -31,19 +35,26 @@ class Events_online(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def display_id(self):
         return f'{self.id:05}'
-    
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.category = "Онлайн"
         super(Events_online, self).save(*args, **kwargs)
-    
+
+    @property
+    def start_time(self):
+        return datetime.combine(self.date, self.time_start)
+
 class Events_offline(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
+    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
+    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
+    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
     time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
     time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
@@ -70,7 +81,7 @@ class Events_offline(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def display_id(self):
         return f'{self.id:05}'
 
@@ -78,3 +89,7 @@ class Events_offline(models.Model):
         if not self.pk:
             self.category = "Оффлайн"
         super(Events_offline, self).save(*args, **kwargs)
+
+    @property
+    def start_time(self):
+        return datetime.combine(self.date, self.time_start)

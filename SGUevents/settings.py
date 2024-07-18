@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
-
 	'main',
 	'users',
 	'events_available',
@@ -47,6 +46,7 @@ INSTALLED_APPS = [
 	'support',
 	'personal',
     'debug_toolbar',
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
