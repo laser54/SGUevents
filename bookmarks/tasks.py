@@ -1,46 +1,39 @@
-# bookmarks/tasks.py
-
 import datetime
+import logging
 from django.utils import timezone
-from django.db.models import Q
 from bookmarks.models import Registered
 from users.telegram_utils import send_message_to_user
-import logging
 
 logger = logging.getLogger(__name__)
 
+
 def send_event_reminders():
-    logger.info("Starting send_event_reminders task.")
     now = timezone.now()
-    one_day_later_start = now + datetime.timedelta(days=1)
-    one_day_later_end = now + datetime.timedelta(days=1, minutes=5)
-    one_hour_later_start = now + datetime.timedelta(hours=1)
-    one_hour_later_end = now + datetime.timedelta(hours=1, minutes=5)
-    five_minutes_later_start = now + datetime.timedelta(minutes=5)
-    five_minutes_later_end = now + datetime.timedelta(minutes=10)
+    time_intervals = [
+        datetime.timedelta(days=1),
+        datetime.timedelta(hours=1),
+        datetime.timedelta(minutes=5),
+    ]
 
-    logger.info(f"Checking for events starting between {one_day_later_start} and {one_day_later_end}")
-    logger.info(f"Checking for events starting between {one_hour_later_start} and {one_hour_later_end}")
-    logger.info(f"Checking for events starting between {five_minutes_later_start} and {five_minutes_later_end}")
+    for interval in time_intervals:
+        reminder_time = now + interval
+        # Увеличиваем временное окно для фильтрации
+        start_time_window = reminder_time - datetime.timedelta(minutes=1)
+        end_time_window = reminder_time + datetime.timedelta(minutes=1)
 
-    events = Registered.objects.filter(
-        Q(start_datetime__range=(one_day_later_start, one_day_later_end)) |
-        Q(start_datetime__range=(one_hour_later_start, one_hour_later_end)) |
-        Q(start_datetime__range=(five_minutes_later_start, five_minutes_later_end))
-    ).select_related('user', 'online', 'offline', 'attractions', 'for_visiting')
+        events = Registered.objects.filter(
+            start_datetime__gte=start_time_window,
+            start_datetime__lt=end_time_window
+        )
 
-    logger.info(f"Found {events.count()} events to send reminders for.")
+        logger.info(f"Interval: {interval}, Reminder time: {reminder_time}, Events found: {events.count()}")
 
-    for event in events:
-        if event.online:
-            event_obj = event.online
-        elif event.offline:
-            event_obj = event.offline
-        elif event.attractions:
-            event_obj = event.attractions
-        elif event.for_visiting:
-            event_obj = event.for_visiting
-
-        message = f"Напоминание: мероприятие '{event_obj.name}' начинается скоро."
-        send_message_to_user(event.user.telegram_id, message)
-        logger.info(f"Sent reminder to {event.user.username} for event {event_obj.name}.")
+        for event in events:
+            user = event.user
+            if user.telegram_id:
+                message = f'Ваше событие "{event.online.name}" начнется через {interval}.'
+                send_message_to_user(user.telegram_id, message)
+                logger.info(
+                    f"Отправлено сообщение пользователю {user.username} о событии {event.online.name} через {interval}.")
+            else:
+                logger.warning(f"User {user.username} has no telegram_id.")

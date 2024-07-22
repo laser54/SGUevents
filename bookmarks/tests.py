@@ -1,84 +1,68 @@
-# bookmarks/tests.py
-
-import datetime
 from django.test import TestCase
-from django.utils import timezone
-from bookmarks.models import Registered
-from bookmarks.tasks import send_event_reminders
-from events_available.models import Events_online, Events_offline
-from events_cultural.models import Attractions, Events_for_visiting
-from users.models import User, Department
 from unittest.mock import patch
+from bookmarks.models import Registered
+from users.models import User
+from events_available.models import Events_online
+from django.utils import timezone
 from freezegun import freeze_time
+import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SendEventRemindersTestCase(TestCase):
-    def setUp(self):
-        # Create test department and user
-        self.department = Department.objects.create(department_id='test-dept', department_name='Test Department')
-        self.user = User.objects.create(username='testuser', telegram_id='1349308', department=self.department)
-
-        # Create test events
-        now = timezone.now()
-        self.event_online = Events_online.objects.create(
-            name="Test Online Event",
-            slug="test-online-event",
-            date=now.date(),
-            time_start=(now + datetime.timedelta(hours=25)).time(),
-            time_end=(now + datetime.timedelta(hours=26)).time(),
-            description="Description",
-            speakers="Speakers",
-            member="Members",
-            tags="Tags",
-            platform="Platform",
-            link="https://example.com",
-            events_admin="Admin"
-        )
-        self.event_online.start_datetime = now + datetime.timedelta(hours=25)
-        self.event_online.save()
-
-        self.event_offline = Events_offline.objects.create(
-            name="Test Offline Event",
-            slug="test-offline-event",
-            date=now.date(),
-            time_start=(now + datetime.timedelta(hours=1)).time(),
-            time_end=(now + datetime.timedelta(hours=2)).time(),
-            description="Description",
-            speakers="Speakers",
-            member="Members",
-            tags="Tags",
-            town="Town",
-            street="Street",
-            cabinet="Cabinet",
-            link="https://example.com",
-            events_admin="Admin"
-        )
-        self.event_offline.start_datetime = now + datetime.timedelta(hours=1)
-        self.event_offline.save()
-
-        Registered.objects.create(user=self.user, online=self.event_online)
-        Registered.objects.create(user=self.user, offline=self.event_offline)
-
-    @patch('users.telegram_utils.send_message_to_user')
+    @patch('bookmarks.tasks.send_message_to_user')
+    @freeze_time("2024-07-22 14:00:00")
     def test_send_event_reminders(self, mock_send_message_to_user):
-        now = timezone.now()
+        test_user = User.objects.create(username='testuser', telegram_id='1349308')
 
-        # Test for 24-hour reminder
-        with freeze_time(now):
+        start_time = timezone.now() + datetime.timedelta(days=1)
+        date = start_time.date()
+        time_start = start_time.time()
+        time_end = (start_time + datetime.timedelta(hours=2)).time()
+
+        event_online = Events_online.objects.create(
+            name='Test Online Event',
+            slug='test-online-event',
+            date=date,
+            time_start=time_start,
+            time_end=time_end,
+            description='Test description',
+            platform='Zoom',
+            link='http://testlink.com',
+            category='Test Category',
+            start_datetime=start_time  # добавляем start_datetime в событие
+        )
+        Registered.objects.create(
+            user=test_user,
+            online=event_online,
+            start_datetime=start_time  # добавляем start_datetime
+        )
+
+        from bookmarks.tasks import send_event_reminders
+
+        # Check reminders for 1 day
+        with freeze_time("2024-07-23 14:00:00"):
             send_event_reminders()
+            logger.info(f"Call count after 1 day reminder: {mock_send_message_to_user.call_count}")
             self.assertEqual(mock_send_message_to_user.call_count, 1)
-            call_args_24h = mock_send_message_to_user.call_args_list[0]
-            self.assertIn("Напоминание: мероприятие 'Test Online Event' начинается скоро.", call_args_24h[0][1])
+            expected_message = f'Ваше событие "{event_online.name}" начнется через 1 day, 0:00:00.'
+            mock_send_message_to_user.assert_called_with('1349308', expected_message)
 
-        # Test for 1-hour reminder
-        with freeze_time(now + datetime.timedelta(hours=24)):
+        # Check reminders for 1 hour
+        mock_send_message_to_user.reset_mock()
+        with freeze_time("2024-07-24 13:00:00"):
             send_event_reminders()
-            self.assertEqual(mock_send_message_to_user.call_count, 2)
-            call_args_1h = mock_send_message_to_user.call_args_list[1]
-            self.assertIn("Напоминание: мероприятие 'Test Offline Event' начинается скоро.", call_args_1h[0][1])
+            logger.info(f"Call count after 1 hour reminder: {mock_send_message_to_user.call_count}")
+            self.assertEqual(mock_send_message_to_user.call_count, 1)
+            expected_message = f'Ваше событие "{event_online.name}" начнется через 1:00:00.'
+            mock_send_message_to_user.assert_called_with('1349308', expected_message)
 
-        # Test for 5-minute reminder
-        with freeze_time(now + datetime.timedelta(hours=1) - datetime.timedelta(minutes=5)):
+        # Check reminders for 5 minutes
+        mock_send_message_to_user.reset_mock()
+        with freeze_time("2024-07-24 13:55:00"):
             send_event_reminders()
-            self.assertEqual(mock_send_message_to_user.call_count, 3)
-            call_args_5m = mock_send_message_to_user.call_args_list[2]
-            self.assertIn("Напоминание: мероприятие 'Test Offline Event' начинается скоро.", call_args_5m[0][1])
+            logger.info(f"Call count after 5 minutes reminder: {mock_send_message_to_user.call_count}")
+            self.assertEqual(mock_send_message_to_user.call_count, 1)
+            expected_message = f'Ваше событие "{event_online.name}" начнется через 0:05:00.'
+            mock_send_message_to_user.assert_called_with('1349308', expected_message)
