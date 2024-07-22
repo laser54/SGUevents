@@ -235,19 +235,17 @@
 
                                                 {% if reviews %}
                                                     <div class="reviews">
-                                                        <ul>
-                                                            {% for review in reviews|get_item:events.unique_id %}
-                                                                {% for i in reviews %}
-                                                                    {% if events.unique_id == i %}
-                                                                        <li>
-                                                                            <h5>Отзыв:</h5>
-                                                                            <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-                                                                            <p>{{ review.comment }}</p>
-                                                                        </li>
-                                                                    {% endif %}
+                                                        {% if reviews|get_item:events.id %}
+                                                            <ul>
+                                                                {% for review in reviews|get_item:events.id %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
                                                                 {% endfor %}
-                                                            {% endfor %}
-                                                        </ul>
+                                                            </ul>
+                                                        {% endif %}
                                                     </div>
                                                 {% endif %}
                                             </div>
@@ -260,6 +258,7 @@
 
                     
                     {% block favorite %}{% endblock favorite %}
+                    {% block register %}{% endblock register %}
 					
 		
 				</div>
@@ -445,9 +444,9 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.registered) {
-                buttonElement.classList.remove('btn-sent_app');
-                buttonElement.classList.add('btn-remove_app');
+            if (data.added) {
+                buttonElement.classList.remove('btn-danger', 'btn-sent_app');
+                buttonElement.classList.add('btn-light', 'btn-remove_app');
                 buttonElement.innerHTML = 'Отмена регистрации';
                 buttonElement.setAttribute('data-event-id', data.event_id);
                 showRegistrationNotification("Зарегистрировано");
@@ -475,8 +474,8 @@
         .then(response => response.json())
         .then(data => {
             if (data.removed) {
-                buttonElement.classList.remove('btn-remove_app');
-                buttonElement.classList.add('btn-sent_app');
+                buttonElement.classList.remove('btn-light', 'btn-remove_app');
+                buttonElement.classList.add('btn-danger', 'btn-sent_app');
                 buttonElement.innerHTML = 'Регистрация';
                 buttonElement.removeAttribute('data-event-id');
                 showRegistrationNotification("Регистрация отменена");

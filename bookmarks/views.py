@@ -108,17 +108,24 @@ def favorites(request):
             events.append(fav.attractions)
         elif fav.for_visiting:
             events.append(fav.for_visiting)
+    
     reviews = {}
     for event in events:
         content_type = ContentType.objects.get_for_model(event)
         reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
-        
+
+    events_for_visiting = [event for event in events if isinstance(event, Events_for_visiting)]
+    registered = Registered.objects.filter(user=request.user, for_visiting__in=events_for_visiting)
+    registered_dict = {reg.for_visiting.id: reg.id for reg in registered}
+
     context = {
         'events': events,
         'reviews': reviews,
         'favorites': favorites,
+        'registered': registered_dict,
     }
     return render(request, 'bookmarks/favorites.html', context)
+
 
 def events_attended(request):
     pass
@@ -182,7 +189,7 @@ def registered(request):
     reviews = Review.objects.all()
     registered = Registered.objects.filter(user=request.user)
     context = {
-        'favorites': registered,
+        'registered': registered,
         'reviews': reviews,
         }
     return render(request, 'bookmarks/registered.html', context)
