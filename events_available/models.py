@@ -3,14 +3,10 @@ from django.db import models
 from datetime import datetime
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
-
 class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
-    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
-    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
-    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
     time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
     time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
@@ -27,11 +23,12 @@ class Events_online(models.Model):
     const_category = 'Онлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('events_cultural.Review', related_query_name='online_reviews')
+    start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
 
     class Meta:
         db_table = 'Events_online'
         verbose_name = 'Онлайн мероприятие'
-        verbose_name_plural = 'Онлайн'
+        verbose_name_plural = 'Онлайн мероприятия'
 
     def __str__(self):
         return self.name
@@ -40,21 +37,13 @@ class Events_online(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.category = "Онлайн"
+        self.start_datetime = datetime.combine(self.date, self.time_start)
         super(Events_online, self).save(*args, **kwargs)
-
-    @property
-    def start_time(self):
-        return datetime.combine(self.date, self.time_start)
 
 class Events_offline(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
     name = models.CharField(max_length=150, unique=False, blank=False, null=False, verbose_name='Название')
     slug = models.SlugField(max_length=200, unique=True, blank=False, null=False, verbose_name='URL')
-    date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
-    time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
-    time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
     date = models.DateField(max_length=10, unique=False, blank=False, null=False, verbose_name='Дата')
     time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
     time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
@@ -73,11 +62,12 @@ class Events_offline(models.Model):
     const_category = 'Оффлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('events_cultural.Review', related_query_name='offline_reviews')
-    
+    start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+
     class Meta:
         db_table = 'Events_offline'
         verbose_name = 'Оффлайн мероприятие'
-        verbose_name_plural = 'Оффлайн'
+        verbose_name_plural = 'Оффлайн мероприятия'
 
     def __str__(self):
         return self.name
@@ -86,10 +76,5 @@ class Events_offline(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.category = "Оффлайн"
+        self.start_datetime = datetime.combine(self.date, self.time_start)
         super(Events_offline, self).save(*args, **kwargs)
-
-    @property
-    def start_time(self):
-        return datetime.combine(self.date, self.time_start)

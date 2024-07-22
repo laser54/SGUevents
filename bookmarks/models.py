@@ -41,6 +41,7 @@ class Registered(models.Model):
     attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
     for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
     created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+    start_datetime = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время начала")  # Новое поле
 
     class Meta:
         verbose_name = "Зарегистрированные"
@@ -58,16 +59,16 @@ class Registered(models.Model):
                 except:
                     return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
 
-    @property
-    def start_time(self):
+    def save(self, *args, **kwargs):
         if self.online:
-            return self.online.time_start
+            self.start_datetime = self.online.start_datetime
         elif self.offline:
-            return self.offline.time_start
+            self.start_datetime = self.offline.start_datetime
         elif self.attractions:
-            return self.attractions.time_start
-        else:
-            return self.for_visiting.time_start
+            self.start_datetime = self.attractions.start_datetime
+        elif self.for_visiting:
+            self.start_datetime = self.for_visiting.start_datetime
+        super().save(*args, **kwargs)
 
 @receiver(post_save, sender=Registered)
 def notify_user_on_registration(sender, instance, created, **kwargs):
