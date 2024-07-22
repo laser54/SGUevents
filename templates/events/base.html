@@ -450,6 +450,7 @@
                 buttonElement.innerHTML = 'Отмена регистрации';
                 buttonElement.setAttribute('data-event-id', data.event_id);
                 buttonElement.removeAttribute('data-event-slug');
+                showRegistrationNotification("Зарегистрировано"); // Show notification
                 initializeRegistrationButtons(); // Re-initialize buttons
             } else {
                 console.error('Ошибка при регистрации:', data.error);
@@ -479,12 +480,32 @@
                 buttonElement.innerHTML = 'Регистрация';
                 buttonElement.setAttribute('data-event-slug', data.event_slug);
                 buttonElement.removeAttribute('data-event-id');
+                showRegistrationNotification("Регистрация отменена"); // Show notification
                 initializeRegistrationButtons(); // Re-initialize buttons
             } else {
                 console.error('Ошибка при отмене регистрации:', data.error);
             }
         })
         .catch(error => console.error('Ошибка:', error));
+    }
+
+    function showRegistrationNotification(message) {
+        const notification = document.getElementById('registrationNotification');
+        notification.querySelector('p').textContent = message;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.classList.add('fade-in');
+        }, 10); // Slight delay to trigger transition
+
+        setTimeout(function() {
+            notification.classList.remove('fade-in');
+            notification.classList.add('fade-out');
+
+            setTimeout(function() {
+                notification.style.display = 'none';
+                notification.classList.remove('fade-out');
+            }, 700);
+        }, 1000);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
