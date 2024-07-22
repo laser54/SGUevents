@@ -134,6 +134,8 @@ def events_attended(request):
 
 @login_required
 def events_registered(request, event_slug):
+    event = None
+    event_type = None
     try:
         event = Events_online.objects.get(slug=event_slug)
         event_type = 'online'
@@ -153,25 +155,23 @@ def events_registered(request, event_slug):
                     pass
 
     if event and request.user.is_authenticated:
-        favorite, created = None, False
+        registered, created = None, False
         if event_type == 'online':
-            favorite, created = Registered.objects.get_or_create(user=request.user, online=event)
+            registered, created = Registered.objects.get_or_create(user=request.user, online=event)
         elif event_type == 'offline':
-            favorite, created = Registered.objects.get_or_create(user=request.user, offline=event)
+            registered, created = Registered.objects.get_or_create(user=request.user, offline=event)
         elif event_type == 'attractions':
-            favorite, created = Registered.objects.get_or_create(user=request.user, attractions=event)
+            registered, created = Registered.objects.get_or_create(user=request.user, attractions=event)
         elif event_type == 'for_visiting':
-            favorite, created = Registered.objects.get_or_create(user=request.user, for_visiting=event)
+            registered, created = Registered.objects.get_or_create(user=request.user, for_visiting=event)
 
-        if not created:
-            favorite.delete()
-            added = False
+        if created:
+            return JsonResponse({'added': True, 'event_id': registered.id, 'event_slug': event_slug})
         else:
-            added = True
-
-        return JsonResponse({'added': added})
+            return JsonResponse({'added': False, 'error': 'Already registered'}, status=400)
 
     return JsonResponse({'error': 'Event not found or user not authenticated'}, status=400)
+
 
 
 
@@ -179,14 +179,21 @@ def events_registered(request, event_slug):
 def registered_remove(request, event_id):
     if request.method == 'POST':
         event = get_object_or_404(Registered, id=event_id, user=request.user)
-        event_name = str(event)
+        event_slug = event.for_visiting.slug if event.for_visiting else (
+            event.online.slug if event.online else (
+                event.offline.slug if event.offline else (
+                    event.attractions.slug if event.attractions else None
+                )
+            )
+        )
         event.delete()
         telegram_id = request.user.telegram_id
         if telegram_id:
-            message = f"Вы успешно отменили регистрацию на мероприятие: {event_name}"
+            message = f"Вы успешно отменили регистрацию на мероприятие: {event_slug}"
             send_message_to_user(telegram_id, message)
-        return JsonResponse({'removed': True})
+        return JsonResponse({'removed': True, 'event_slug': event_slug})
     return JsonResponse({'removed': False, 'error': 'Invalid request method'}, status=400)
+
 
 
 
