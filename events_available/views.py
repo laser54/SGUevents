@@ -84,9 +84,6 @@ def online(request):
 
     return render(request, 'events_available/online_events.html', context=context)
 
-
-
-
 @login_required
 def online_card(request, event_slug=False, event_id=False):
     if event_id:

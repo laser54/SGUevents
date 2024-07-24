@@ -35,19 +35,16 @@ def index(request):
     paginator = Paginator(all_content, 10)
     current_page = paginator.page(int(page))
 
-    # Separate the events by type
     current_online = [event for event in current_page if isinstance(event, Events_online)]
     current_offline = [event for event in current_page if isinstance(event, Events_offline)]
     current_attractions = [event for event in current_page if isinstance(event, Attractions)]
     current_for_visiting = [event for event in current_page if isinstance(event, Events_for_visiting)]
 
-    # Fetch favorites
     favorites_online = Favorite.objects.filter(user=request.user, online__in=current_online).values_list('online_id', 'id')
     favorites_offline = Favorite.objects.filter(user=request.user, offline__in=current_offline).values_list('offline_id', 'id')
     favorites_attractions = Favorite.objects.filter(user=request.user, attractions__in=current_attractions).values_list('attractions_id', 'id')
     favorites_for_visiting = Favorite.objects.filter(user=request.user, for_visiting__in=current_for_visiting).values_list('for_visiting_id', 'id')
 
-    # Construct the favorites dictionary
     favorites_dict = {
         'online': {item[0]: item[1] for item in favorites_online},
         'offline': {item[0]: item[1] for item in favorites_offline},

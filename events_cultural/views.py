@@ -8,6 +8,7 @@ from events_cultural.utils import q_search_events_for_visiting, q_search_attract
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import redirect
 
 @login_required
 def attractions(request):
@@ -30,19 +31,16 @@ def attractions(request):
     paginator = Paginator(events_cultural, 3)
     current_page = paginator.page(int(page))
 
-    # Получаем список избранных мероприятий для текущего пользователя
     favorites = Favorite.objects.filter(user=request.user, attractions__in=current_page)
     favorites_dict = {favorite.attractions.id: favorite.id for favorite in favorites}
 
     events = Attractions.objects.all()
     
-    # Получение отзывов для каждого мероприятия
     reviews = {}
     for event in events:
         content_type = ContentType.objects.get_for_model(event)
         reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
-    
     context = {
         'name_page': 'Достопримечательности',
         'event_card_views': current_page,
@@ -56,29 +54,22 @@ def attractions_card(request, event_slug=False, event_id=False):
     reviews = {}
     if event_id:
         event = Attractions.objects.get(id=event_id)
-        # reviews[event.id] = Review.objects.filter(event=event)
     else:
         event = Attractions.objects.get(slug=event_slug)
 
     events = Attractions.objects.all()
     
-    # Получение отзывов для каждого мероприятия
     reviews = {}
 
     for event_rew in events:
         content_type = ContentType.objects.get_for_model(event)
         reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
-    # for event_rew in events:
-    #     reviews[event_rew.id] = Review.objects.filter(event=event_rew)
-
     context = {
         'event': event,
         'reviews': reviews, 
     }
     return render(request, 'events_cultural/card.html', context=context)
-
-from django.shortcuts import redirect
 
 @login_required
 def events_for_visiting(request):
@@ -101,14 +92,12 @@ def events_for_visiting(request):
     paginator = Paginator(events_cultural, 3)
     current_page = paginator.page(int(page))
 
-    # Получаем список избранных и зарегистрированных мероприятий для текущего пользователя
     favorites = Favorite.objects.filter(user=request.user, for_visiting__in=current_page)
     favorites_dict = {favorite.for_visiting.id: favorite.id for favorite in favorites}
 
     registered = Registered.objects.filter(user=request.user, for_visiting__in=current_page)
     registered_dict = {reg.for_visiting.id: reg.id for reg in registered}
 
-    # Получение отзывов для каждого мероприятия
     reviews = {}
     for event in current_page:
         content_type = ContentType.objects.get_for_model(event)
@@ -123,9 +112,6 @@ def events_for_visiting(request):
     }
     return render(request, 'events_cultural/events_for_visiting.html', context)
 
-
-
-
 @login_required
 def for_visiting_card(request, event_slug=False, event_id=False):
     if event_id:
@@ -138,9 +124,7 @@ def for_visiting_card(request, event_slug=False, event_id=False):
     }
     return render(request, 'events_cultural/card.html', context=context)
 
-from django.views.decorators.csrf import csrf_exempt
-
-@login_required
+@login_required 
 @csrf_exempt
 def submit_review(request, event_id):
     if request.method == 'POST':
@@ -170,12 +154,6 @@ def submit_review(request, event_id):
             'formatted_date': review.formatted_date()
         })
     return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
-
-
-
-
-
-
 
 @login_required
 def index(request):

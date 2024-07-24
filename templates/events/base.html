@@ -114,7 +114,6 @@
 					{% if request.GET.q %}
 						<h3 class="mt-4">Результаты поиска по запросу {{ request.GET.q }}</h3>
 						{% if not event_card_views %}
-							{% comment %} <link rel="stylesheet" href="{% static "deps/css/my_footer_css.css" %}"> {% endcomment %}
 							<h2 class="mt-4">По запросу ничего не найдено</h2>
 						{% endif %}
 					{% endif %}
@@ -232,7 +231,6 @@
                                                 </p> 
                                                 {% block content %}{% endblock content %}
                                                 
-                                                
                                                 {% if reviews %}
                                                     <div class="reviews">
                                                         {% if reviews|get_item:events.unique_id %}
@@ -255,14 +253,11 @@
                             </div>
                         </div>
                     {% endfor %}
-
-                    
+ 
                     {% block favorite %}{% endblock favorite %}
                     {% block register %}{% endblock register %}
 					
-		
 				</div>
-		
 				<div class="col-lg-1"></div>
 			</div>
 		</div>
@@ -392,7 +387,7 @@
         notification.style.display = 'block';
         setTimeout(() => {
             notification.classList.add('fade-in');
-        }, 10); // Slight delay to trigger transition
+        }, 10);
 
         setTimeout(function() {
             notification.classList.remove('fade-in');
@@ -410,7 +405,6 @@
     });
 </script>
 
-
 <!-- Notification for Registration -->
 <div id="registrationNotification" class="notification" style="display: none;">
     <p></p>
@@ -419,13 +413,13 @@
 <script>
     function initializeRegistrationButtons() {
         document.querySelectorAll('.btn-sent_app').forEach(function(button) {
-            button.removeEventListener('click', handleRegister); // Remove previous event listeners
-            button.addEventListener('click', handleRegister); // Add new event listeners
+            button.removeEventListener('click', handleRegister);
+            button.addEventListener('click', handleRegister);
         });
 
         document.querySelectorAll('.btn-remove_app').forEach(function(button) {
-            button.removeEventListener('click', handleUnregister); // Remove previous event listeners
-            button.addEventListener('click', handleUnregister); // Add new event listeners
+            button.removeEventListener('click', handleUnregister);
+            button.addEventListener('click', handleUnregister);
         });
     }
 
@@ -450,8 +444,8 @@
                 buttonElement.innerHTML = 'Отмена регистрации';
                 buttonElement.setAttribute('data-event-id', data.event_id);
                 buttonElement.removeAttribute('data-event-slug');
-                showRegistrationNotification("Зарегистрировано"); // Show notification
-                initializeRegistrationButtons(); // Re-initialize buttons
+                showRegistrationNotification("Зарегистрировано");
+                initializeRegistrationButtons();
             } else {
                 console.error('Ошибка при регистрации:', data.error);
             }
@@ -480,8 +474,8 @@
                 buttonElement.innerHTML = 'Регистрация';
                 buttonElement.setAttribute('data-event-slug', data.event_slug);
                 buttonElement.removeAttribute('data-event-id');
-                showRegistrationNotification("Регистрация отменена"); // Show notification
-                initializeRegistrationButtons(); // Re-initialize buttons
+                showRegistrationNotification("Регистрация отменена");
+                initializeRegistrationButtons();
             } else {
                 console.error('Ошибка при отмене регистрации:', data.error);
             }
@@ -495,7 +489,7 @@
         notification.style.display = 'block';
         setTimeout(() => {
             notification.classList.add('fade-in');
-        }, 10); // Slight delay to trigger transition
+        }, 10);
 
         setTimeout(function() {
             notification.classList.remove('fade-in');
@@ -660,7 +654,6 @@
     });
 </script>
 
-
 <style>
     .notification {
         position: fixed;
@@ -690,10 +683,6 @@
         transform: translateX(-50%) translateY(-20px);
     }
 </style>
-
-
-
-
     {% endblock javascript_files %}
 </body>
 </html>
