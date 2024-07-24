@@ -73,7 +73,7 @@ def online(request):
         reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
     context = {
-        'name_page': 'Оффлайн',
+        'name_page': 'Онлайн',
         'event_card_views': current_page,
         'speakers': speakers,
         'tags': tags,
@@ -195,7 +195,7 @@ def offline_card(request, event_slug=False, event_id=False):
         'event': event,
         'reviews': reviews,
     }
-    
+
     return render(request, 'events_available/card.html', context=context)
 
 @login_required

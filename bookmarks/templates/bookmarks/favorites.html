@@ -70,6 +70,7 @@
                                                             {% for i in reviews %}
                                                                 {% if favorite.online.unique_id == i %}
                                                                     <li>
+                                                                        <h5>Отзыв:</h5>
                                                                         <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
                                                                         <p>{{ review.comment }}</p>
                                                                     </li>
@@ -150,6 +151,7 @@
                                                             {% for i in reviews %}
                                                                 {% if favorite.offline.unique_id == i %}
                                                                     <li>
+                                                                        <h5>Отзыв:</h5>
                                                                         <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
                                                                         <p>{{ review.comment }}</p>
                                                                     </li>
@@ -230,6 +232,7 @@
                                                             {% for i in reviews %}
                                                                 {% if favorite.attractions.unique_id == i %}
                                                                     <li>
+                                                                        <h5>Отзыв:</h5>
                                                                         <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
                                                                         <p>{{ review.comment }}</p>
                                                                     </li>
@@ -309,6 +312,7 @@
                                                             {% for i in reviews %}
                                                                 {% if favorite.for_visiting.unique_id == i %}
                                                                     <li>
+                                                                        <h5>Отзыв:</h5>
                                                                         <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
                                                                         <p>{{ review.comment }}</p>
                                                                     </li>

@@ -201,16 +201,25 @@ def registered_remove(request, event_id):
 def registered(request):
     registered = Registered.objects.filter(user=request.user)
     reviews = {}
+    events = []
     for reg in registered:
-        event = reg.online or reg.offline or reg.attractions or reg.for_visiting
+        if reg.online:
+            events.append(reg.online)
+        elif reg.offline:
+            events.append(reg.offline)
+        elif reg.attractions:
+            events.append(reg.attractions)
+        elif reg.for_visiting:
+            events.append(reg.for_visiting)
+    
+    for event in events:
         content_type = ContentType.objects.get_for_model(event)
         reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
-
 
     context = {
         'registered': registered,
         'reviews': reviews,
-        }
+    }
     return render(request, 'bookmarks/registered.html', context)
 
 @login_required
