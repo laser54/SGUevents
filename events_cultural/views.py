@@ -56,17 +56,29 @@ def attractions_card(request, event_slug=False, event_id=False):
     reviews = {}
     if event_id:
         event = Attractions.objects.get(id=event_id)
+        # reviews[event.id] = Review.objects.filter(event=event)
     else:
         event = Attractions.objects.get(slug=event_slug)
 
-    content_type = ContentType.objects.get_for_model(event)
-    reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+    events = Attractions.objects.all()
+    
+    # Получение отзывов для каждого мероприятия
+    reviews = {}
+
+    for event_rew in events:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
+    # for event_rew in events:
+    #     reviews[event_rew.id] = Review.objects.filter(event=event_rew)
 
     context = {
         'event': event,
         'reviews': reviews, 
     }
     return render(request, 'events_cultural/card.html', context=context)
+
+from django.shortcuts import redirect
 
 @login_required
 def events_for_visiting(request):
@@ -96,13 +108,22 @@ def events_for_visiting(request):
     registered = Registered.objects.filter(user=request.user, for_visiting__in=current_page)
     registered_dict = {reg.for_visiting.id: reg.id for reg in registered}
 
+    # Получение отзывов для каждого мероприятия
+    reviews = {}
+    for event in current_page:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
     context = {
         'name_page': 'Доступные к посещению',
         'event_card_views': current_page,
         'favorites': favorites_dict,
         'registered': registered_dict,
+        'reviews': reviews,
     }
     return render(request, 'events_cultural/events_for_visiting.html', context)
+
+
 
 
 @login_required
@@ -123,21 +144,37 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def submit_review(request, event_id):
     if request.method == 'POST':
-        try:
+        comment = request.POST.get('comment', '')
+        model_type = request.POST.get('model_type', '')
+
+        if not comment:
+            return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
+
+        if model_type == 'attractions':
             event = get_object_or_404(Attractions, id=event_id)
-            comment = request.POST.get('comment', '')
-            if comment:
-                review = Review.objects.create(user=request.user, event=event, comment=comment)
-                return JsonResponse({
-                    'success': True,
-                    'message': 'Отзыв добавлен',
-                    'formatted_date': review.formatted_date()
-                })
-            else:
-                return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+        elif model_type == 'for_visiting':
+            event = get_object_or_404(Events_for_visiting, id=event_id)
+        else:
+            return JsonResponse({'success': False, 'message': 'Некорректный тип мероприятия'}, status=400)
+
+        content_type = ContentType.objects.get_for_model(event)
+        review = Review.objects.create(
+            user=request.user,
+            content_type=content_type,
+            object_id=event.id,
+            comment=comment
+        )
+        return JsonResponse({
+            'success': True,
+            'message': 'Отзыв добавлен',
+            'formatted_date': review.formatted_date()
+        })
     return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
+
+
+
+
+
 
 
 @login_required

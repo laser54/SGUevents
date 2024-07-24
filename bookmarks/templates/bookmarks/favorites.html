@@ -288,36 +288,21 @@
                                             {% if favorite.for_visiting.town %}{{ favorite.for_visiting.town }}{% endif %} {% if favorite.for_visiting.street %}{{ evefavorite.for_visiting.street }}{% endif %} {% if favorite.for_visiting.cabinet %}{{ favorite.for_visiting.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
-
-                                        {% for event in events %}
-                                            {% if event.id == favorite.for_visiting.id %}
-                                                <div class="event-item">
-                                                    <p>{{ event.id }} {{ event.name }}</p>
-                                                    {% if event.id in registered %}
-                                                        <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:event.id }}">
-                                                            Отмена регистрации
-                                                        </a>
-                                                    {% else %}
-                                                        <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ event.slug }}">
-                                                            Регистрация
-                                                        </a>
-                                                    {% endif %}
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
                                                          
                                         {% if reviews %}
-                                            <div class="reviews">
-                                                {% if reviews|get_item:favorite.for_visiting.id %}
+                                            <div class="reviews">          
                                                     <ul>
-                                                        {% for review in reviews|get_item:favorite.for_visiting.id %}
-                                                            <li>
-                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                <p>{{ review.comment }}</p>
-                                                            </li>
+                                                        {% for review in reviews|get_item:favorite.for_visiting.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if favorite.for_visiting.unique_id == i %}
+                                                                    <li>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         {% endfor %}
                                                     </ul>
-                                                {% endif %}
                                             </div>
                                         {% endif %}
 

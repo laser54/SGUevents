@@ -257,43 +257,4 @@
     </ul>
 </div>
 
-{% comment %} ДОБАВЛЕНИЕ {% endcomment %}
-{% comment %} <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        document.querySelectorAll('.register-event').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const eventSlug = this.getAttribute('data-event-slug');
-                const buttonElement = this;
-    
-                fetch(`/bookmarks/events_registered/${eventSlug}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ 'slug': eventSlug })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.registered) {
-                        buttonElement.textContent = "Зарегистрировано";
-                        buttonElement.classList.remove('btn-danger');
-                        buttonElement.classList.add('btn-success');
-                    } else if (data.unregistered) {
-                        buttonElement.textContent = "Регистрация";
-                        buttonElement.classList.remove('btn-success');
-                        buttonElement.classList.add('btn-danger');
-                    } else {
-                        console.error('Ошибка:', data.error);
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            });
-        });
-    });
-</script> {% endcomment %}
-
-
 {% endblock register %}
