@@ -17,7 +17,7 @@ urlpatterns = [
 	path('offline/', views.offline, name='offline'),
 	path('offline/<slug:event_slug>/', views.offline_card, name='offline_card'),
 	
-	
+	path('submit_review/<int:event_id>/', views.submit_review, name='submit_review'),
 
 	# path('offline/<int:page>/', views.offline, name='offline'),
 	# path('offline/<int:event_id>/', views.offline_card, name='offline_card'),

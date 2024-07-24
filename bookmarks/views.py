@@ -6,6 +6,8 @@ from bookmarks.models import Favorite, Registered
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting, Review
 from users.telegram_utils import send_message_to_user
+from events_cultural.views import submit_review
+from django.views.decorators.csrf import csrf_exempt
 
 
 @login_required
@@ -195,14 +197,51 @@ def registered_remove(request, event_id):
     return JsonResponse({'removed': False, 'error': 'Invalid request method'}, status=400)
 
 
-
-
 @login_required
 def registered(request):
-    reviews = Review.objects.all()
     registered = Registered.objects.filter(user=request.user)
+    reviews = {}
+    for reg in registered:
+        event = reg.online or reg.offline or reg.attractions or reg.for_visiting
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
+
     context = {
         'registered': registered,
         'reviews': reviews,
         }
     return render(request, 'bookmarks/registered.html', context)
+
+@login_required
+@csrf_exempt
+def submit_review(request, event_id):
+    if request.method == 'POST':
+        comment = request.POST.get('comment', '')
+        model_type = request.POST.get('model_type', '')
+
+        if not comment:
+            return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
+
+        if model_type == 'online':
+            event = get_object_or_404(Events_online, id=event_id)
+        elif model_type == 'offline':
+            event = get_object_or_404(Events_offline, id=event_id)
+        else:
+            return JsonResponse({'success': False, 'message': 'Некорректный тип мероприятия'}, status=400)
+
+        content_type = ContentType.objects.get_for_model(event)
+        review = Review.objects.create(
+            user=request.user,
+            content_type=content_type,
+            object_id=event.id,
+            comment=comment
+        )
+        return JsonResponse({
+            'success': True,
+            'message': 'Отзыв добавлен',
+            'formatted_date': review.formatted_date()
+        })
+    return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
+
+

@@ -61,18 +61,22 @@
                                         </p>
                                         <p>{{ speakers }}</p>
                                     
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.online.id }}" data-model-type="online">Оставить отзыв</button>
+
                                         {% if reviews %}
-                                            <div class="reviews">
-                                                {% if reviews|get_item:favorite.online.id %}
+                                            <div class="reviews">          
                                                     <ul>
-                                                        {% for review in reviews|get_item:favorite.online.id %}
-                                                            <li>
-                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                <p>{{ review.comment }}</p>
-                                                            </li>
+                                                        {% for review in reviews|get_item:favorite.online.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if favorite.online.unique_id == i %}
+                                                                    <li>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         {% endfor %}
                                                     </ul>
-                                                {% endif %}
                                             </div>
                                         {% endif %}
 
@@ -136,21 +140,26 @@
                                             {% if favorite.offline.town %}{{ favorite.offline.town }}{% endif %} {% if favorite.offline.street %}{{ evefavorite.offline.street }}{% endif %} {% if favorite.offline.cabinet %}{{ favorite.offline.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
-                                        
+
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.offline.id }}" data-model-type="offline">Оставить отзыв</button>
+
                                         {% if reviews %}
-                                            <div class="reviews">
-                                                {% if reviews|get_item:favorite.offline.id %}
+                                            <div class="reviews">          
                                                     <ul>
-                                                        {% for review in reviews|get_item:favorite.offline.id %}
-                                                            <li>
-                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                <p>{{ review.comment }}</p>
-                                                            </li>
+                                                        {% for review in reviews|get_item:favorite.offline.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if favorite.offline.unique_id == i %}
+                                                                    <li>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         {% endfor %}
                                                     </ul>
-                                                {% endif %}
                                             </div>
                                         {% endif %}
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -212,6 +221,8 @@
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.attractions.id }}" data-model-type="attractions">Оставить отзыв</button>
+
                                         {% if reviews %}
                                             <div class="reviews">          
                                                     <ul>
@@ -288,7 +299,9 @@
                                             {% if favorite.for_visiting.town %}{{ favorite.for_visiting.town }}{% endif %} {% if favorite.for_visiting.street %}{{ evefavorite.for_visiting.street }}{% endif %} {% if favorite.for_visiting.cabinet %}{{ favorite.for_visiting.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
-                                                         
+                                        
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.for_visiting.id }}" data-model-type="for_visiting">Оставить отзыв</button>
+
                                         {% if reviews %}
                                             <div class="reviews">          
                                                     <ul>

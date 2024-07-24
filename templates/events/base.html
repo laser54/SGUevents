@@ -568,6 +568,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Отправить</button>
                 </form>
+                
             </div>
         </div>
     </div>
@@ -586,16 +587,23 @@
                 modal.show();
             });
         });
-    
+
         document.getElementById('commentForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const eventId = document.getElementById('eventId').value;
             const modelType = document.getElementById('modelType').value;
             const formData = new FormData(this);
-            formData.append('model_type', modelType); // Добавить model_type в formData
+            formData.append('model_type', modelType);
             const csrftoken = getCookie('csrftoken');
-    
-            fetch(`/events_cultural/submit_review/${eventId}/`, {
+
+            let url = '';
+            if (modelType === 'attractions' || modelType === 'for_visiting') {
+                url = `/events_cultural/submit_review/${eventId}/`;
+            } else if (modelType === 'offline' || modelType === 'online') {
+                url = `/events_available/submit_review/${eventId}/`;
+            }
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken
@@ -615,21 +623,22 @@
             })
             .catch(error => console.error('Error:', error));
         });
-    
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
                 const cookies = document.cookie.split(';');
                 for (let i = 0; i < cookies.length; i++) {
                     const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '='))
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                         break;
+                    }
                 }
             }
             return cookieValue;
         }
-    
+
         function showNotification(message, isError = false) {
             const notification = document.getElementById('reviewNotification');
             notification.querySelector('p').textContent = message;
@@ -638,11 +647,11 @@
             setTimeout(() => {
                 notification.classList.add('fade-in');
             }, 10);
-    
+
             setTimeout(function() {
                 notification.classList.remove('fade-in');
                 notification.classList.add('fade-out');
-    
+
                 setTimeout(function() {
                     notification.style.display = 'none';
                     notification.classList.remove('fade-out');
@@ -650,10 +659,8 @@
             }, 2000);
         }
     });
-    
-    
-    
 </script>
+
 
 <style>
     .notification {

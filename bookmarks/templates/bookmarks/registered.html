@@ -62,6 +62,27 @@
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ register.online.id }}" data-model-type="online">Оставить отзыв</button>
+
+                                        <p> {{ register.online.unique_id  }}</p>
+                                        <p>{{ reviews }}</p>
+
+                                        {% if reviews %}
+                                            <div class="reviews">          
+                                                    <ul>
+                                                        {% for review in reviews|get_item:register.online.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if register.online.unique_id == i %}
+                                                                    <li>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    </ul>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from bookmarks.models import Favorite, Registered
 from events_available.models import Events_offline, Events_online
@@ -5,6 +6,9 @@ from django.core.paginator import Paginator
 from events_available.utils import q_search_offline, q_search_online, q_search_name_offline
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.contenttypes.models import ContentType
+from events_cultural.models import Review
 
 @login_required
 def online(request):
@@ -63,14 +67,21 @@ def online(request):
     registered = Registered.objects.filter(user=request.user, online__in=current_page)
     registered_dict = {reg.online.id: reg.id for reg in registered}
 
+    reviews = {}
+    for event in current_page:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
     context = {
-        'name_page': 'Онлайн',
+        'name_page': 'Оффлайн',
         'event_card_views': current_page,
         'speakers': speakers,
         'tags': tags,
         'favorites': favorites_dict,
         'registered': registered_dict,
+        'reviews': reviews,
     }
+
     return render(request, 'events_available/online_events.html', context=context)
 
 
@@ -83,8 +94,12 @@ def online_card(request, event_slug=False, event_id=False):
     else:
         event = Events_online.objects.get(slug=event_slug)
 
+    content_type = ContentType.objects.get_for_model(event)
+    reviews = Review.objects.filter(content_type=content_type, object_id=event.id)
+
     context = {
         'event': event,
+        'reviews': reviews,
     }
     return render(request, 'events_available/card.html', context=context)
 
@@ -149,6 +164,11 @@ def offline(request):
     registered = Registered.objects.filter(user=request.user, offline__in=current_page)
     registered_dict = {reg.offline.id: reg.id for reg in registered}
 
+    reviews = {}
+    for event in current_page:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
     context = {
         'name_page': 'Оффлайн',
         'event_card_views': current_page,
@@ -156,7 +176,9 @@ def offline(request):
         'tags': tags,
         'favorites': favorites_dict,
         'registered': registered_dict,
+        'reviews': reviews,
     }
+
     return render(request, 'events_available/offline_events.html', context=context)
 
 @login_required
@@ -166,7 +188,43 @@ def offline_card(request, event_slug=False, event_id=False):
     else:
         event = Events_offline.objects.get(slug=event_slug)
 
+    content_type = ContentType.objects.get_for_model(event)
+    reviews = Review.objects.filter(content_type=content_type, object_id=event.id)
+
     context = {
         'event': event,
+        'reviews': reviews,
     }
+    
     return render(request, 'events_available/card.html', context=context)
+
+@login_required
+@csrf_exempt
+def submit_review(request, event_id):
+    if request.method == 'POST':
+        comment = request.POST.get('comment', '')
+        model_type = request.POST.get('model_type', '')
+
+        if not comment:
+            return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
+
+        if model_type == 'offline':
+            event = get_object_or_404(Events_offline, id=event_id)
+        elif model_type == 'online':
+            event = get_object_or_404(Events_online, id=event_id)
+        else:
+            return JsonResponse({'success': False, 'message': 'Некорректный тип мероприятия'}, status=400)
+
+        content_type = ContentType.objects.get_for_model(event)
+        review = Review.objects.create(
+            user=request.user,
+            content_type=content_type,
+            object_id=event.id,
+            comment=comment
+        )
+        return JsonResponse({
+            'success': True,
+            'message': 'Отзыв добавлен',
+            'formatted_date': review.formatted_date()
+        })
+    return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
