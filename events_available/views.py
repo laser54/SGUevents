@@ -84,21 +84,29 @@ def online(request):
 
     return render(request, 'events_available/online_events.html', context=context)
 
+
 @login_required
 def online_card(request, event_slug=False, event_id=False):
+    reviews = {}
     if event_id:
         event = Events_online.objects.get(id=event_id)
     else:
         event = Events_online.objects.get(slug=event_slug)
 
-    content_type = ContentType.objects.get_for_model(event)
-    reviews = Review.objects.filter(content_type=content_type, object_id=event.id)
+    events = Events_online.objects.all()
+    
+    reviews = {}
+
+    for event_rew in events:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
     context = {
         'event': event,
-        'reviews': reviews,
+        'reviews': reviews, 
     }
     return render(request, 'events_available/card.html', context=context)
+
 
 @login_required
 def offline(request):
@@ -185,12 +193,17 @@ def offline_card(request, event_slug=False, event_id=False):
     else:
         event = Events_offline.objects.get(slug=event_slug)
 
-    content_type = ContentType.objects.get_for_model(event)
-    reviews = Review.objects.filter(content_type=content_type, object_id=event.id)
+    events = Events_offline.objects.all()
+    
+    reviews = {}
+
+    for event_rew in events:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
     context = {
         'event': event,
-        'reviews': reviews,
+        'reviews': reviews, 
     }
 
     return render(request, 'events_available/card.html', context=context)
