@@ -60,7 +60,18 @@
                                             {% if favorite.online.town %}{{ favorite.online.town }}{% endif %} {% if favorite.online.street %}{{ evefavorite.onlinents.street }}{% endif %} {% if favorite.online.cabinet %}{{ favorite.online.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
-                                    
+                                        
+
+                                        {% if favorite.online.id in registered %}
+                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.online.id }}">
+                                                Отмена регистрации
+                                            </a>
+                                        {% else %}
+                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.online.slug }}">
+                                                Регистрация
+                                            </a>
+                                        {% endif %}
+
                                         <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.online.id }}" data-model-type="online">Оставить отзыв</button>
 
                                         {% if reviews %}
@@ -140,6 +151,16 @@
                                             {% if favorite.offline.town %}{{ favorite.offline.town }}{% endif %} {% if favorite.offline.street %}{{ evefavorite.offline.street }}{% endif %} {% if favorite.offline.cabinet %}{{ favorite.offline.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
+
+                                        {% if favorite.offline.id in registered %}
+                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.offline.id }}">
+                                                Отмена регистрации
+                                            </a>
+                                        {% else %}
+                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.offline.slug }}">
+                                                Регистрация
+                                            </a>
+                                        {% endif %}
 
                                         <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.offline.id }}" data-model-type="offline">Оставить отзыв</button>
 
@@ -300,6 +321,16 @@
                                             {% if favorite.for_visiting.town %}{{ favorite.for_visiting.town }}{% endif %} {% if favorite.for_visiting.street %}{{ evefavorite.for_visiting.street }}{% endif %} {% if favorite.for_visiting.cabinet %}{{ favorite.for_visiting.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
+                                        
+                                        {% if favorite.for_visiting.id in registered %}
+                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.for_visiting.id }}">
+                                                Отмена регистрации
+                                            </a>
+                                        {% else %}
+                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.for_visiting.slug }}">
+                                                Регистрация
+                                            </a>
+                                        {% endif %}
                                         
                                         <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.for_visiting.id }}" data-model-type="for_visiting">Оставить отзыв</button>
 
