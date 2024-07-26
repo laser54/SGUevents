@@ -14,14 +14,11 @@
                             <div class="row g-0">
                                 <div class="col-md-4">
                                     {% if register.online.image %}
-                                    <img src="{{ register.online.image.url }}" class="img-fluid rounded-start" alt="{{ register.online.name }}">
+                                        <img src="{{ register.online.image.url }}" class="img-fluid rounded-start" alt="{{ register.online.name }}">
                                     {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.online.name }}">
+                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.online.name }}">
                                     {% endif %}
-                                    <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
-                                        Отмена регистрации
-                                    </a>
-                                    
+                        
                                     <div class="card-img-info">
                                         <p>id: {{ register.online.display_id }}</p>
                                         <p>category: {{ register.online.category }}</p>
@@ -58,10 +55,33 @@
                                             </small>
                                         </p>
                                         <p>
-                                            {% if register.online.town %}{{ register.online.town }}{% endif %} {% if register.online.street %}{{ everegister.onlinents.street }}{% endif %} {% if register.online.cabinet %}{{ register.online.cabinet }}{% endif %}
+                                            {% if register.online.town %}{{ register.online.town }}{% endif %} {% if register.online.street %}{{ register.online.street}}{% endif %} {% if register.online.cabinet %}{{ register.online.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
+                                            Отмена регистрации
+                                        </a>
+
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ register.online.id }}" data-model-type="online">Оставить отзыв</button>
+
+                                        {% if reviews %}
+                                            <div class="reviews">          
+                                                    <ul>
+                                                        {% for review in reviews|get_item:register.online.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if register.online.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    </ul>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -76,13 +96,11 @@
                             <div class="row g-0">
                                 <div class="col-md-4">
                                     {% if register.offline.image %}
-                                    <img src="{{ register.offline.image.url }}" class="img-fluid rounded-start" alt="{{ register.offline.name }}">
+                                        <img src="{{ register.offline.image.url }}" class="img-fluid rounded-start" alt="{{ register.offline.name }}">
                                     {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.offline.name }}">
+                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.offline.name }}">
                                     {% endif %}
-                                    <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
-                                        Отмена регистрации
-                                    </a>
+                                    
                                     <div class="card-img-info">
                                         <p>id: {{ register.offline.display_id }}</p>
                                         <p>category: {{ register.offline.category }}</p>
@@ -119,10 +137,33 @@
                                             </small>
                                         </p>
                                         <p>
-                                            {% if register.offline.town %}{{ register.offline.town }}{% endif %} {% if register.offline.street %}{{ everegister.offline.street }}{% endif %} {% if register.offline.cabinet %}{{ register.offline.cabinet }}{% endif %}
+                                            {% if register.offline.town %}{{ register.offline.town }}{% endif %} {% if register.offline.street %}{{ register.offline.street }}{% endif %} {% if register.offline.cabinet %}{{ register.offline.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
+                                            Отмена регистрации
+                                        </a>
+                                        
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ register.offline.id }}" data-model-type="offline">Оставить отзыв</button>
+
+                                        {% if reviews %}
+                                            <div class="reviews">          
+                                                    <ul>
+                                                        {% for review in reviews|get_item:register.offline.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if register.offline.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    </ul>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -137,16 +178,14 @@
                             <div class="row g-0">
                                 <div class="col-md-4">
                                     {% if register.attractions.image %}
-                                    <img src="{{ register.attractions.image.url }}" class="img-fluid rounded-start" alt="{{ register.attractions.name }}">
+                                        <img src="{{ register.attractions.image.url }}" class="img-fluid rounded-start" alt="{{ register.attractions.name }}">
                                     {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.attractions.name }}">
+                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.attractions.name }}">
                                     {% endif %}
-                                    <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
-                                        Отмена регистрации
-                                    </a>
+                                
                                     <div class="card-img-info">
                                         <p>id: {{ register.attractions.display_id }}</p>
-                                        <p>category: {{ register.onliattractionsne.category }}</p>
+                                        <p>category: {{ register.attractions.category }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -180,10 +219,33 @@
                                             </small>
                                         </p>
                                         <p>
-                                            {% if register.attractions.town %}{{ register.attractions.town }}{% endif %} {% if register.attractions.street %}{{ everegister.attractions.street }}{% endif %} {% if register.attractions.cabinet %}{{ register.attractions.cabinet }}{% endif %}
+                                            {% if register.attractions.town %}{{ register.attractions.town }}{% endif %} {% if register.attractions.street %}{{ register.attractions.street }}{% endif %} {% if register.attractions.cabinet %}{{ register.attractions.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
+                                            Отмена регистрации
+                                        </a>
+
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ register.attractions.id }}" data-model-type="attractions">Оставить отзыв</button>
+
+                                        {% if reviews %}
+                                            <div class="reviews">          
+                                                    <ul>
+                                                        {% for review in reviews|get_item:register.attractions.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if register.attractions.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    </ul>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -198,13 +260,11 @@
                             <div class="row g-0">
                                 <div class="col-md-4">
                                     {% if register.for_visiting.image %}
-                                    <img src="{{ register.for_visiting.image.url }}" class="img-fluid rounded-start" alt="{{ register.for_visiting.name }}">
+                                        <img src="{{ register.for_visiting.image.url }}" class="img-fluid rounded-start" alt="{{ register.for_visiting.name }}">
                                     {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.for_visiting.name }}">
+                                        <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.for_visiting.name }}">
                                     {% endif %}
-                                    <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
-                                        Отмена регистрации
-                                    </a>
+                                    
                                     <div class="card-img-info">
                                         <p>id: {{ register.for_visiting.display_id }}</p>
                                         <p>category: {{ register.for_visiting.category }}</p>
@@ -241,11 +301,33 @@
                                             </small>
                                         </p>
                                         <p>
-                                            {% if register.for_visiting.town %}{{ register.for_visiting.town }}{% endif %} {% if register.for_visiting.street %}{{ everegister.for_visiting.street }}{% endif %} {% if register.for_visiting.cabinet %}{{ register.for_visiting.cabinet }}{% endif %}
+                                            {% if register.for_visiting.town %}{{ register.for_visiting.town }}{% endif %} {% if register.for_visiting.street %}{{ register.for_visiting.street }}{% endif %} {% if register.for_visiting.cabinet %}{{ register.for_visiting.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
-                                        
+                                        <a href="{% url 'bookmarks:registered_remove' register.id %}" class="btn btn-light btn-remove_app" data-event-id="{{ register.id }}">
+                                            Отмена регистрации
+                                        </a>
+
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ register.for_visiting.id }}" data-model-type="for_visiting">Оставить отзыв</button>
+
+                                        {% if reviews %}
+                                            <div class="reviews">          
+                                                    <ul>
+                                                        {% for review in reviews|get_item:register.for_visiting.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if register.for_visiting.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    </ul>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -256,44 +338,4 @@
         {% endfor %}
     </ul>
 </div>
-
-{% comment %} ДОБАВЛЕНИЕ {% endcomment %}
-{% comment %} <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        document.querySelectorAll('.register-event').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const eventSlug = this.getAttribute('data-event-slug');
-                const buttonElement = this;
-    
-                fetch(`/bookmarks/events_registered/${eventSlug}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ 'slug': eventSlug })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.registered) {
-                        buttonElement.textContent = "Зарегистрировано";
-                        buttonElement.classList.remove('btn-danger');
-                        buttonElement.classList.add('btn-success');
-                    } else if (data.unregistered) {
-                        buttonElement.textContent = "Регистрация";
-                        buttonElement.classList.remove('btn-success');
-                        buttonElement.classList.add('btn-danger');
-                    } else {
-                        console.error('Ошибка:', data.error);
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            });
-        });
-    });
-</script> {% endcomment %}
-
-
 {% endblock register %}

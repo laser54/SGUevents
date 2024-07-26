@@ -1,9 +1,50 @@
-{% extends 'events/base.html' %} {% load static %} {% block title %} Главная
-страница {% endblock %} 
-
-
+{% extends 'events/base.html' %} 
+{% load static %} 
+{% load main_tags %}
+{% block title %} 
+Главная страница 
+{% endblock %} 
 
 {% block content %}
 <!-- Контент на странице -->
+{% if events.category  == 'Онлайн' %}
+	{% if events.id in registered %}
+		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+			Отмена регистрации
+		</a>
+	{% else %}
+		<a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ events.slug }}">
+			Регистрация
+		</a>
+	{% endif %}
+
+	<button class="btn btn-primary btn-comment" data-event-id="{{ events.id }}" data-model-type="online">Оставить отзыв</button>
+{% elif events.category  == 'Оффлайн' %}
+	{% if events.id in registered %}
+		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+			Отмена регистрации
+		</a>
+	{% else %}
+		<a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ events.slug }}">
+			Регистрация
+		</a>
+	{% endif %}
+
+	<button class="btn btn-primary btn-comment" data-event-id="{{ events.id }}" data-model-type="offline">Оставить отзыв</button>
+
+{% elif events.category  == 'Достопримечательности' %}
+	<button class="btn btn-primary btn-comment" data-event-id="{{ events.id }}" data-model-type="attractions">Оставить отзыв</button>
+{% elif events.category  == 'Доступные к посещению' %}
+	{% if events.id in registered %}
+		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+			Отмена регистрации
+		</a>
+		{% else %}
+		<a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ events.slug }}">
+			Регистрация
+		</a>
+	{% endif %}
+	<button class="btn btn-primary btn-comment" data-event-id="{{ events.id }}" data-model-type="for_visiting">Оставить отзыв </button>
+{% endif %}
 
 {% endblock content %}
