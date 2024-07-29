@@ -1,4 +1,6 @@
 import os
+
+from celery.schedules import crontab
 from dotenv import load_dotenv
 from pathlib import Path
 import logging
@@ -190,13 +192,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Novosibirsk'
 
+# Обновление Celery beat
 CELERY_BEAT_SCHEDULE = {
-    'print-every-30-seconds': {
-        'task': 'bookmarks.tasks.send_test_message',
-        'schedule': 30.0,
+    'schedule-notifications-every-5-minutes': {
+        'task': 'bookmarks.tasks.schedule_notifications',
+        'schedule': crontab(minute='*/5'),  # каждые 5 минут
     },
 }
 
+# Настройки логирования (раскомментировать, если нужно)
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,
