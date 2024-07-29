@@ -192,7 +192,7 @@ CELERY_TIMEZONE = 'Asia/Novosibirsk'
 
 CELERY_BEAT_SCHEDULE = {
     'print-every-30-seconds': {
-        'task': 'bookmarks.tasks.print_text',
+        'task': 'bookmarks.tasks.send_test_message',
         'schedule': 30.0,
     },
 }
