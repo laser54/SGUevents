@@ -12,12 +12,24 @@ app.autodiscover_tasks()
 
 app.conf.beat_scheduler = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-app.conf.beat_schedule = {
-    'schedule-notifications-every-5-minutes': {
-        'task': 'bookmarks.tasks.schedule_notifications',
-        'schedule': crontab(minute='*/5'),  # каждые 5 минут
+app.conf.update(
+    broker_url='redis://localhost:6379/0',
+    result_backend='redis://localhost:6379/0',
+    beat_schedule={
+        'schedule_notifications_day': {
+            'task': 'bookmarks.tasks.schedule_notifications',
+            'schedule': crontab(hour='*', minute=0),  # Запускать каждый час
+        },
+        'schedule_notifications_hour': {
+            'task': 'bookmarks.tasks.schedule_notifications',
+            'schedule': crontab(minute='*/10'),  # Запускать каждые 10 минут
+        },
+        'schedule_notifications_minutes': {
+            'task': 'bookmarks.tasks.schedule_notifications',
+            'schedule': crontab(minute='*/1'),  # Запускать каждую минуту
+        },
     },
-}
+)
 
 @app.task(bind=True)
 def debug_task(self):

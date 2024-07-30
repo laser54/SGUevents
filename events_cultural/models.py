@@ -1,9 +1,11 @@
 import uuid
 from django.db import models
+from datetime import datetime
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
 from users.models import User
+
 
 class Attractions(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -17,12 +19,14 @@ class Attractions(models.Model):
     street = models.CharField(max_length=100, blank=False, verbose_name='Улица')
     link = models.URLField(blank=False, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
-    image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True,
+                              verbose_name='Изображение')
     rating = models.DecimalField(default=0.00, max_digits=4, decimal_places=2, blank=False, verbose_name='Рейтинг 1-10')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Достопримечательности'
     category = models.CharField(default=const_category, max_length=30, blank=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('Review', related_query_name='attraction_reviews')
+    start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
 
     class Meta:
         db_table = 'attractions'
@@ -31,14 +35,14 @@ class Attractions(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def display_id(self):
         return f'{self.id:05}'
-    
-    # def save(self, *args, **kwargs):
-    #     if not self.pk:
-    #         self.category = "Достопримечательности"
-    #     super(Attractions, self).save(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        combined_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
+        super(Attractions, self).save(*args, **kwargs)
 
 
 class Events_for_visiting(models.Model):
@@ -54,15 +58,18 @@ class Events_for_visiting(models.Model):
     street = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Улица')
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
-    image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True,
+                              verbose_name='Изображение')
     events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
     place_limit = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество мест')
     place_free = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество свободных мест')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Доступные к посещению'
-    category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
+    category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False,
+                                verbose_name='Тип мероприятия')
     reviews = GenericRelation('Review', related_query_name='visiting_reviews')
-    
+    start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+
     class Meta:
         db_table = 'Events_for_visiting'
         verbose_name = 'Доступные к посещению'
@@ -70,14 +77,15 @@ class Events_for_visiting(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def display_id(self):
         return f'{self.id:05}'
-    
-    # def save(self, *args, **kwargs):
-    #     if not self.pk:
-    #         self.category = "Доступные к посещению"
-    #     super(Events_for_visiting, self).save(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        combined_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
+        super(Events_for_visiting, self).save(*args, **kwargs)
+
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
@@ -94,8 +102,6 @@ class Review(models.Model):
 
     def __str__(self):
         return f'{self.date_submitted.strftime("%d.%m.%Y %H:%M")} Отзыв от {self.user.username} на {self.event}'
-    # def __str__(self):
-    #     return f'{self.date_submitted.strftime("%d.%m.%Y %H:%M")} Отзыв от {self.user.username} на {self.event.name}'
+
     def formatted_date(self):
         return self.date_submitted.strftime("%d.%m.%y %H:%M")
-

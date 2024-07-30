@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from datetime import datetime
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.utils.timezone import make_aware, get_default_timezone
 
 class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -37,7 +38,8 @@ class Events_online(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        self.start_datetime = datetime.combine(self.date, self.time_start)
+        combined_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
         super(Events_online, self).save(*args, **kwargs)
 
 class Events_offline(models.Model):
@@ -76,5 +78,6 @@ class Events_offline(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        self.start_datetime = datetime.combine(self.date, self.time_start)
+        combined_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
         super(Events_offline, self).save(*args, **kwargs)

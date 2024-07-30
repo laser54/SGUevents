@@ -192,11 +192,18 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Novosibirsk'
 
-# Обновление Celery beat
 CELERY_BEAT_SCHEDULE = {
-    'schedule-notifications-every-5-minutes': {
+    'schedule-notifications-every-hour': {
         'task': 'bookmarks.tasks.schedule_notifications',
-        'schedule': crontab(minute='*/5'),  # каждые 5 минут
+        'schedule': crontab(minute=0),  # запуск каждый час
+    },
+    'schedule-notifications-every-10-minutes': {
+        'task': 'bookmarks.tasks.schedule_notifications',
+        'schedule': crontab(minute='*/10'),  # запуск каждые 10 минут
+    },
+    'schedule-notifications-every-minute': {
+        'task': 'bookmarks.tasks.schedule_notifications',
+        'schedule': crontab(minute='*/1'),  # запуск каждую минуту
     },
 }
 

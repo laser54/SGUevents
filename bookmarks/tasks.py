@@ -1,15 +1,11 @@
-# bookmarks/tasks.py
-from datetime import datetime, timedelta
-from django.utils.timezone import make_aware, is_naive, now as tz_now
+from datetime import timedelta
+from django.utils.timezone import localtime, now as tz_now
 from celery import shared_task
 from bookmarks.models import Registered
 from users.telegram_utils import send_message_to_user
 import logging
 
 logger = logging.getLogger(__name__)
-
-def make_aware_if_naive(dt):
-    return make_aware(dt) if is_naive(dt) else dt
 
 @shared_task
 def send_notification(event_id, user_id, timeframe):
@@ -36,7 +32,8 @@ def send_notification(event_id, user_id, timeframe):
 
 @shared_task
 def schedule_notifications():
-    now = make_aware_if_naive(datetime.now())
+    now = localtime(tz_now())  # Используем локальное время
+    logger.info(f"Текущее локальное время: {now}")
     timeframes = {
         '1 day': timedelta(days=1),
         '1 hour': timedelta(hours=1),
@@ -52,9 +49,12 @@ def schedule_notifications():
         if registered_events.exists():
             logger.info(f"Найдено зарегистрированных событий для {timeframe}: {registered_events.count()}")
             for event in registered_events:
-                eta_time = make_aware_if_naive(event.start_datetime - delta)
+                eta_time = localtime(event.start_datetime - delta)
+                logger.info(f"Проверка события {event.id} с началом в {event.start_datetime}, ETA время: {eta_time}")
                 if eta_time > now:
                     send_notification.apply_async((event.id, event.user.id, timeframe), eta=eta_time)
                     logger.info(f"Запланировано уведомление для события {event.id} пользователю {event.user.id} в {eta_time} о мероприятии запланированном на {event.start_datetime}.")
+                else:
+                    logger.warning(f"Время {eta_time} для события {event.id} уже прошло, уведомление не запланировано.")
         else:
             logger.info(f"Нет зарегистрированных событий для уведомления за {timeframe}.")

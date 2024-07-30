@@ -1,5 +1,7 @@
-from django.conf import settings
+import uuid
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.utils.timezone import make_aware, get_default_timezone
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
 from users.models import User
@@ -41,7 +43,7 @@ class Registered(models.Model):
     attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
     for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
     created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
-    start_datetime = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время начала")  # Новое поле
+    start_datetime = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время начала")
 
     class Meta:
         verbose_name = "Зарегистрированные"
