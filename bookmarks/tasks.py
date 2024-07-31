@@ -1,5 +1,5 @@
 from datetime import timedelta
-from django.utils.timezone import localtime, now as tz_now
+from django.utils.timezone import localtime, now as tz_now, get_current_timezone
 from celery import shared_task
 from bookmarks.models import Registered
 from users.telegram_utils import send_message_to_user
@@ -49,7 +49,7 @@ def schedule_notifications():
         if registered_events.exists():
             logger.info(f"Найдено зарегистрированных событий для {timeframe}: {registered_events.count()}")
             for event in registered_events:
-                eta_time = localtime(event.start_datetime - delta)
+                eta_time = localtime(event.start_datetime - delta, get_current_timezone())
                 logger.info(f"Проверка события {event.id} с началом в {event.start_datetime}, ETA время: {eta_time}")
                 if eta_time > now:
                     send_notification.apply_async((event.id, event.user.id, timeframe), eta=eta_time)

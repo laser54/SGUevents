@@ -51,6 +51,9 @@
 
 - Для работоспособности Telegram login Widget требуется [ngrok](https://dashboard.ngrok.com/get-started/setup/windows)
 - Делаем по инструкции потом запускаем `ngrok http http://localhost:8000`
+- Для запуска celery локально - запускаем Redis в докере `docker run --name redis -p 6379:6379 -d redis:latest`
+- В одном окне из venv `celery -A SGUevents worker -l info -P solo` (-P solo - костыль для Windows)
+- В другом окне аналогично `celery -A SGUevents beat -l info`
 
 ## Заполнение БД:
 

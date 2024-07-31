@@ -191,6 +191,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Novosibirsk'
+CELERY_ENABLE_UTC = False
 
 CELERY_BEAT_SCHEDULE = {
     'schedule-notifications-every-hour': {

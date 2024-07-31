@@ -63,13 +63,13 @@ class Registered(models.Model):
 
     def save(self, *args, **kwargs):
         if self.online:
-            self.start_datetime = self.online.start_datetime
+            self.start_datetime = make_aware(self.online.start_datetime, get_default_timezone())
         elif self.offline:
-            self.start_datetime = self.offline.start_datetime
+            self.start_datetime = make_aware(self.offline.start_datetime, get_default_timezone())
         elif self.attractions:
-            self.start_datetime = self.attractions.start_datetime
+            self.start_datetime = make_aware(self.attractions.start_datetime, get_default_timezone())
         elif self.for_visiting:
-            self.start_datetime = self.for_visiting.start_datetime
+            self.start_datetime = make_aware(self.for_visiting.start_datetime, get_default_timezone())
         super().save(*args, **kwargs)
 
 @receiver(post_save, sender=Registered)
