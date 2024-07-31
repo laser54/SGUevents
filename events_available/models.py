@@ -1,8 +1,8 @@
 import uuid
 from django.db import models
 from datetime import datetime
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.utils.timezone import make_aware, get_default_timezone
+from django.contrib.contenttypes.fields import GenericRelation
 
 class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')

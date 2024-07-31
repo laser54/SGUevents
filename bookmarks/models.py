@@ -43,7 +43,6 @@ class Registered(models.Model):
     attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
     for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
     created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
-    start_datetime = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время начала")
 
     class Meta:
         verbose_name = "Зарегистрированные"
@@ -61,21 +60,12 @@ class Registered(models.Model):
                 except:
                     return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
 
-    def save(self, *args, **kwargs):
-        if self.online:
-            self.start_datetime = make_aware(self.online.start_datetime, get_default_timezone())
-        elif self.offline:
-            self.start_datetime = make_aware(self.offline.start_datetime, get_default_timezone())
-        elif self.attractions:
-            self.start_datetime = make_aware(self.attractions.start_datetime, get_default_timezone())
-        elif self.for_visiting:
-            self.start_datetime = make_aware(self.for_visiting.start_datetime, get_default_timezone())
-        super().save(*args, **kwargs)
-
 @receiver(post_save, sender=Registered)
 def notify_user_on_registration(sender, instance, created, **kwargs):
     if created:
-        event_name = instance.online.name if instance.online else (instance.offline.name if instance.offline else (instance.attractions.name if instance.attractions else instance.for_visiting.name))
+        event_name = instance.online.name if instance.online else (
+            instance.offline.name if instance.offline else (
+                instance.attractions.name if instance.attractions else instance.for_visiting.name))
         message = f"Вы зарегистрировались на мероприятие: {event_name}."
         user_telegram_id = instance.user.telegram_id
         if user_telegram_id:
