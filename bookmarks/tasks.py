@@ -22,7 +22,6 @@ def send_notification(event_id, user_id, event_name, timeframe):
         message = f"Напоминаем, что мероприятие '{event_name}' начнется через {timeframe}."
         if user.telegram_id:
             send_message_to_user(user.telegram_id, message)
-            logger.info(f"Отправлено уведомление пользователю {user.username} с telegram_id: {user.telegram_id} о мероприятии {event_name}.")
         else:
             logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
     except User.DoesNotExist:
@@ -35,7 +34,7 @@ def schedule_notifications():
     now = round_to_minute(localtime(tz_now()))  # Используем локальное время и округляем до минуты
     previous_minute = now - timedelta(minutes=1)
     current_tz = get_current_timezone()
-    logger.info(f"Текущее локальное время: {now}")
+
     timeframes = {
         '1 day': timedelta(days=1),
         '1 hour': timedelta(hours=1),
@@ -44,8 +43,6 @@ def schedule_notifications():
 
     for timeframe, delta in timeframes.items():
         target_time = round_to_minute(now + delta)
-        logger.info(f"Проверка временного интервала: {timeframe}")
-        logger.info(f"Целевое время для {timeframe}: {target_time}")
 
         # Фильтрация зарегистрированных событий по связанным моделям
         registered_events = Registered.objects.filter(
@@ -56,7 +53,6 @@ def schedule_notifications():
         )
 
         if registered_events.exists():
-            logger.info(f"Найдено зарегистрированных событий для {timeframe}: {registered_events.count()}")
             for event in registered_events:
                 if event.online:
                     start_datetime = round_to_minute(event.online.start_datetime.astimezone(current_tz))
@@ -74,12 +70,8 @@ def schedule_notifications():
                     continue
 
                 eta_time = start_datetime - delta
-                logger.info(f"Проверка события {event.id} с началом в {start_datetime}, ETA время: {eta_time}")
 
                 if eta_time >= previous_minute:
                     send_notification.apply_async((event.id, event.user.id, event_name, timeframe), eta=now)
-                    logger.info(f"Запланировано уведомление для события {event.id} пользователю {event.user.id} в {now} о мероприятии запланированном на {start_datetime}.")
                 else:
                     logger.warning(f"Время {eta_time} для события {event.id} уже прошло, уведомление не запланировано.")
-        else:
-            logger.info(f"Нет зарегистрированных событий для уведомления за {timeframe}.")
