@@ -1,5 +1,7 @@
-from django.conf import settings
+import uuid
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.utils.timezone import make_aware, get_default_timezone
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
 from users.models import User
@@ -58,21 +60,12 @@ class Registered(models.Model):
                 except:
                     return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
 
-    @property
-    def start_time(self):
-        if self.online:
-            return self.online.time_start
-        elif self.offline:
-            return self.offline.time_start
-        elif self.attractions:
-            return self.attractions.time_start
-        else:
-            return self.for_visiting.time_start
-
 @receiver(post_save, sender=Registered)
 def notify_user_on_registration(sender, instance, created, **kwargs):
     if created:
-        event_name = instance.online.name if instance.online else (instance.offline.name if instance.offline else (instance.attractions.name if instance.attractions else instance.for_visiting.name))
+        event_name = instance.online.name if instance.online else (
+            instance.offline.name if instance.offline else (
+                instance.attractions.name if instance.attractions else instance.for_visiting.name))
         message = f"Вы зарегистрировались на мероприятие: {event_name}."
         user_telegram_id = instance.user.telegram_id
         if user_telegram_id:
