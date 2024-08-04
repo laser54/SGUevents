@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    'main',
     'users',
     'events_available',
     'events_cultural',
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     'application_for_admin_rights',
     'support',
     'personal',
-    'main',
+
 ]
 
 MIDDLEWARE = [
