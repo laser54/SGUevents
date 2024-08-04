@@ -46,7 +46,6 @@ INSTALLED_APPS = [
 	'support',
 	'personal',
     'debug_toolbar',
-    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
