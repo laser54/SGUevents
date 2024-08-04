@@ -33,7 +33,7 @@ services:
 
   bot:
     image: la5er/events:latest
-    command: sh -c "python manage.py migrate && python /code/bot/main.py"
+    command: sh -c "python /code/manage.py migrate && python /code/bot/main.py"
     restart: always
     working_dir: /code/bot
     depends_on:
