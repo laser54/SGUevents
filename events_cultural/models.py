@@ -83,8 +83,8 @@ class Events_for_visiting(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, default=1)
-    object_id = models.PositiveIntegerField(default=1)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
     event = GenericForeignKey('content_type', 'object_id')
     comment = models.TextField(verbose_name='Комментарий')
     date_submitted = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')

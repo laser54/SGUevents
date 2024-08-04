@@ -4,5 +4,5 @@ from events_calendar import views
 app_name = 'events_calendar'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.calendar_view, name='index'),
 ]

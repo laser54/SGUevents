@@ -114,7 +114,6 @@
 					{% if request.GET.q %}
 						<h3 class="mt-4">Результаты поиска по запросу {{ request.GET.q }}</h3>
 						{% if not event_card_views %}
-							{% comment %} <link rel="stylesheet" href="{% static "deps/css/my_footer_css.css" %}"> {% endcomment %}
 							<h2 class="mt-4">По запросу ничего не найдено</h2>
 						{% endif %}
 					{% endif %}
@@ -231,13 +230,12 @@
                                                     {{ speakers }}
                                                 </p> 
                                                 {% block content %}{% endblock content %}
-                                                
 
                                                 {% if reviews %}
                                                     <div class="reviews">
-                                                        {% if reviews|get_item:events.id %}
+                                                        {% if reviews|get_item:events.unique_id %}
                                                             <ul>
-                                                                {% for review in reviews|get_item:events.id %}
+                                                                {% for review in reviews|get_item:events.unique_id %}
                                                                     <li>
                                                                         <h5>Отзыв:</h5>
                                                                         <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
@@ -255,13 +253,11 @@
                             </div>
                         </div>
                     {% endfor %}
-
-                    
+ 
                     {% block favorite %}{% endblock favorite %}
+                    {% block register %}{% endblock register %}
 					
-		
 				</div>
-		
 				<div class="col-lg-1"></div>
 			</div>
 		</div>
@@ -391,7 +387,7 @@
         notification.style.display = 'block';
         setTimeout(() => {
             notification.classList.add('fade-in');
-        }, 10); // Slight delay to trigger transition
+        }, 10);
 
         setTimeout(function() {
             notification.classList.remove('fade-in');
@@ -409,7 +405,6 @@
     });
 </script>
 
-
 <!-- Notification for Registration -->
 <div id="registrationNotification" class="notification" style="display: none;">
     <p></p>
@@ -418,13 +413,13 @@
 <script>
     function initializeRegistrationButtons() {
         document.querySelectorAll('.btn-sent_app').forEach(function(button) {
-            button.removeEventListener('click', handleRegister); // Remove previous event listeners
-            button.addEventListener('click', handleRegister); // Add new event listeners
+            button.removeEventListener('click', handleRegister);
+            button.addEventListener('click', handleRegister);
         });
 
         document.querySelectorAll('.btn-remove_app').forEach(function(button) {
-            button.removeEventListener('click', handleUnregister); // Remove previous event listeners
-            button.addEventListener('click', handleUnregister); // Add new event listeners
+            button.removeEventListener('click', handleUnregister);
+            button.addEventListener('click', handleUnregister);
         });
     }
 
@@ -443,13 +438,14 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.registered) {
-                buttonElement.classList.remove('btn-sent_app');
-                buttonElement.classList.add('btn-remove_app');
+            if (data.added) {
+                buttonElement.classList.remove('btn-danger', 'btn-sent_app');
+                buttonElement.classList.add('btn-light', 'btn-remove_app');
                 buttonElement.innerHTML = 'Отмена регистрации';
                 buttonElement.setAttribute('data-event-id', data.event_id);
+                buttonElement.removeAttribute('data-event-slug');
                 showRegistrationNotification("Зарегистрировано");
-                initializeRegistrationButtons(); // Re-initialize buttons
+                initializeRegistrationButtons();
             } else {
                 console.error('Ошибка при регистрации:', data.error);
             }
@@ -473,12 +469,13 @@
         .then(response => response.json())
         .then(data => {
             if (data.removed) {
-                buttonElement.classList.remove('btn-remove_app');
-                buttonElement.classList.add('btn-sent_app');
+                buttonElement.classList.remove('btn-light', 'btn-remove_app');
+                buttonElement.classList.add('btn-danger', 'btn-sent_app');
                 buttonElement.innerHTML = 'Регистрация';
+                buttonElement.setAttribute('data-event-slug', data.event_slug);
                 buttonElement.removeAttribute('data-event-id');
                 showRegistrationNotification("Регистрация отменена");
-                initializeRegistrationButtons(); // Re-initialize buttons
+                initializeRegistrationButtons();
             } else {
                 console.error('Ошибка при отмене регистрации:', data.error);
             }
@@ -492,7 +489,7 @@
         notification.style.display = 'block';
         setTimeout(() => {
             notification.classList.add('fade-in');
-        }, 10); // Slight delay to trigger transition
+        }, 10);
 
         setTimeout(function() {
             notification.classList.remove('fade-in');
@@ -509,6 +506,7 @@
         initializeRegistrationButtons();
     });
 </script>
+
 
 <style>
     .notification {
@@ -556,50 +554,28 @@
             <div class="modal-body">
                 <form id="commentForm">
                     <input type="hidden" id="eventId" name="event_id">
+                    <input type="hidden" id="modelType" name="model_type">
                     <div class="mb-3">
                         <label for="commentText" class="form-label">Ваш отзыв</label>
                         <textarea class="form-control" id="commentText" name="comment" rows="3"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Отправить</button>
                 </form>
+                
             </div>
         </div>
     </div>
 </div>
 
-<!-- Notification -->
-<div id="reviewNotification" class="notification" style="display: none;">
-    <p></p>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="commentModalLabel">Оставить отзыв</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="commentForm">
-                    <input type="hidden" id="eventId" name="event_id">
-                    <div class="mb-3">
-                        <label for="commentText" class="form-label">Ваш отзыв</label>
-                        <textarea class="form-control" id="commentText" name="comment" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Отправить</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.btn-comment').forEach(function(button) {
             button.addEventListener('click', function() {
                 const eventId = this.getAttribute('data-event-id');
+                const modelType = this.getAttribute('data-model-type');
                 document.getElementById('eventId').value = eventId;
+                document.getElementById('modelType').value = modelType;
                 const modal = new bootstrap.Modal(document.getElementById('commentModal'));
                 modal.show();
             });
@@ -608,10 +584,19 @@
         document.getElementById('commentForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const eventId = document.getElementById('eventId').value;
+            const modelType = document.getElementById('modelType').value;
             const formData = new FormData(this);
+            formData.append('model_type', modelType);
             const csrftoken = getCookie('csrftoken');
 
-            fetch(`/events_cultural/submit_review/${eventId}/`, {
+            let url = '';
+            if (modelType === 'attractions' || modelType === 'for_visiting') {
+                url = `/events_cultural/submit_review/${eventId}/`;
+            } else if (modelType === 'offline' || modelType === 'online') {
+                url = `/events_available/submit_review/${eventId}/`;
+            }
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken

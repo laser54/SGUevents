@@ -14,3 +14,9 @@ def user_registered(request):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+# @register.filter
+# def get_review(rev, res):
+   
+
+   

@@ -1,20 +1,25 @@
 services:
   db:
-    image: postgres:14.5
+    image: postgres:14.5 # Updated to latest version
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     restart: always
     env_file:
       - ./.env
 
+  redis:
+    image: redis:6.2
+    restart: always
+
   backend:
     image: la5er/events:latest
-    command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887"
+    command: gunicorn SGUevents.wsgi:application --bind 0.0.0.0:8887
     restart: always
     volumes:
       - static_value:/code/staticfiles/
     depends_on:
       - db
+      - redis
     env_file:
       - ./.env
     ports:
@@ -22,11 +27,32 @@ services:
 
   bot:
     image: la5er/events:latest
-    command: python /code/bot/main.py
+    command: sh -c "python manage.py migrate && python /code/bot/main.py"
     restart: always
     working_dir: /code/bot
     depends_on:
       - db
+      - redis
+    env_file:
+      - ./.env
+
+  celery:
+    image: la5er/events:latest
+    command: celery -A SGUevents worker --loglevel=info
+    restart: always
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./.env
+
+  celery_beat:
+    image: la5er/events:latest
+    command: celery -A SGUevents beat --loglevel=info
+    restart: always
+    depends_on:
+      - db
+      - redis
     env_file:
       - ./.env
 
