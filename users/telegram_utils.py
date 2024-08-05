@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 ADMIN_TG_NAME = os.getenv("ADMIN_TG_NAME")
@@ -48,16 +49,24 @@ def send_confirmation_to_user(telegram_id):
     if not response.ok:
         print(f"Ошибка отправки подтверждающего сообщения пользователю: {response.text}")
 
-def send_message_to_user(telegram_id, message):
+
+def send_message_to_user(telegram_id, message, event_id):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    inline_keyboard = {
+        "inline_keyboard": [[
+            {
+                "text": "Отключить уведомления",
+                "callback_data": f"disable_{event_id}"
+            }
+        ]]
+    }
     data = {
         "chat_id": telegram_id,
         "text": message,
+        "reply_markup": json.dumps(inline_keyboard)
     }
     response = requests.post(send_url, data=data)
     if response.ok:
         print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
     else:
         print(f"Ошибка отправки сообщения пользователю: {response.text}")
-
-

@@ -1,19 +1,16 @@
 import asyncio
 import logging
-import os
-import sys
-import requests
 
-from dotenv import load_dotenv
+import requests
 from aiogram import Bot, Dispatcher, types, F, Router
-from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
-from asgiref.sync import sync_to_async
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.storage.memory import MemoryStorage
-
-
+from aiogram.types import CallbackQuery
+from asgiref.sync import sync_to_async
+from dotenv import load_dotenv
 
 load_dotenv()
 from bot.django_initializer import setup_django_environment
@@ -27,6 +24,7 @@ TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 SUPPORT_CHAT_ID = settings.ACTIVE_TELEGRAM_SUPPORT_CHAT_ID
 storage = MemoryStorage()
 dp = Dispatcher()
+router = Router()
 
 class SupportRequestForm(StatesGroup):
     waiting_for_question = State()
@@ -143,6 +141,17 @@ def send_message_to_support_chat(text):
         print(f"Failed to send message: {response.status_code}, {response.text}")
 # Функция запуска бота
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+
+@router.callback_query(F.data.startswith("disable_"))
+async def disable_notification(callback_query: types.CallbackQuery):
+    event_id = callback_query.data.split("_")[1]
+    user = await get_user_profile(callback_query.from_user.id)
+    if user:
+        from bookmarks.models import Registered
+        await sync_to_async(Registered.objects.filter(user=user, id=event_id).delete)()
+        await callback_query.answer("Уведомления отключены.")
+    else:
+        await callback_query.answer("Вы не зарегистрированы на портале.")
 
 
 async def run_bot():

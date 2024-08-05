@@ -36,13 +36,18 @@ class Favorite(models.Model):
                 except:
                     return f'Избранные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
 
+
 class Registered(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, verbose_name="Пользователь")
     online = models.ForeignKey(to=Events_online, on_delete=models.CASCADE, verbose_name="Онлайн", null=True, blank=True)
-    offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True, blank=True)
-    attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
-    for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
+    offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True,
+                                blank=True)
+    attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности",
+                                    null=True, blank=True)
+    for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE,
+                                     verbose_name="Доступные для посещения", null=True, blank=True)
     created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+    notifications_enabled = models.BooleanField(default=True, verbose_name="Уведомления включены")
 
     class Meta:
         verbose_name = "Зарегистрированные"
