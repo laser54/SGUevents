@@ -73,6 +73,8 @@
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/attractions.json`
 7. Загружаем информацию для страницы доступные к посещению:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/events_for_visiting.json`
+8. Загружаем информацию об отделах:
+   - Выполнить команду: `python3 manage.py loaddata fixtures/departments.json`
 
 ## При запуске на сервере:
 1. Из каталога с файлом docker-compose.yml:
