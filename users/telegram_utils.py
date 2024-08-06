@@ -64,7 +64,7 @@ def send_message_to_user(telegram_id, message):
 
 def send_message_to_user_with_toggle_button(telegram_id, message, event_id, notifications_enabled):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
-    button_text = "Отключить уведомления" if notifications_enabled else "Включить уведомления"
+    button_text = "\U0001F534 Отключить уведомления" if notifications_enabled else "\U0001F7E2 Включить уведомления"
     callback_data = f"toggle_{event_id}"
     inline_keyboard = {
         "inline_keyboard": [[

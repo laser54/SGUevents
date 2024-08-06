@@ -153,7 +153,7 @@ async def toggle_notification(callback_query: types.CallbackQuery):
         registration.notifications_enabled = not registration.notifications_enabled
         await sync_to_async(registration.save)()
 
-        new_button_text = "Включить уведомления" if not registration.notifications_enabled else "Отключить уведомления"
+        new_button_text = "\U0001F7E2 Включить уведомления" if not registration.notifications_enabled else "\U0001F534 Отключить уведомления"
         inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text=new_button_text, callback_data=f"toggle_{event_id}")]
         ])
