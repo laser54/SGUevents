@@ -1,15 +1,17 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
     <link rel="stylesheet" href="{% static 'general/css/general-page.css' %}">
     <link rel="stylesheet" href="{% static 'general/css/events_available.css' %}">
-    <link rel="stylesheet" href="{% static 'general/css/calendar.css' %}">
+    <link rel="stylesheet" href="{% static 'calendar/css/calendar.css' %}">
+    
+    {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/ru.js"></script> {% endcomment %}
 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
@@ -17,6 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static "calendar/js/ru.js" %}"></script>
 
     <title>Календарь мероприятий</title>
 
@@ -54,7 +57,6 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
-                            
                             <li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
                         </ul>
                     </li>
@@ -72,8 +74,7 @@
                                 <a class="dropdown-item text-black" href={% url "bookmarks:registered" %}>Зарегистрированные</a>
                             </li>
                             <li>
-                                <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
-                            </li>
+                                <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a></li>
                             <li>
                                 <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
                             </li>
@@ -113,6 +114,7 @@
         console.log(events);
 
         $('#calendar').fullCalendar({
+            locale: 'ru',
             height: 'parent',
             events: events,
             eventRender: function(event, element) {
