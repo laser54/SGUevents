@@ -4,7 +4,7 @@ from celery import shared_task
 from django.db.models import Q
 from bookmarks.models import Registered
 from users.models import User
-from users.telegram_utils import send_message_to_user_with_toggle_button, send_message_to_user
+from users.telegram_utils import send_message_to_user_with_toggle_button, send_message_to_user_with_review_buttons
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 
@@ -39,10 +39,20 @@ def send_review_request(event_id, user_id, event_name):
     try:
         user = User.objects.get(id=user_id)
         message = f"Мероприятие '{event_name}' завершилось. Пожалуйста, оставьте отзыв."
+
+        reply_markup = {
+            "inline_keyboard": [
+                [
+                    {"text": "\U0000270D Оставить отзыв", "callback_data": f"leave_review_{event_id}"},
+                    {"text": "В другой раз", "callback_data": f"review_later_{event_id}"}
+                ]
+            ]
+        }
+
         if user.telegram_id:
-            send_message_to_user(user.telegram_id, message)
+            send_message_to_user_with_review_buttons(user.telegram_id, message, event_id=event_id, reply_markup=reply_markup)
         else:
-            logger.warning(f"Пользователь {user.username} не имеет telegram_id, запрос на отзыв не отправлен.")
+            logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
     except User.DoesNotExist:
         logger.error(f"User with id {user_id} does not exist.")
     except Exception as e:

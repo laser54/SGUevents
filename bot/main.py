@@ -13,6 +13,7 @@ from aiogram.types import CallbackQuery
 from asgiref.sync import sync_to_async
 from dotenv import load_dotenv
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from django.contrib.contenttypes.models import ContentType
 
 load_dotenv()
 from bot.django_initializer import setup_django_environment
@@ -30,6 +31,9 @@ router = Router()
 
 class SupportRequestForm(StatesGroup):
     waiting_for_question = State()
+
+class ReviewForm(StatesGroup):
+    waiting_for_review = State()
 
 
 async def get_user_profile(telegram_id):
@@ -161,6 +165,43 @@ async def toggle_notification(callback_query: types.CallbackQuery):
         await callback_query.answer(f"Уведомления {'включены' if registration.notifications_enabled else 'отключены'}.")
     else:
         await callback_query.answer("Вы не зарегистрированы на портале.")
+
+@router.callback_query(F.data.startswith("leave_review_"))
+async def leave_review(callback_query: types.CallbackQuery, state: FSMContext):
+    event_id = callback_query.data.split("_")[2]
+    user = await get_user_profile(callback_query.from_user.id)
+    if user:
+        await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
+        await state.set_state(ReviewForm.waiting_for_review)
+        await state.update_data(event_id=event_id)
+    else:
+        await callback_query.answer("Вы не зарегистрированы на портале.")
+
+@router.callback_query(F.data.startswith("review_later_"))
+async def remind_later(callback_query: types.CallbackQuery):
+    await callback_query.answer("Хорошо, напомним позже.")
+    # Логика для напоминания позже может быть добавлена здесь
+
+@router.message(ReviewForm.waiting_for_review)
+async def receive_review(message: types.Message, state: FSMContext):
+    user = await get_user_profile(message.from_user.id)
+    data = await state.get_data()
+    event_id = data.get("event_id")
+    if user and event_id:
+        from bookmarks.models import Registered
+        from events_cultural.models import Review
+        content_type = await sync_to_async(ContentType.objects.get_for_model)(Registered)
+        review = await sync_to_async(Review.objects.create)(
+            user=user,
+            content_type=content_type,
+            object_id=event_id,
+            comment=message.text
+        )
+        await message.answer("Спасибо за ваш отзыв!")
+        await state.clear()
+    else:
+        await message.answer("Произошла ошибка, попробуйте снова.")
+        await state.clear()
 
 # Функция запуска бота
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)

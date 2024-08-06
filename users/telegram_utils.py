@@ -50,12 +50,16 @@ def send_confirmation_to_user(telegram_id):
         print(f"Ошибка отправки подтверждающего сообщения пользователю: {response.text}")
 
 
-def send_message_to_user(telegram_id, message):
+def send_message_to_user(telegram_id, message, event_id=None, reply_markup=None):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
     data = {
         "chat_id": telegram_id,
         "text": message,
     }
+
+    if reply_markup:
+        data["reply_markup"] = json.dumps(reply_markup)
+
     response = requests.post(send_url, data=data)
     if response.ok:
         print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
@@ -84,3 +88,46 @@ def send_message_to_user_with_toggle_button(telegram_id, message, event_id, noti
         print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
     else:
         print(f"Ошибка отправки сообщения пользователю: {response.text}")
+
+def send_message_to_user(telegram_id, message, event_id=None, reply_markup=None):
+    send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    data = {
+        "chat_id": telegram_id,
+        "text": message,
+    }
+
+    if reply_markup:
+        data["reply_markup"] = json.dumps(reply_markup)
+
+    response = requests.post(send_url, data=data)
+    if response.ok:
+        print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
+    else:
+        print(f"Ошибка отправки сообщения пользователю: {response.text}")
+
+def send_message_to_user_with_toggle_button(telegram_id, message, event_id, notifications_enabled):
+    send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    button_text = "\U0001F534 Отключить уведомления" if notifications_enabled else "\U0001F7E2 Включить уведомления"
+    callback_data = f"toggle_{event_id}"
+    inline_keyboard = {
+        "inline_keyboard": [[
+            {
+                "text": button_text,
+                "callback_data": callback_data
+            }
+        ]]
+    }
+    data = {
+        "chat_id": telegram_id,
+        "text": message,
+        "reply_markup": json.dumps(inline_keyboard)
+    }
+    response = requests.post(send_url, data=data)
+    if response.ok:
+        print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
+    else:
+        print(f"Ошибка отправки сообщения пользователю: {response.text}")
+
+def send_message_to_user_with_review_buttons(telegram_id, message, event_id, reply_markup):
+    send_message_to_user(telegram_id, message, event_id, reply_markup=reply_markup)
+
