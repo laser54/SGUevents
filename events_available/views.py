@@ -95,6 +95,12 @@ def online_card(request, event_slug=False, event_id=False):
 
     events = Events_online.objects.all()
     
+    favorites = Favorite.objects.filter(user=request.user, online__in=events)
+    favorites_dict = {favorite.online.id: favorite.id for favorite in favorites}
+
+    registered = Registered.objects.filter(user=request.user, online__in=events)
+    registered_dict = {reg.online.id: reg.id for reg in registered}
+
     reviews = {}
 
     for event_rew in events:
@@ -103,7 +109,9 @@ def online_card(request, event_slug=False, event_id=False):
 
     context = {
         'event': event,
-        'reviews': reviews, 
+        'reviews': reviews,
+        'registered': registered_dict,
+        'favorites': favorites_dict, 
     }
     return render(request, 'events_available/card.html', context=context)
 
@@ -201,9 +209,17 @@ def offline_card(request, event_slug=False, event_id=False):
         content_type = ContentType.objects.get_for_model(event)
         reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
+    favorites = Favorite.objects.filter(user=request.user, offline__in=events)
+    favorites_dict = {favorite.offline.id: favorite.id for favorite in favorites}
+    
+    registered = Registered.objects.filter(user=request.user, offline__in=events)
+    registered_dict = {reg.offline.id: reg.id for reg in registered}
+
     context = {
         'event': event,
         'reviews': reviews, 
+        'registered': registered_dict,
+        'favorites': favorites_dict,
     }
 
     return render(request, 'events_available/card.html', context=context)

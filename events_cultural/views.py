@@ -59,6 +59,9 @@ def attractions_card(request, event_slug=False, event_id=False):
 
     events = Attractions.objects.all()
     
+    favorites = Favorite.objects.filter(user=request.user, attractions__in=events)
+    favorites_dict = {favorite.attractions.id: favorite.id for favorite in favorites}
+    
     reviews = {}
 
     for event_rew in events:
@@ -68,6 +71,7 @@ def attractions_card(request, event_slug=False, event_id=False):
     context = {
         'event': event,
         'reviews': reviews, 
+        'favorites': favorites_dict,
     }
     return render(request, 'events_cultural/card.html', context=context)
 
@@ -119,8 +123,24 @@ def for_visiting_card(request, event_slug=False, event_id=False):
     else:
         event = Events_for_visiting.objects.get(slug=event_slug)
 
+    events = Events_for_visiting.objects.all()
+
+    favorites = Favorite.objects.filter(user=request.user, for_visiting__in=events)
+    favorites_dict = {favorite.for_visiting.id: favorite.id for favorite in favorites}
+
+    registered = Registered.objects.filter(user=request.user, for_visiting__in=events)
+    registered_dict = {reg.for_visiting.id: reg.id for reg in registered}
+
+    reviews = {}
+    for event_rew in events:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
     context = {
         'event': event,
+        'reviews': reviews,
+        'registered': registered_dict,
+        'favorites': favorites_dict, 
     }
     return render(request, 'events_cultural/card.html', context=context)
 
