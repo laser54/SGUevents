@@ -4,7 +4,7 @@ from celery import shared_task
 from django.db.models import Q
 from bookmarks.models import Registered
 from users.models import User
-from users.telegram_utils import send_message_with_cancel_button
+from users.telegram_utils import send_message_to_user_with_toggle_button
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 
@@ -24,7 +24,7 @@ def send_notification(event_id, user_id, event_name, timeframe):
         if registered_event.notifications_enabled:
             message = f"Напоминаем, что мероприятие '{event_name}' начнется через {timeframe}."
             if user.telegram_id:
-                send_message_with_cancel_button(user.telegram_id, message, event_id)
+                send_message_to_user_with_toggle_button(user.telegram_id, message, event_id, True)
             else:
                 logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
     except User.DoesNotExist:

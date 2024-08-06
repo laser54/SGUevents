@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 import requests
+import json
 from aiogram import Bot, Dispatcher, types, F, Router
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
@@ -11,6 +12,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import CallbackQuery
 from asgiref.sync import sync_to_async
 from dotenv import load_dotenv
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 load_dotenv()
 from bot.django_initializer import setup_django_environment
@@ -141,19 +143,22 @@ def send_message_to_support_chat(text):
         print(f"Failed to send message: {response.status_code}, {response.text}")
 
 
-@router.callback_query(F.data.startswith("disable_"))
-async def disable_notification(callback_query: types.CallbackQuery):
+@router.callback_query(F.data.startswith("toggle_"))
+async def toggle_notification(callback_query: types.CallbackQuery):
     event_id = callback_query.data.split("_")[1]
     user = await get_user_profile(callback_query.from_user.id)
     if user:
         from bookmarks.models import Registered
-        registered_event = await sync_to_async(Registered.objects.get)(user=user, id=event_id)
-        if registered_event:
-            registered_event.notifications_enabled = False
-            await sync_to_async(registered_event.save)()
-            await callback_query.answer("Уведомления отключены.")
-        else:
-            await callback_query.answer("Мероприятие не найдено.")
+        registration = await sync_to_async(Registered.objects.get)(user=user, id=event_id)
+        registration.notifications_enabled = not registration.notifications_enabled
+        await sync_to_async(registration.save)()
+
+        new_button_text = "Включить уведомления" if not registration.notifications_enabled else "Отключить уведомления"
+        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text=new_button_text, callback_data=f"toggle_{event_id}")]
+        ])
+        await callback_query.message.edit_reply_markup(reply_markup=inline_keyboard)
+        await callback_query.answer(f"Уведомления {'включены' if registration.notifications_enabled else 'отключены'}.")
     else:
         await callback_query.answer("Вы не зарегистрированы на портале.")
 

@@ -62,13 +62,15 @@ def send_message_to_user(telegram_id, message):
     else:
         print(f"Ошибка отправки сообщения пользователю: {response.text}")
 
-def send_message_with_cancel_button(telegram_id, message, event_id):
+def send_message_to_user_with_toggle_button(telegram_id, message, event_id, notifications_enabled):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    button_text = "Отключить уведомления" if notifications_enabled else "Включить уведомления"
+    callback_data = f"toggle_{event_id}"
     inline_keyboard = {
         "inline_keyboard": [[
             {
-                "text": "Отключить уведомления",
-                "callback_data": f"disable_{event_id}"
+                "text": button_text,
+                "callback_data": callback_data
             }
         ]]
     }

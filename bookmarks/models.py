@@ -7,7 +7,7 @@ from events_cultural.models import Attractions, Events_for_visiting
 from users.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from users.telegram_utils import send_message_with_cancel_button
+from users.telegram_utils import send_message_to_user_with_toggle_button
 import logging
 
 logger = logging.getLogger(__name__)
@@ -75,6 +75,6 @@ def notify_user_on_registration(sender, instance, created, **kwargs):
         user_telegram_id = instance.user.telegram_id
         if user_telegram_id:
             logger.info(f"Отправка сообщения о регистрации пользователю {instance.user.username} с telegram_id: {user_telegram_id}")
-            send_message_with_cancel_button(user_telegram_id, message, instance.id)
+            send_message_to_user_with_toggle_button(user_telegram_id, message, instance.id, instance.notifications_enabled)
         else:
             logger.warning(f"У пользователя {instance.user.username} нет telegram_id")
