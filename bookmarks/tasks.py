@@ -4,7 +4,7 @@ from celery import shared_task
 from django.db.models import Q
 from bookmarks.models import Registered
 from users.models import User
-from users.telegram_utils import send_message_to_user_with_toggle_button
+from users.telegram_utils import send_message_to_user_with_toggle_button, send_message_to_user
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 
@@ -35,6 +35,20 @@ def send_notification(event_id, user_id, event_name, timeframe):
         logger.error(f"Error sending notification: {e}")
 
 @shared_task
+def send_review_request(event_id, user_id, event_name):
+    try:
+        user = User.objects.get(id=user_id)
+        message = f"Мероприятие '{event_name}' завершилось. Пожалуйста, оставьте отзыв."
+        if user.telegram_id:
+            send_message_to_user(user.telegram_id, message)
+        else:
+            logger.warning(f"Пользователь {user.username} не имеет telegram_id, запрос на отзыв не отправлен.")
+    except User.DoesNotExist:
+        logger.error(f"User with id {user_id} does not exist.")
+    except Exception as e:
+        logger.error(f"Error sending review request: {e}")
+
+@shared_task
 def schedule_notifications():
     now = round_to_minute(localtime(tz_now()))  # Используем локальное время и округляем до минуты
     previous_minute = now - timedelta(minutes=1)
@@ -62,15 +76,19 @@ def schedule_notifications():
                 if event.online:
                     start_datetime = round_to_minute(event.online.start_datetime.astimezone(current_tz))
                     event_name = event.online.name
+                    end_datetime = event.online.end_datetime.astimezone(current_tz)
                 elif event.offline:
                     start_datetime = round_to_minute(event.offline.start_datetime.astimezone(current_tz))
                     event_name = event.offline.name
+                    end_datetime = event.offline.end_datetime.astimezone(current_tz)
                 elif event.attractions:
                     start_datetime = round_to_minute(event.attractions.start_datetime.astimezone(current_tz))
                     event_name = event.attractions.name
+                    end_datetime = event.attractions.end_datetime.astimezone(current_tz)
                 elif event.for_visiting:
                     start_datetime = round_to_minute(event.for_visiting.start_datetime.astimezone(current_tz))
                     event_name = event.for_visiting.name
+                    end_datetime = event.for_visiting.end_datetime.astimezone(current_tz)
                 else:
                     continue
 
@@ -80,3 +98,10 @@ def schedule_notifications():
                     send_notification.apply_async((event.id, event.user.id, event_name, timeframe), eta=now)
                 else:
                     logger.warning(f"Время {eta_time} для события {event.id} уже прошло, уведомление не запланировано.")
+
+                # Планирование уведомления о запросе отзыва
+                review_eta_time = end_datetime + timedelta(minutes=1)
+                if review_eta_time > now:
+                    send_review_request.apply_async((event.id, event.user.id, event_name), eta=review_eta_time)
+                else:
+                    logger.warning(f"Время {review_eta_time} для события {event.id} уже прошло, запрос на отзыв не запланирован.")

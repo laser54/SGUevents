@@ -25,6 +25,7 @@ class Events_online(models.Model):
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('events_cultural.Review', related_query_name='online_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
 
     class Meta:
         db_table = 'Events_online'
@@ -38,8 +39,12 @@ class Events_online(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        combined_datetime = datetime.combine(self.date, self.time_start)
-        self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
+        combined_start_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
+
+        combined_end_datetime = datetime.combine(self.date, self.time_end)
+        self.end_datetime = make_aware(combined_end_datetime, timezone=get_default_timezone())
+
         super(Events_online, self).save(*args, **kwargs)
 
 class Events_offline(models.Model):
@@ -65,6 +70,7 @@ class Events_offline(models.Model):
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('events_cultural.Review', related_query_name='offline_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
 
     class Meta:
         db_table = 'Events_offline'
@@ -78,6 +84,10 @@ class Events_offline(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        combined_datetime = datetime.combine(self.date, self.time_start)
-        self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
+        combined_start_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
+
+        combined_end_datetime = datetime.combine(self.date, self.time_end)
+        self.end_datetime = make_aware(combined_end_datetime, timezone=get_default_timezone())
+
         super(Events_offline, self).save(*args, **kwargs)
