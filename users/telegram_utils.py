@@ -50,7 +50,19 @@ def send_confirmation_to_user(telegram_id):
         print(f"Ошибка отправки подтверждающего сообщения пользователю: {response.text}")
 
 
-def send_message_to_user(telegram_id, message, event_id):
+def send_message_to_user(telegram_id, message):
+    send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    data = {
+        "chat_id": telegram_id,
+        "text": message,
+    }
+    response = requests.post(send_url, data=data)
+    if response.ok:
+        print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
+    else:
+        print(f"Ошибка отправки сообщения пользователю: {response.text}")
+
+def send_message_with_cancel_button(telegram_id, message, event_id):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
     inline_keyboard = {
         "inline_keyboard": [[

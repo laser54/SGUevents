@@ -139,8 +139,7 @@ def send_message_to_support_chat(text):
     response = requests.post(url, json=payload, headers=headers)
     if response.status_code != 200:
         print(f"Failed to send message: {response.status_code}, {response.text}")
-# Функция запуска бота
-bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+
 
 @router.callback_query(F.data.startswith("disable_"))
 async def disable_notification(callback_query: types.CallbackQuery):
@@ -148,14 +147,21 @@ async def disable_notification(callback_query: types.CallbackQuery):
     user = await get_user_profile(callback_query.from_user.id)
     if user:
         from bookmarks.models import Registered
-        await sync_to_async(Registered.objects.filter(user=user, id=event_id).delete)()
-        await callback_query.answer("Уведомления отключены.")
+        registered_event = await sync_to_async(Registered.objects.get)(user=user, id=event_id)
+        if registered_event:
+            registered_event.notifications_enabled = False
+            await sync_to_async(registered_event.save)()
+            await callback_query.answer("Уведомления отключены.")
+        else:
+            await callback_query.answer("Мероприятие не найдено.")
     else:
         await callback_query.answer("Вы не зарегистрированы на портале.")
 
-
+# Функция запуска бота
+bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 async def run_bot():
     try:
+        dp.include_router(router)
         await dp.start_polling(bot)
     finally:
         await bot.close()
