@@ -118,7 +118,13 @@
             height: 'parent',
             events: events,
             eventRender: function(event, element) {
+                element.css('background-color', event.backgroundColor); // Устанавливаем цвет события
                 element.find('.fc-title').append('<br/><b>' + event.time + '</b><br/><i>' + event.category + '</i>');
+            },
+            dayRender: function(date, cell) {
+                if (date.isSame(new Date(), "day")) {
+                    cell.css("background-color", "yellow"); // Сегодняшняя дата выделена желтым
+                }
             }
         });
     });
