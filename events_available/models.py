@@ -3,6 +3,7 @@ from django.db import models
 from datetime import datetime
 from django.utils.timezone import make_aware, get_default_timezone
 from django.contrib.contenttypes.fields import GenericRelation
+from users.models import Department
 
 class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -25,6 +26,7 @@ class Events_online(models.Model):
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('events_cultural.Review', related_query_name='online_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
 
     class Meta:
         db_table = 'Events_online'
@@ -65,6 +67,7 @@ class Events_offline(models.Model):
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('events_cultural.Review', related_query_name='offline_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
 
     class Meta:
         db_table = 'Events_offline'

@@ -4,7 +4,7 @@ from datetime import datetime
 from django.utils.timezone import make_aware, get_default_timezone
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from users.models import User
+from users.models import Department, User
 
 class Attractions(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -25,6 +25,7 @@ class Attractions(models.Model):
     category = models.CharField(default=const_category, max_length=30, blank=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('Review', related_query_name='attraction_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
 
     class Meta:
         db_table = 'attractions'
@@ -64,6 +65,7 @@ class Events_for_visiting(models.Model):
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
     reviews = GenericRelation('Review', related_query_name='visiting_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
 
     class Meta:
         db_table = 'Events_for_visiting'

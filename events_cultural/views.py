@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import redirect
+from users.models import User, Department
+from django.db.models import Q
 
 @login_required
 def attractions(request):
@@ -16,11 +18,21 @@ def attractions(request):
     f_attractions = request.GET.get('f_attractions', None)
     order_by = request.GET.get('order_by', None)
     query = request.GET.get('q', None)
+    user = request.user
     
     if not query:
         events_cultural = Attractions.objects.order_by('time_start')
     else:
         events_cultural = q_search_attractions(query)
+
+    #Фильтрация по скрытым мероприятиям
+    if user.is_superuser or user.department.department_name in ['Administration', 'Superuser']:
+        pass 
+    else:
+        if user.department:
+            events_cultural = events_cultural.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+        else:
+            events_cultural = events_cultural.filter(secret__isnull=True).distinct()
 
     if f_attractions:
         events_cultural = events_cultural.filter(date__month=1)
@@ -81,6 +93,7 @@ def events_for_visiting(request):
     f_events_for_visiting = request.GET.get('f_events_for_visiting', None)
     order_by = request.GET.get('order_by', None)
     query = request.GET.get('q', None)
+    user = request.user
 
     if not query:
         events_cultural = Events_for_visiting.objects.order_by('time_start')
@@ -90,6 +103,15 @@ def events_for_visiting(request):
     if f_events_for_visiting:
         events_cultural = events_cultural.filter(date__month=1)
     
+    #Фильтрация по скрытым мероприятиям
+    if user.is_superuser or user.department.department_name in ['Administration', 'Superuser']:
+        pass 
+    else:
+        if user.department:
+            events_cultural = events_cultural.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+        else:
+            events_cultural = events_cultural.filter(secret__isnull=True).distinct()
+
     if order_by and order_by != "default":
         events_cultural = events_cultural.order_by(order_by)
 
