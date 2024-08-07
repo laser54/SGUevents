@@ -182,26 +182,59 @@ async def remind_later(callback_query: types.CallbackQuery):
     await callback_query.answer("Хорошо, напомним позже.")
     # Логика для напоминания позже может быть добавлена здесь
 
+
 @router.message(ReviewForm.waiting_for_review)
 async def receive_review(message: types.Message, state: FSMContext):
     user = await get_user_profile(message.from_user.id)
     data = await state.get_data()
     event_id = data.get("event_id")
+
     if user and event_id:
+        from events_cultural.models import Attractions, Events_for_visiting, Review
+        from events_available.models import Events_online, Events_offline
         from bookmarks.models import Registered
-        from events_cultural.models import Review
-        content_type = await sync_to_async(ContentType.objects.get_for_model)(Registered)
-        review = await sync_to_async(Review.objects.create)(
-            user=user,
-            content_type=content_type,
-            object_id=event_id,
-            comment=message.text
-        )
-        await message.answer("Спасибо за ваш отзыв!")
-        await state.clear()
+
+        # Определяем тип мероприятия и получаем соответствующий объект
+        event = None
+        model_type = None
+
+        try:
+            registered_event = await sync_to_async(Registered.objects.get)(unique_id=event_id)
+            if registered_event.online:
+                event = registered_event.online
+                model_type = 'online'
+            elif registered_event.offline:
+                event = registered_event.offline
+                model_type = 'offline'
+            elif registered_event.attractions:
+                event = registered_event.attractions
+                model_type = 'attractions'
+            elif registered_event.for_visiting:
+                event = registered_event.for_visiting
+                model_type = 'for_visiting'
+        except Registered.DoesNotExist:
+            event = None
+
+        if event and model_type:
+            content_type = await sync_to_async(ContentType.objects.get_for_model)(event)
+            review = await sync_to_async(Review.objects.create)(
+                user=user,
+                content_type=content_type,
+                object_id=event.id,
+                comment=message.text
+            )
+            await message.answer("Спасибо за ваш отзыв!")
+            await state.clear()
+        else:
+            await message.answer("Произошла ошибка, мероприятие не найдено.")
+            await state.clear()
     else:
         await message.answer("Произошла ошибка, попробуйте снова.")
         await state.clear()
+
+
+
+
 
 # Функция запуска бота
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
