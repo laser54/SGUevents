@@ -119,6 +119,7 @@
             events: events,
             eventRender: function(event, element) {
                 element.css('background-color', event.backgroundColor); // Устанавливаем цвет события
+                element.find('.fc-title').html('<a href="' + event.url + '" style="color:white;">' + event.title + '</a>');
                 element.find('.fc-title').append('<br/><b>' + event.time + '</b><br/><i>' + event.category + '</i>');
             },
             dayRender: function(date, cell) {
