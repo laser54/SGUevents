@@ -4,7 +4,8 @@ from celery import shared_task
 from django.db.models import Q
 from bookmarks.models import Registered
 from users.models import User
-from users.telegram_utils import send_message_to_user
+from users.telegram_utils import send_message_to_user_with_toggle_button
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,13 +20,17 @@ def round_to_minute(dt):
 def send_notification(event_id, user_id, event_name, timeframe):
     try:
         user = User.objects.get(id=user_id)
-        message = f"Напоминаем, что мероприятие '{event_name}' начнется через {timeframe}."
-        if user.telegram_id:
-            send_message_to_user(user.telegram_id, message)
-        else:
-            logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
+        registered_event = Registered.objects.get(id=event_id)
+        if registered_event.notifications_enabled:
+            message = f"Напоминаем, что мероприятие '{event_name}' начнется через {timeframe}."
+            if user.telegram_id:
+                send_message_to_user_with_toggle_button(user.telegram_id, message, event_id, True)
+            else:
+                logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
     except User.DoesNotExist:
         logger.error(f"User with id {user_id} does not exist.")
+    except Registered.DoesNotExist:
+        logger.error(f"Registered event with id {event_id} does not exist.")
     except Exception as e:
         logger.error(f"Error sending notification: {e}")
 

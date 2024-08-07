@@ -1,19 +1,18 @@
 import asyncio
 import logging
-import os
-import sys
-import requests
 
-from dotenv import load_dotenv
+import requests
+import json
 from aiogram import Bot, Dispatcher, types, F, Router
-from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
-from asgiref.sync import sync_to_async
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.storage.memory import MemoryStorage
-
-
+from aiogram.types import CallbackQuery
+from asgiref.sync import sync_to_async
+from dotenv import load_dotenv
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 load_dotenv()
 from bot.django_initializer import setup_django_environment
@@ -27,6 +26,7 @@ TOKEN = settings.ACTIVE_TELEGRAM_BOT_TOKEN
 SUPPORT_CHAT_ID = settings.ACTIVE_TELEGRAM_SUPPORT_CHAT_ID
 storage = MemoryStorage()
 dp = Dispatcher()
+router = Router()
 
 class SupportRequestForm(StatesGroup):
     waiting_for_question = State()
@@ -141,12 +141,32 @@ def send_message_to_support_chat(text):
     response = requests.post(url, json=payload, headers=headers)
     if response.status_code != 200:
         print(f"Failed to send message: {response.status_code}, {response.text}")
+
+
+@router.callback_query(F.data.startswith("toggle_"))
+async def toggle_notification(callback_query: types.CallbackQuery):
+    event_id = callback_query.data.split("_")[1]
+    user = await get_user_profile(callback_query.from_user.id)
+    if user:
+        from bookmarks.models import Registered
+        registration = await sync_to_async(Registered.objects.get)(user=user, id=event_id)
+        registration.notifications_enabled = not registration.notifications_enabled
+        await sync_to_async(registration.save)()
+
+        new_button_text = "Включить уведомления" if not registration.notifications_enabled else "Отключить уведомления"
+        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text=new_button_text, callback_data=f"toggle_{event_id}")]
+        ])
+        await callback_query.message.edit_reply_markup(reply_markup=inline_keyboard)
+        await callback_query.answer(f"Уведомления {'включены' if registration.notifications_enabled else 'отключены'}.")
+    else:
+        await callback_query.answer("Вы не зарегистрированы на портале.")
+
 # Функция запуска бота
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
-
-
 async def run_bot():
     try:
+        dp.include_router(router)
         await dp.start_polling(bot)
     finally:
         await bot.close()
