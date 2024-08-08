@@ -62,7 +62,7 @@ def events_remove(request, event_id):
 
 @login_required
 def favorites(request):
-    favorites = Favorite.objects.filter(user=request.user)
+    favorites = Favorite.objects.filter(user=request.user).order_by('-created_timestamp')
 
     events = []
     for fav in favorites:
