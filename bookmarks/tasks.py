@@ -35,7 +35,7 @@ def send_notification(event_id, user_id, event_name, timeframe):
         logger.error(f"Error sending notification: {e}")
 
 @shared_task
-def send_review_request(event_id, user_id, event_name):
+def send_review_request(event_id, user_id, event_name, event_type):
     try:
         user = User.objects.get(id=user_id)
         message = f"Мероприятие '{event_name}' завершилось. Пожалуйста, оставьте отзыв."
@@ -43,20 +43,32 @@ def send_review_request(event_id, user_id, event_name):
         reply_markup = {
             "inline_keyboard": [
                 [
-                    {"text": "\U0000270D Оставить отзыв", "callback_data": f"leave_review_{event_id}"},
-                    {"text": "В другой раз", "callback_data": f"review_later_{event_id}"}
+                    {"text": "\U0000270D Оставить отзыв", "callback_data": f"leave_review_{event_type}_{event_id}"},
+                    {"text": "В другой раз", "callback_data": f"review_later_{event_type}_{event_id}"}
                 ]
             ]
         }
 
         if user.telegram_id:
-            send_message_to_user_with_review_buttons(user.telegram_id, message, event_id=event_id, reply_markup=reply_markup)
+            send_message_to_user_with_review_buttons(user.telegram_id, message, event_id, event_type, reply_markup)
         else:
             logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
     except User.DoesNotExist:
         logger.error(f"User with id {user_id} does not exist.")
     except Exception as e:
         logger.error(f"Error sending review request: {e}")
+
+def determine_event_type(event):
+    if event.online:
+        return "online"
+    elif event.offline:
+        return "offline"
+    elif event.attractions:
+        return "attractions"
+    elif event.for_visiting:
+        return "for_visiting"
+    else:
+        raise ValueError("Unknown event type")
 
 @shared_task
 def schedule_notifications():
@@ -102,6 +114,8 @@ def schedule_notifications():
                 else:
                     continue
 
+                event_type = determine_event_type(event)
+
                 eta_time = start_datetime - delta
 
                 if eta_time >= previous_minute:
@@ -112,6 +126,6 @@ def schedule_notifications():
                 # Планирование уведомления о запросе отзыва
                 review_eta_time = end_datetime + timedelta(minutes=1)
                 if review_eta_time > now:
-                    send_review_request.apply_async((event.id, event.user.id, event_name), eta=review_eta_time)
+                    send_review_request.apply_async((event.id, event.user.id, event_name, event_type), eta=review_eta_time)
                 else:
                     logger.warning(f"Время {review_eta_time} для события {event.id} уже прошло, запрос на отзыв не запланирован.")

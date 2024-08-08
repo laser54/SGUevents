@@ -186,22 +186,50 @@ async def remind_later(callback_query: types.CallbackQuery):
 async def receive_review(message: types.Message, state: FSMContext):
     user = await get_user_profile(message.from_user.id)
     data = await state.get_data()
+    event_type = data.get("event_type")
     event_id = data.get("event_id")
-    if user and event_id:
+
+    logger.info(f"Received review for event_id: {event_id}, event_type: {event_type} from user: {user.id}")
+
+    if user and event_id and event_type:
         from bookmarks.models import Registered
-        from events_cultural.models import Review
-        content_type = await sync_to_async(ContentType.objects.get_for_model)(Registered)
-        review = await sync_to_async(Review.objects.create)(
-            user=user,
-            content_type=content_type,
-            object_id=event_id,
-            comment=message.text
-        )
-        await message.answer("Спасибо за ваш отзыв!")
-        await state.clear()
+        from events_cultural.models import Review, Attractions, Events_for_visiting
+        from events_available.models import Events_online, Events_offline
+        from django.contrib.contenttypes.models import ContentType
+
+        # Определяем ContentType в зависимости от типа мероприятия
+        if event_type == "online":
+            model = Events_online
+        elif event_type == "offline":
+            model = Events_offline
+        elif event_type == "attractions":
+            model = Attractions
+        elif event_type == "for_visiting":
+            model = Events_for_visiting
+        else:
+            await message.answer("Произошла ошибка, попробуйте снова.")
+            await state.clear()
+            return
+
+        try:
+            content_type = await sync_to_async(ContentType.objects.get_for_model)(model)
+            review = await sync_to_async(Review.objects.create)(
+                user=user,
+                content_type=content_type,
+                object_id=event_id,
+                comment=message.text
+            )
+            await message.answer("Спасибо за ваш отзыв!")
+        except Exception as e:
+            logger.error(f"Error creating review: {e}")
+            await message.answer(f"Ошибка при сохранении отзыва: {e}")
+        finally:
+            await state.clear()
     else:
+        logger.warning(f"Missing data: user={user}, event_id={event_id}, event_type={event_type}")
         await message.answer("Произошла ошибка, попробуйте снова.")
         await state.clear()
+
 
 # Функция запуска бота
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
