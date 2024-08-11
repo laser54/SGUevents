@@ -14,6 +14,8 @@ from asgiref.sync import sync_to_async
 from dotenv import load_dotenv
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from django.contrib.contenttypes.models import ContentType
+from aiogram.client.bot import DefaultBotProperties
+
 
 load_dotenv()
 from bot.django_initializer import setup_django_environment
@@ -28,12 +30,14 @@ SUPPORT_CHAT_ID = settings.ACTIVE_TELEGRAM_SUPPORT_CHAT_ID
 storage = MemoryStorage()
 dp = Dispatcher()
 router = Router()
+logger = logging.getLogger(__name__)
 
 class SupportRequestForm(StatesGroup):
     waiting_for_question = State()
 
 class ReviewForm(StatesGroup):
     waiting_for_review = State()
+
 
 
 async def get_user_profile(telegram_id):
@@ -166,73 +170,96 @@ async def toggle_notification(callback_query: types.CallbackQuery):
     else:
         await callback_query.answer("Вы не зарегистрированы на портале.")
 
+
 @router.callback_query(F.data.startswith("leave_review_"))
 async def leave_review(callback_query: types.CallbackQuery, state: FSMContext):
-    event_id = callback_query.data.split("_")[2]
+    # Убираем префикс "leave_review_" и разбиваем строку
+    data = callback_query.data[len("leave_review_"):]
+    parts = data.split("_")
+
+    # Проверка, чтобы было ровно 2 части после "leave_review_"
+    if len(parts) != 2:
+        await callback_query.answer("Произошла ошибка, попробуйте снова.")
+        return
+
+    event_type = parts[0]
+    event_id = parts[1]
+
+    # Проверяем, является ли event_id числом
+    if not event_id.isdigit():
+        await callback_query.answer("Произошла ошибка, попробуйте снова.")
+        return
+
     user = await get_user_profile(callback_query.from_user.id)
     if user:
         await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
         await state.set_state(ReviewForm.waiting_for_review)
-        await state.update_data(event_id=event_id)
+        await state.update_data(event_id=int(event_id), event_type=event_type)
     else:
         await callback_query.answer("Вы не зарегистрированы на портале.")
 
+
+
 @router.callback_query(F.data.startswith("review_later_"))
 async def remind_later(callback_query: types.CallbackQuery):
+    # Отправляем ответ на callback_query
     await callback_query.answer("Хорошо, напомним позже.")
-    # Логика для напоминания позже может быть добавлена здесь
+    # Здесь можно добавить логику для повторного напоминания
+
 
 @router.message(ReviewForm.waiting_for_review)
 async def receive_review(message: types.Message, state: FSMContext):
+    from events_cultural.models import Review, Attractions, Events_for_visiting
+    from events_available.models import Events_online, Events_offline
+    from django.contrib.contenttypes.models import ContentType
+
     user = await get_user_profile(message.from_user.id)
+    if not user:
+        await message.answer("Произошла ошибка, попробуйте снова.")
+        await state.clear()
+        return
+
     data = await state.get_data()
     event_type = data.get("event_type")
     event_id = data.get("event_id")
 
-    logger.info(f"Received review for event_id: {event_id}, event_type: {event_type} from user: {user.id}")
-
-    if user and event_id and event_type:
-        from bookmarks.models import Registered
-        from events_cultural.models import Review, Attractions, Events_for_visiting
-        from events_available.models import Events_online, Events_offline
-        from django.contrib.contenttypes.models import ContentType
-
-        # Определяем ContentType в зависимости от типа мероприятия
-        if event_type == "online":
-            model = Events_online
-        elif event_type == "offline":
-            model = Events_offline
-        elif event_type == "attractions":
-            model = Attractions
-        elif event_type == "for_visiting":
-            model = Events_for_visiting
-        else:
-            await message.answer("Произошла ошибка, попробуйте снова.")
-            await state.clear()
-            return
-
-        try:
-            content_type = await sync_to_async(ContentType.objects.get_for_model)(model)
-            review = await sync_to_async(Review.objects.create)(
-                user=user,
-                content_type=content_type,
-                object_id=event_id,
-                comment=message.text
-            )
-            await message.answer("Спасибо за ваш отзыв!")
-        except Exception as e:
-            logger.error(f"Error creating review: {e}")
-            await message.answer(f"Ошибка при сохранении отзыва: {e}")
-        finally:
-            await state.clear()
-    else:
-        logger.warning(f"Missing data: user={user}, event_id={event_id}, event_type={event_type}")
+    if not event_type or not event_id:
         await message.answer("Произошла ошибка, попробуйте снова.")
+        await state.clear()
+        return
+
+    model_map = {
+        "online": Events_online,
+        "offline": Events_offline,
+        "attractions": Attractions,
+        "for_visiting": Events_for_visiting
+    }
+
+    model = model_map.get(event_type)
+    if not model:
+        await message.answer("Произошла ошибка, попробуйте снова.")
+        await state.clear()
+        return
+
+    try:
+        content_type = await sync_to_async(ContentType.objects.get_for_model)(model)
+
+        review = await sync_to_async(Review.objects.create)(
+            user=user,
+            content_type=content_type,
+            object_id=int(event_id),  # Убедимся, что event_id приводится к int
+            comment=message.text
+        )
+        await message.answer("Спасибо за ваш отзыв!")
+    except Exception as e:
+        print(f"Ошибка при создании отзыва: {e}")
+        await message.answer(f"Ошибка при сохранении отзыва: {e}")
+    finally:
         await state.clear()
 
 
 # Функция запуска бота
-bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 async def run_bot():
     try:
         dp.include_router(router)

@@ -7,6 +7,15 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+import logging
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.serialization import deserialize_telegram_object_to_python
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
+
+
+logger = logging.getLogger('my_debug_logger')
 
 
 ADMIN_TG_NAME = os.getenv("ADMIN_TG_NAME")
@@ -128,19 +137,41 @@ def send_message_to_user_with_toggle_button(telegram_id, message, event_id, noti
     else:
         print(f"Ошибка отправки сообщения пользователю: {response.text}")
 
-def send_message_to_user_with_review_buttons(telegram_id, message, event_id, event_type, reply_markup):
+
+import json
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+
+def send_message_to_user_with_review_buttons(telegram_id, message, event_id, event_type):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+
+    # Создаем клавиатуру вручную
+    reply_markup = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="\U0000270D Оставить отзыв",
+                    callback_data=f"leave_review_{event_type}_{event_id}"
+                ),
+                InlineKeyboardButton(
+                    text="В другой раз",
+                    callback_data=f"review_later_{event_type}_{event_id}"
+                )
+            ]
+        ]
+    )
+
+    # Сериализация клавиатуры в формат, совместимый с JSON
+    serialized_reply_markup = deserialize_telegram_object_to_python(reply_markup)
+
     data = {
         "chat_id": telegram_id,
         "text": message,
+        "reply_markup": json.dumps(serialized_reply_markup)  # Преобразуем в JSON
     }
 
-    if reply_markup:
-        data["reply_markup"] = json.dumps(reply_markup)
-
-    response = requests.post(send_url, data=data)
+    response = requests.post(send_url, json=data)  # Отправляем данные в формате JSON
     if response.ok:
         print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
     else:
         print(f"Ошибка отправки сообщения пользователю: {response.text}")
-

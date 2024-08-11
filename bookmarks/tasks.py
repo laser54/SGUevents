@@ -34,45 +34,39 @@ def send_notification(event_id, user_id, event_name, timeframe):
     except Exception as e:
         logger.error(f"Error sending notification: {e}")
 
+
 @shared_task
 def send_review_request(event_id, user_id, event_name, event_type):
     try:
         user = User.objects.get(id=user_id)
         message = f"Мероприятие '{event_name}' завершилось. Пожалуйста, оставьте отзыв."
 
-        reply_markup = {
-            "inline_keyboard": [
-                [
-                    {"text": "\U0000270D Оставить отзыв", "callback_data": f"leave_review_{event_type}_{event_id}"},
-                    {"text": "В другой раз", "callback_data": f"review_later_{event_type}_{event_id}"}
-                ]
-            ]
-        }
+        # Формируем reply_markup здесь
+        send_message_to_user_with_review_buttons(user.telegram_id, message, event_id, event_type)
 
-        if user.telegram_id:
-            send_message_to_user_with_review_buttons(user.telegram_id, message, event_id, event_type, reply_markup)
-        else:
-            logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
     except User.DoesNotExist:
-        logger.error(f"User with id {user_id} does not exist.")
+        logger.error(f"User with id {user_id} does not exist. Event ID: {event_id}, Event Type: {event_type}")
     except Exception as e:
-        logger.error(f"Error sending review request: {e}")
+        logger.error(f"Error sending review request for Event ID: {event_id}, Event Type: {event_type}. Exception: {e}")
 
-def determine_event_type(event):
-    if event.online:
-        return "online"
-    elif event.offline:
-        return "offline"
-    elif event.attractions:
-        return "attractions"
-    elif event.for_visiting:
-        return "for_visiting"
+
+def determine_event_type_and_object(registered_event):
+    if registered_event.online:
+        return "online", registered_event.online
+    elif registered_event.offline:
+        return "offline", registered_event.offline
+    elif registered_event.attractions:
+        return "attractions", registered_event.attractions
+    elif registered_event.for_visiting:
+        return "for_visiting", registered_event.for_visiting
     else:
         raise ValueError("Unknown event type")
 
+
+
 @shared_task
 def schedule_notifications():
-    now = round_to_minute(localtime(tz_now()))  # Используем локальное время и округляем до минуты
+    now = round_to_minute(localtime(tz_now()))
     previous_minute = now - timedelta(minutes=1)
     current_tz = get_current_timezone()
 
@@ -85,7 +79,6 @@ def schedule_notifications():
     for timeframe, delta in timeframes.items():
         target_time = round_to_minute(now + delta)
 
-        # Фильтрация зарегистрированных событий по связанным моделям
         registered_events = Registered.objects.filter(
             Q(online__start_datetime__lte=target_time, online__start_datetime__gt=previous_minute) |
             Q(offline__start_datetime__lte=target_time, offline__start_datetime__gt=previous_minute) |
@@ -95,26 +88,15 @@ def schedule_notifications():
 
         if registered_events.exists():
             for event in registered_events:
-                if event.online:
-                    start_datetime = round_to_minute(event.online.start_datetime.astimezone(current_tz))
-                    event_name = event.online.name
-                    end_datetime = event.online.end_datetime.astimezone(current_tz)
-                elif event.offline:
-                    start_datetime = round_to_minute(event.offline.start_datetime.astimezone(current_tz))
-                    event_name = event.offline.name
-                    end_datetime = event.offline.end_datetime.astimezone(current_tz)
-                elif event.attractions:
-                    start_datetime = round_to_minute(event.attractions.start_datetime.astimezone(current_tz))
-                    event_name = event.attractions.name
-                    end_datetime = event.attractions.end_datetime.astimezone(current_tz)
-                elif event.for_visiting:
-                    start_datetime = round_to_minute(event.for_visiting.start_datetime.astimezone(current_tz))
-                    event_name = event.for_visiting.name
-                    end_datetime = event.for_visiting.end_datetime.astimezone(current_tz)
-                else:
+                try:
+                    event_type, event_obj = determine_event_type_and_object(event)
+                except ValueError as e:
+                    logger.error(f"Error determining event type for event ID: {event.id}. Exception: {e}")
                     continue
 
-                event_type = determine_event_type(event)
+                start_datetime = round_to_minute(event_obj.start_datetime.astimezone(current_tz))
+                end_datetime = event_obj.end_datetime.astimezone(current_tz)
+                event_name = event_obj.name
 
                 eta_time = start_datetime - delta
 
@@ -123,7 +105,6 @@ def schedule_notifications():
                 else:
                     logger.warning(f"Время {eta_time} для события {event.id} уже прошло, уведомление не запланировано.")
 
-                # Планирование уведомления о запросе отзыва
                 review_eta_time = end_datetime + timedelta(minutes=1)
                 if review_eta_time > now:
                     send_review_request.apply_async((event.id, event.user.id, event_name, event_type), eta=review_eta_time)

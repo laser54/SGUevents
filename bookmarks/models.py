@@ -38,12 +38,14 @@ class Favorite(models.Model):
 
 
 class Registered(models.Model):
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="Уникальный ID")  # Removed unique=True
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, verbose_name="Пользователь")
     online = models.ForeignKey(to=Events_online, on_delete=models.CASCADE, verbose_name="Онлайн", null=True, blank=True)
-    offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True, blank=True)
-    attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
-    for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
+    offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True,
+                                blank=True)
+    attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности",
+                                    null=True, blank=True)
+    for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE,
+                                     verbose_name="Доступные для посещения", null=True, blank=True)
     created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
     notifications_enabled = models.BooleanField(default=True, verbose_name="Уведомления включены")
 
@@ -62,7 +64,6 @@ class Registered(models.Model):
                     return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.attractions.name} | Тип {self.attractions.category}'
                 except:
                     return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
-
 
 @receiver(post_save, sender=Registered)
 def notify_user_on_registration(sender, instance, created, **kwargs):
