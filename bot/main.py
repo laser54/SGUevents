@@ -171,33 +171,35 @@ async def toggle_notification(callback_query: types.CallbackQuery):
         await callback_query.answer("Вы не зарегистрированы на портале.")
 
 
-@router.callback_query(F.data.startswith("leave_review_"))
+@router.callback_query(F.data)
 async def leave_review(callback_query: types.CallbackQuery, state: FSMContext):
-    # Убираем префикс "leave_review_" и разбиваем строку
-    data = callback_query.data[len("leave_review_"):]
-    parts = data.split("_")
+    try:
+        # Разбираем JSON из callback_data
+        data = json.loads(callback_query.data)
 
-    # Проверка, чтобы было ровно 2 части после "leave_review_"
-    if len(parts) != 2:
-        await callback_query.answer("Произошла ошибка, попробуйте снова.")
-        return
+        # Проверяем наличие нужных полей в данных
+        if data.get("action") != "leave_review" or "event_type" not in data or "event_id" not in data:
+            await callback_query.answer("Произошла ошибка, попробуйте снова.")
+            return
 
-    event_type = parts[0]
-    event_id = parts[1]
+        event_type = data["event_type"]
+        event_id = data["event_id"]
 
-    # Проверяем, является ли event_id числом
-    if not event_id.isdigit():
-        await callback_query.answer("Произошла ошибка, попробуйте снова.")
-        return
+        # Проверяем, является ли event_id числом
+        if not isinstance(event_id, int):
+            await callback_query.answer("Произошла ошибка, попробуйте снова.")
+            return
 
-    user = await get_user_profile(callback_query.from_user.id)
-    if user:
-        await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
-        await state.set_state(ReviewForm.waiting_for_review)
-        await state.update_data(event_id=int(event_id), event_type=event_type)
-    else:
-        await callback_query.answer("Вы не зарегистрированы на портале.")
-
+        user = await get_user_profile(callback_query.from_user.id)
+        if user:
+            await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
+            await state.set_state(ReviewForm.waiting_for_review)
+            await state.update_data(event_id=event_id, event_type=event_type)
+        else:
+            await callback_query.answer("Вы не зарегистрированы на портале.")
+    except (json.JSONDecodeError, KeyError) as e:
+        # Обработка ошибок при разборе JSON
+        await callback_query.answer("Произошла ошибка при разборе данных, попробуйте снова.")
 
 
 @router.callback_query(F.data.startswith("review_later_"))

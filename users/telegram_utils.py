@@ -145,29 +145,32 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def send_message_to_user_with_review_buttons(telegram_id, message, event_id, event_type):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
 
-    # Создаем клавиатуру вручную
+    # Создаем callback_data в формате JSON
+    callback_data = json.dumps({
+        "action": "leave_review",
+        "event_type": event_type,
+        "event_id": event_id
+    })
+
+    # Создаем клавиатуру с одной кнопкой
     reply_markup = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
                     text="\U0000270D Оставить отзыв",
-                    callback_data=f"leave_review_{event_type}_{event_id}"
-                ),
-                InlineKeyboardButton(
-                    text="В другой раз",
-                    callback_data=f"review_later_{event_type}_{event_id}"
+                    callback_data=callback_data
                 )
             ]
         ]
     )
 
-    # Сериализация клавиатуры в формат, совместимый с JSON
-    serialized_reply_markup = deserialize_telegram_object_to_python(reply_markup)
+    # Преобразуем клавиатуру в формат JSON совместимый с Telegram API
+    serialized_reply_markup = json.dumps(reply_markup.to_python())
 
     data = {
         "chat_id": telegram_id,
         "text": message,
-        "reply_markup": json.dumps(serialized_reply_markup)  # Преобразуем в JSON
+        "reply_markup": serialized_reply_markup  # Преобразуем в JSON
     }
 
     response = requests.post(send_url, json=data)  # Отправляем данные в формате JSON
