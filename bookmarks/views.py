@@ -80,9 +80,31 @@ def favorites(request):
         content_type = ContentType.objects.get_for_model(event)
         reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
-    events_for_visiting = [event for event in events if isinstance(event, Events_for_visiting)]
-    registered = Registered.objects.filter(user=request.user, for_visiting__in=events_for_visiting)
-    registered_dict = {reg.for_visiting.id: reg.id for reg in registered}
+    registered_dict = {
+        'online': {},
+        'offline': {},
+        'attractions': {},
+        'for_visiting': {}
+    }
+
+    # Получаем все зарегистрированные мероприятия и распределяем их по типам
+    for event in events:
+        if isinstance(event, Events_online):
+            reg_event = Registered.objects.filter(user=request.user, online=event).first()
+            if reg_event:
+                registered_dict['online'][event.id] = reg_event.id
+        elif isinstance(event, Events_offline):
+            reg_event = Registered.objects.filter(user=request.user, offline=event).first()
+            if reg_event:
+                registered_dict['offline'][event.id] = reg_event.id
+        elif isinstance(event, Attractions):
+            reg_event = Registered.objects.filter(user=request.user, attractions=event).first()
+            if reg_event:
+                registered_dict['attractions'][event.id] = reg_event.id
+        elif isinstance(event, Events_for_visiting):
+            reg_event = Registered.objects.filter(user=request.user, for_visiting=event).first()
+            if reg_event:
+                registered_dict['for_visiting'][event.id] = reg_event.id
 
     context = {
         'events': events,
@@ -100,6 +122,10 @@ def events_attended(request):
 def events_registered(request, event_slug):
     event = None
     event_type = None
+    favorites = Favorite.objects.filter(user=request.user)
+
+    
+
     try:
         event = Events_online.objects.get(slug=event_slug)
         event_type = 'online'
@@ -160,25 +186,49 @@ def registered(request):
     registered = Registered.objects.filter(user=request.user)
     reviews = {}
     events = []
+
+    online_ids = []
+    offline_ids = []
+    attractions_ids = []
+    for_visiting_ids = []
+
     for reg in registered:
         if reg.online:
             events.append(reg.online)
+            online_ids.append(reg.online.id)
         elif reg.offline:
             events.append(reg.offline)
+            offline_ids.append(reg.offline.id)
         elif reg.attractions:
             events.append(reg.attractions)
+            attractions_ids.append(reg.attractions.id)
         elif reg.for_visiting:
             events.append(reg.for_visiting)
-    
+            for_visiting_ids.append(reg.for_visiting.id)
+
     for event in events:
         content_type = ContentType.objects.get_for_model(event)
         reviews[event.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
+    favorites_online = Favorite.objects.filter(user=request.user, online_id__in=online_ids).values_list('online_id', 'id')
+    favorites_offline = Favorite.objects.filter(user=request.user, offline_id__in=offline_ids).values_list('offline_id', 'id')
+    favorites_attractions = Favorite.objects.filter(user=request.user, attractions_id__in=attractions_ids).values_list('attractions_id', 'id')
+    favorites_for_visiting = Favorite.objects.filter(user=request.user, for_visiting_id__in=for_visiting_ids).values_list('for_visiting_id', 'id')
+
+    favorites_dict = {
+        'online': {item[0]: item[1] for item in favorites_online},
+        'offline': {item[0]: item[1] for item in favorites_offline},
+        'attractions': {item[0]: item[1] for item in favorites_attractions},
+        'for_visiting': {item[0]: item[1] for item in favorites_for_visiting},
+    }
+
     context = {
         'registered': registered,
         'reviews': reviews,
+        'favorites': favorites_dict,
     }
     return render(request, 'bookmarks/registered.html', context)
+
 
 @login_required
 @csrf_exempt

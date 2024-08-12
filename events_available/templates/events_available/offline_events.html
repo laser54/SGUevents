@@ -200,7 +200,7 @@
 {% block content %}
 <!-- Контент на странице -->
 {% if events.id in registered %}
-<p>{{ registered }}</p>
+
 <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
     Отмена регистрации
 </a>

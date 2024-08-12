@@ -62,7 +62,7 @@
                                         <p>{{ speakers }}</p>
                                         
 
-                                        {% if favorite.online.id in registered %}
+                                        {% if favorite.online.id in registered.online %}
                                             <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.online.id }}">
                                                 Отмена регистрации
                                             </a>
@@ -151,8 +151,9 @@
                                             {% if favorite.offline.town %}{{ favorite.offline.town }}{% endif %} {% if favorite.offline.street %}{{ evefavorite.offline.street }}{% endif %} {% if favorite.offline.cabinet %}{{ favorite.offline.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
-
-                                        {% if favorite.offline.id in registered %}
+                                        
+                                        
+                                        {% if favorite.offline.id in registered.offline %}
                                             <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.offline.id }}">
                                                 Отмена регистрации
                                             </a>
@@ -322,7 +323,7 @@
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
-                                        {% if favorite.for_visiting.id in registered %}
+                                        {% if favorite.for_visiting.id in registered.for_visiting %}
                                             <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.for_visiting.id }}">
                                                 Отмена регистрации
                                             </a>
