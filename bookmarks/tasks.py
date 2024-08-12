@@ -40,15 +40,11 @@ def send_review_request(event_id, user_id, event_name, event_type):
     try:
         user = User.objects.get(id=user_id)
         message = f"Мероприятие '{event_name}' завершилось. Пожалуйста, оставьте отзыв."
-
-        # Формируем reply_markup здесь
         send_message_to_user_with_review_buttons(user.telegram_id, message, event_id, event_type)
-
     except User.DoesNotExist:
         logger.error(f"User with id {user_id} does not exist. Event ID: {event_id}, Event Type: {event_type}")
     except Exception as e:
         logger.error(f"Error sending review request for Event ID: {event_id}, Event Type: {event_type}. Exception: {e}")
-
 
 def determine_event_type_and_object(registered_event):
     if registered_event.online:

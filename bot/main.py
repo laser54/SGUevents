@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import uuid
 
 import requests
 import json
@@ -171,37 +172,12 @@ async def toggle_notification(callback_query: types.CallbackQuery):
         await callback_query.answer("Вы не зарегистрированы на портале.")
 
 
-@router.callback_query(F.data)
-async def leave_review(callback_query: types.CallbackQuery, state: FSMContext):
-    try:
-        # Разбираем JSON из callback_data
-        data = json.loads(callback_query.data)
-
-        # Проверяем наличие нужных полей в данных
-        if data.get("action") != "leave_review" or "event_type" not in data or "event_id" not in data:
-            await callback_query.answer("Произошла ошибка, попробуйте снова.")
-            return
-
-        event_type = data["event_type"]
-        event_id = data["event_id"]
-
-        user = await get_user_profile(callback_query.from_user.id)
-        if user:
-            await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
-            await state.set_state(ReviewForm.waiting_for_review)
-            await state.update_data(event_id=event_id, event_type=event_type)
-        else:
-            await callback_query.answer("Вы не зарегистрированы на портале.")
-    except (json.JSONDecodeError, KeyError) as e:
-        # Обработка ошибок при разборе JSON
-        await callback_query.answer("Произошла ошибка при разборе данных, попробуйте снова.")
-
-
 @router.message(ReviewForm.waiting_for_review)
 async def receive_review(message: types.Message, state: FSMContext):
+    from django.shortcuts import get_object_or_404
+    from django.contrib.contenttypes.models import ContentType
     from events_cultural.models import Review, Attractions, Events_for_visiting
     from events_available.models import Events_online, Events_offline
-    from django.contrib.contenttypes.models import ContentType
 
     user = await get_user_profile(message.from_user.id)
     if not user:
@@ -210,12 +186,13 @@ async def receive_review(message: types.Message, state: FSMContext):
         return
 
     data = await state.get_data()
-    event_type = data.get("event_type")
     event_id = data.get("event_id")
+    event_type = data.get("event_type")
 
-    if not event_type or not event_id:
-        await message.answer("Произошла ошибка, попробуйте снова.")
-        await state.clear()
+    comment = message.text
+
+    if not comment:
+        await message.answer("Комментарий не может быть пустым")
         return
 
     model_map = {
@@ -227,26 +204,52 @@ async def receive_review(message: types.Message, state: FSMContext):
 
     model = model_map.get(event_type)
     if not model:
-        await message.answer("Произошла ошибка, попробуйте снова.")
-        await state.clear()
+        await message.answer("Некорректный тип мероприятия")
         return
 
     try:
+        # Проверяем, что event_id - это UUID
+        event = await sync_to_async(get_object_or_404)(model, unique_id=event_id)
+
         content_type = await sync_to_async(ContentType.objects.get_for_model)(model)
 
         review = await sync_to_async(Review.objects.create)(
             user=user,
             content_type=content_type,
-            object_id=int(event_id),  # Убедимся, что event_id приводится к int
-            comment=message.text
+            object_id=event.id,  # Используем внутренний ID для создания отзыва
+            comment=comment
         )
+
         await message.answer("Спасибо за ваш отзыв!")
-    except Exception as e:
-        print(f"Ошибка при создании отзыва: {e}")
-        await message.answer(f"Ошибка при сохранении отзыва: {e}")
+    except model.DoesNotExist:
+        await message.answer("Не удалось найти событие. Возможно, оно было удалено.")
+    except ValueError:
+        await message.answer("Некорректный UUID для события.")
     finally:
         await state.clear()
 
+
+@router.callback_query(F.data.startswith("review:"))
+async def handle_leave_review(callback_query: types.CallbackQuery, state: FSMContext):
+    try:
+        _, event_id, event_type = callback_query.data.split(":")
+
+        # Проверяем, что event_id является валидным UUID
+        try:
+            uuid_obj = uuid.UUID(event_id)
+        except ValueError:
+            await callback_query.answer("Некорректный UUID для события.")
+            return
+
+        user = await get_user_profile(callback_query.from_user.id)
+        if user:
+            await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
+            await state.set_state(ReviewForm.waiting_for_review)
+            await state.update_data(event_id=str(uuid_obj), event_type=event_type)
+        else:
+            await callback_query.answer("Вы не зарегистрированы на портале.")
+    except Exception as e:
+        await callback_query.answer(f"Произошла ошибка: {e}")
 
 # Функция запуска бота
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))

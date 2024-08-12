@@ -1,3 +1,5 @@
+import uuid
+
 import requests
 import json
 import os
@@ -143,6 +145,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import json
 
 
+logger = logging.getLogger('my_debug_logger')
+
 def inline_keyboard_to_dict(inline_keyboard):
     """
     Преобразует объект InlineKeyboardMarkup в словарь.
@@ -162,26 +166,30 @@ def inline_keyboard_to_dict(inline_keyboard):
 def send_message_to_user_with_review_buttons(telegram_id, message, event_id, event_type):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
 
+    # Проверяем, что event_id является валидным UUID
+    try:
+        uuid_obj = uuid.UUID(event_id)  # Проверка UUID
+    except ValueError:
+        print(f"Некорректный UUID: {event_id}")
+        return
+
     # Создаем клавиатуру
     reply_markup = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(
                 text="\U0000270D Оставить отзыв",
-                callback_data=f"leave_review_{event_type}_{event_id}"
+                callback_data=f"review:{uuid_obj}:{event_type}"
             )
         ]
     ])
 
-    # Преобразуем InlineKeyboardMarkup в словарь
-    serialized_reply_markup = inline_keyboard_to_dict(reply_markup)
-
     data = {
         "chat_id": telegram_id,
         "text": message,
-        "reply_markup": serialized_reply_markup  # Передаем словарь
+        "reply_markup": inline_keyboard_to_dict(reply_markup)
     }
 
-    response = requests.post(send_url, json=data)  # Используем параметр json для отправки данных
+    response = requests.post(send_url, json=data)
     if response.ok:
         print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
     else:
