@@ -7,9 +7,10 @@
 
 {% block content %}
 <!-- Контент на странице -->
+ 
 {% if events.category  == 'Онлайн' %}
-	{% if events.id in registered %}
-		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+	{% if events.id in registered.online %}
+		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered.online|get_item:events.id }}">
 			Отмена регистрации
 		</a>
 	{% else %}
@@ -20,8 +21,8 @@
 
 	<button class="btn btn-primary btn-comment" data-event-id="{{ events.id }}" data-model-type="online">Оставить отзыв</button>
 {% elif events.category  == 'Оффлайн' %}
-	{% if events.id in registered %}
-		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+	{% if events.id in registered.offline %}
+		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered.offline|get_item:events.id }}">
 			Отмена регистрации
 		</a>
 	{% else %}
@@ -35,8 +36,8 @@
 {% elif events.category  == 'Достопримечательности' %}
 	<button class="btn btn-primary btn-comment" data-event-id="{{ events.id }}" data-model-type="attractions">Оставить отзыв</button>
 {% elif events.category  == 'Доступные к посещению' %}
-	{% if events.id in registered %}
-		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:events.id }}">
+	{% if events.id in registered.for_visiting %}
+		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered.for_visiting|get_item:events.id }}">
 			Отмена регистрации
 		</a>
 		{% else %}
@@ -46,5 +47,6 @@
 	{% endif %}
 	<button class="btn btn-primary btn-comment" data-event-id="{{ events.id }}" data-model-type="for_visiting">Оставить отзыв </button>
 {% endif %}
+
 
 {% endblock content %}

@@ -13,12 +13,23 @@
                         <div class="card mb-3">
                             <div class="row g-0">
                                 <div class="col-md-4">
+                                    
                                     {% if register.online.image %}
                                         <img src="{{ register.online.image.url }}" class="img-fluid rounded-start" alt="{{ register.online.name }}">
                                     {% else %}
                                         <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.online.name }}">
                                     {% endif %}
-                        
+                                    
+                                
+                                    {% if register.online.id in favorites.online %}
+                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.online|get_item:register.online.id }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% else %}
+                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ register.online.slug }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% endif %}
                                     <div class="card-img-info">
                                         <p>id: {{ register.online.display_id }}</p>
                                         <p>category: {{ register.online.category }}</p>
@@ -100,7 +111,16 @@
                                     {% else %}
                                         <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.offline.name }}">
                                     {% endif %}
-                                    
+
+                                    {% if register.offline.id in favorites.offline %}
+                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.offline|get_item:register.offline.id }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% else %}
+                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ register.offline.slug }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% endif %}
                                     <div class="card-img-info">
                                         <p>id: {{ register.offline.display_id }}</p>
                                         <p>category: {{ register.offline.category }}</p>
@@ -182,7 +202,17 @@
                                     {% else %}
                                         <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.attractions.name }}">
                                     {% endif %}
-                                
+                                    
+                                    {% if register.attractions.id in favorites.attractions %}
+                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.attractions|get_item:register.attractions.id }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% else %}
+                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ register.attractions.slug }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% endif %}
+
                                     <div class="card-img-info">
                                         <p>id: {{ register.attractions.display_id }}</p>
                                         <p>category: {{ register.attractions.category }}</p>
@@ -265,7 +295,18 @@
                                         <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ register.for_visiting.name }}">
                                     {% endif %}
                                     
-                                    <div class="card-img-info">
+                                    {% if register.for_visiting.id in favorites.for_visiting %}
+                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.for_visiting|get_item:register.for_visiting.id }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% else %}
+                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ register.for_visiting.slug }}">
+                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                        </a>
+                                    {% endif %}
+
+
+                                    <div class="card-img-info">    
                                         <p>id: {{ register.for_visiting.display_id }}</p>
                                         <p>category: {{ register.for_visiting.category }}</p>
                                     </div>
