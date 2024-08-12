@@ -9,7 +9,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Update
 from asgiref.sync import sync_to_async
 from dotenv import load_dotenv
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -185,11 +185,6 @@ async def leave_review(callback_query: types.CallbackQuery, state: FSMContext):
         event_type = data["event_type"]
         event_id = data["event_id"]
 
-        # Проверяем, является ли event_id числом
-        if not isinstance(event_id, int):
-            await callback_query.answer("Произошла ошибка, попробуйте снова.")
-            return
-
         user = await get_user_profile(callback_query.from_user.id)
         if user:
             await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
@@ -200,13 +195,6 @@ async def leave_review(callback_query: types.CallbackQuery, state: FSMContext):
     except (json.JSONDecodeError, KeyError) as e:
         # Обработка ошибок при разборе JSON
         await callback_query.answer("Произошла ошибка при разборе данных, попробуйте снова.")
-
-
-@router.callback_query(F.data.startswith("review_later_"))
-async def remind_later(callback_query: types.CallbackQuery):
-    # Отправляем ответ на callback_query
-    await callback_query.answer("Хорошо, напомним позже.")
-    # Здесь можно добавить логику для повторного напоминания
 
 
 @router.message(ReviewForm.waiting_for_review)

@@ -138,9 +138,26 @@ def send_message_to_user_with_toggle_button(telegram_id, message, event_id, noti
         print(f"Ошибка отправки сообщения пользователю: {response.text}")
 
 
-import json
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import json
+
+
+def inline_keyboard_to_dict(inline_keyboard):
+    """
+    Преобразует объект InlineKeyboardMarkup в словарь.
+    """
+    keyboard = []
+    for row in inline_keyboard.inline_keyboard:
+        row_buttons = []
+        for button in row:
+            button_data = {
+                "text": button.text,
+                "callback_data": button.callback_data
+            }
+            row_buttons.append(button_data)
+        keyboard.append(row_buttons)
+    return {"inline_keyboard": keyboard}
 
 def send_message_to_user_with_review_buttons(telegram_id, message, event_id, event_type):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -155,13 +172,16 @@ def send_message_to_user_with_review_buttons(telegram_id, message, event_id, eve
         ]
     ])
 
+    # Преобразуем InlineKeyboardMarkup в словарь
+    serialized_reply_markup = inline_keyboard_to_dict(reply_markup)
+
     data = {
         "chat_id": telegram_id,
         "text": message,
-        "reply_markup": reply_markup  # Передаем объект напрямую, aiogram сам его сериализует
+        "reply_markup": serialized_reply_markup  # Передаем словарь
     }
 
-    response = requests.post(send_url, json=data)
+    response = requests.post(send_url, json=data)  # Используем параметр json для отправки данных
     if response.ok:
         print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
     else:
