@@ -12,6 +12,7 @@ urlpatterns = [
     path('events_cultural/', include('events_cultural.urls', namespace='events_cultural')),
     path('application_for_admin_rights/', include('application_for_admin_rights.urls', namespace='application_for_admin_rights')),
     path('personal/', include('personal.urls', namespace='personal')),
+    path('select2/', include('django_select2.urls')),
     path('bookmarks/', include('bookmarks.urls', namespace='bookmarks')),
     path('', include('main.urls', namespace='main')),
 ]

@@ -1,0 +1,74 @@
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_name" class="form-label">Название:</label>
+                {{ form.name }}
+            </div>
+            <div class="mb-3">
+                <label for="id_slug" class="form-label">URL:</label>
+                {{ form.slug }}
+            </div>
+            <div class="mb-3">
+                <label for="id_date" class="form-label">Дата:</label>
+                {{ form.date }}
+            </div>
+            <div class="mb-3">
+                <label for="id_time_start" class="form-label">Время начала:</label>
+                {{ form.time_start }}
+            </div>
+            <div class="mb-3">
+                <label for="id_time_end" class="form-label">Время окончания:</label>
+                {{ form.time_end }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_description" class="form-label">Описание:</label>
+                {{ form.description }}
+            </div>
+            <div class="mb-3">
+                <label for="id_speakers" class="form-label">Спикеры:</label>
+                {{ form.speakers }}
+            </div>
+            <div class="mb-3">
+                <label for="id_member" class="form-label">Участники:</label>
+                {{ form.member }}
+            </div>
+            <div class="mb-3">
+                <label for="id_tags" class="form-label">Теги:</label>
+                {{ form.tags }}
+            </div>
+            <div class="mb-3">
+                <label for="id_platform" class="form-label">Платформа:</label>
+                {{ form.platform }}
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="id_link" class="form-label">Ссылка:</label>
+        {{ form.link }}
+    </div>
+    <div class="mb-3">
+        <label for="id_qr" class="form-label">QR-код:</label>
+        {{ form.qr }}
+    </div>
+    <div class="mb-3">
+        <label for="id_image" class="form-label">Изображение:</label>
+        {{ form.image }}
+    </div>
+    <div class="mb-3">
+        <label for="id_events_admin" class="form-label">Администратор:</label>
+        {{ form.events_admin }}
+    </div>
+    <div class="mb-3">
+        <label for="id_documents" class="form-label">Документы:</label>
+        {{ form.documents }}
+    </div>
+    <div class="mb-3">
+        <label for="id_secret" class="form-label">Ключ для мероприятия:</label>
+        {{ form.secret }}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
