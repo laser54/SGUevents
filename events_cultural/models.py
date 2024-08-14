@@ -5,6 +5,8 @@ from django.utils.timezone import make_aware, get_default_timezone
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from users.models import Department, User
+from django.utils import timezone
+from pytz import timezone as pytz_timezone
 
 class Attractions(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -83,6 +85,9 @@ class Events_for_visiting(models.Model):
         self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
         super(Events_for_visiting, self).save(*args, **kwargs)
 
+from django.utils import timezone
+from pytz import timezone as pytz_timezone
+
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -91,13 +96,22 @@ class Review(models.Model):
     comment = models.TextField(verbose_name='Комментарий')
     date_submitted = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')
 
+    def save(self, *args, **kwargs):
+        # Ensure the time is saved in UTC+7 when saving the object
+        local_timezone = pytz_timezone('Asia/Novosibirsk')
+        self.date_submitted = timezone.now().astimezone(local_timezone)
+        super(Review, self).save(*args, **kwargs)
+
     class Meta:
         db_table = 'reviews'
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
 
     def __str__(self):
-        return f'{self.date_submitted.strftime("%d.%m.%Y %H:%M")} Отзыв от {self.user.username} на {self.event}'
+        return f'{self.formatted_date()} Отзыв от {self.user.username} на {self.event}'
 
     def formatted_date(self):
-        return self.date_submitted.strftime("%d.%m.%y %H:%M")
+        local_timezone = pytz_timezone('Asia/Novosibirsk')
+        return self.date_submitted.astimezone(local_timezone).strftime("%d.%m.%y %H:%M")
+
+

@@ -9,6 +9,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from users.telegram_utils import send_message_to_user_with_toggle_button
 import logging
+from django.utils import timezone
+from pytz import timezone as pytz_timezone
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,13 @@ class Favorite(models.Model):
     offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True, blank=True)
     attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
     for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
-    created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+    created_timestamp = models.DateTimeField(verbose_name="Дата добавления")
+
+    def save(self, *args, **kwargs):
+        if not self.created_timestamp:
+            local_timezone = pytz_timezone('Asia/Novosibirsk')
+            self.created_timestamp = timezone.now().astimezone(local_timezone)
+        super(Favorite, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Избранные"
@@ -48,6 +56,12 @@ class Registered(models.Model):
                                      verbose_name="Доступные для посещения", null=True, blank=True)
     created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
     notifications_enabled = models.BooleanField(default=True, verbose_name="Уведомления включены")
+
+    def save(self, *args, **kwargs):
+        if not self.created_timestamp:
+            local_timezone = pytz_timezone('Asia/Novosibirsk')
+            self.created_timestamp = timezone.now().astimezone(local_timezone)
+        super(Registered, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Зарегистрированные"
