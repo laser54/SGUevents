@@ -4,7 +4,7 @@ from celery import shared_task
 from django.db.models import Q
 from bookmarks.models import Registered
 from users.models import User
-from users.telegram_utils import send_message_to_user_with_toggle_button
+from users.telegram_utils import send_message_to_user_with_toggle_button, send_message_to_user_with_review_buttons
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 
@@ -34,9 +34,35 @@ def send_notification(event_id, user_id, event_name, timeframe):
     except Exception as e:
         logger.error(f"Error sending notification: {e}")
 
+
+@shared_task
+def send_review_request(event_unique_id, user_id, event_name, event_type):
+    try:
+        user = User.objects.get(id=user_id)
+        message = f"Мероприятие '{event_name}' завершилось. Пожалуйста, оставьте отзыв."
+        send_message_to_user_with_review_buttons(user.telegram_id, message, str(event_unique_id), event_type)
+    except User.DoesNotExist:
+        logger.error(f"User with id {user_id} does not exist. Event Unique ID: {event_unique_id}, Event Type: {event_type}")
+    except Exception as e:
+        logger.error(f"Error sending review request for Event Unique ID: {event_unique_id}, Event Type: {event_type}. Exception: {e}")
+
+def determine_event_type_and_object(registered_event):
+    if registered_event.online:
+        return "online", registered_event.online
+    elif registered_event.offline:
+        return "offline", registered_event.offline
+    elif registered_event.attractions:
+        return "attractions", registered_event.attractions
+    elif registered_event.for_visiting:
+        return "for_visiting", registered_event.for_visiting
+    else:
+        raise ValueError("Unknown event type")
+
+
+
 @shared_task
 def schedule_notifications():
-    now = round_to_minute(localtime(tz_now()))  # Используем локальное время и округляем до минуты
+    now = round_to_minute(localtime(tz_now()))
     previous_minute = now - timedelta(minutes=1)
     current_tz = get_current_timezone()
 
@@ -49,7 +75,6 @@ def schedule_notifications():
     for timeframe, delta in timeframes.items():
         target_time = round_to_minute(now + delta)
 
-        # Фильтрация зарегистрированных событий по связанным моделям
         registered_events = Registered.objects.filter(
             Q(online__start_datetime__lte=target_time, online__start_datetime__gt=previous_minute) |
             Q(offline__start_datetime__lte=target_time, offline__start_datetime__gt=previous_minute) |
@@ -59,24 +84,25 @@ def schedule_notifications():
 
         if registered_events.exists():
             for event in registered_events:
-                if event.online:
-                    start_datetime = round_to_minute(event.online.start_datetime.astimezone(current_tz))
-                    event_name = event.online.name
-                elif event.offline:
-                    start_datetime = round_to_minute(event.offline.start_datetime.astimezone(current_tz))
-                    event_name = event.offline.name
-                elif event.attractions:
-                    start_datetime = round_to_minute(event.attractions.start_datetime.astimezone(current_tz))
-                    event_name = event.attractions.name
-                elif event.for_visiting:
-                    start_datetime = round_to_minute(event.for_visiting.start_datetime.astimezone(current_tz))
-                    event_name = event.for_visiting.name
-                else:
+                try:
+                    event_type, event_obj = determine_event_type_and_object(event)
+                except ValueError as e:
+                    logger.error(f"Error determining event type for event with Unique ID: {event_obj.unique_id}. Exception: {e}")
                     continue
+
+                start_datetime = round_to_minute(event_obj.start_datetime.astimezone(current_tz))
+                end_datetime = event_obj.end_datetime.astimezone(current_tz)
+                event_name = event_obj.name
 
                 eta_time = start_datetime - delta
 
                 if eta_time >= previous_minute:
-                    send_notification.apply_async((event.id, event.user.id, event_name, timeframe), eta=now)
+                    send_notification.apply_async((str(event_obj.unique_id), event.user.id, event_name, timeframe), eta=now)
                 else:
-                    logger.warning(f"Время {eta_time} для события {event.id} уже прошло, уведомление не запланировано.")
+                    logger.warning(f"Время {eta_time} для события {event_obj.unique_id} уже прошло, уведомление не запланировано.")
+
+                review_eta_time = end_datetime + timedelta(minutes=1)
+                if review_eta_time > now:
+                    send_review_request.apply_async((str(event_obj.unique_id), event.user.id, event_name, event_type), eta=review_eta_time)
+                else:
+                    logger.warning(f"Время {review_eta_time} для события {event_obj.unique_id} уже прошло, запрос на отзыв не запланирован.")

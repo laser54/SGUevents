@@ -209,34 +209,28 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# Настройки логирования (раскомментировать, если нужно)
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'DEBUG',
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         'celery': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         'bookmarks': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#     },
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'my_debug_filter': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': lambda record: record.levelname == 'DEBUG' and 'my_debug' in record.msg,
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['my_debug_filter'],
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'my_debug_logger': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
