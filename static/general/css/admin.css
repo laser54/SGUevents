@@ -25,3 +25,11 @@
 .form-group .custom-file-label {
 	padding-left: 10px;
 }
+
+.form-label {
+	font-weight: bold;
+}
+
+.text-danger {
+	color: red;
+}

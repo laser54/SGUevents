@@ -1,15 +1,19 @@
 from django import forms
 from django_select2.forms import ModelSelect2MultipleWidget
-from events_available.models import Events_online, Events_offline, Department
+from events_available.models import Events_online, Events_offline
+from users.models import Department
+
 
 class EventsOnlineForm(forms.ModelForm):
     secret = forms.ModelMultipleChoiceField(
-        queryset=Department.objects.all(),
+        queryset=Department.objects.all(),  # Проверяем, что все отделы доступны для выбора
         widget=ModelSelect2MultipleWidget(
             model=Department,
-            search_fields=['department_name__icontains']
+            search_fields=['department_name__icontains'],  # Поиск по названию отдела
+            attrs={'class': 'form-control django-select2'}
         ),
-        required=False
+        required=False,
+        label="Ключ для мероприятия"
     )
 
     class Meta:
@@ -34,14 +38,6 @@ class EventsOnlineForm(forms.ModelForm):
         }
 
 class EventsOfflineForm(forms.ModelForm):
-    secret = forms.ModelMultipleChoiceField(
-        queryset=Department.objects.all(),
-        widget=ModelSelect2MultipleWidget(
-            model=Department,
-            search_fields=['department_name__icontains']
-        ),
-        required=False
-    )
 
     class Meta:
         model = Events_offline
@@ -64,4 +60,8 @@ class EventsOfflineForm(forms.ModelForm):
             'image': forms.FileInput(attrs={'class': 'form-control'}),
             'events_admin': forms.TextInput(attrs={'class': 'form-control'}),
             'documents': forms.FileInput(attrs={'class': 'form-control'}),
+            'secret': ModelSelect2MultipleWidget(
+                queryset=Department.objects.all(),
+                search_fields=['department_name__icontains'],
+                attrs={'class': 'form-control'}),
         }

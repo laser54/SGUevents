@@ -3,60 +3,47 @@
 {% block title %} Admin {% endblock %}
 {% block form_events %}
 <link rel="stylesheet" href="{% static "general/css/admin.css" %}"
-<div class="container mt-5">
-    <h1>Личный кабинет</h1>
+    `   
 
-    <!-- Кнопки для добавления мероприятий -->
-    <button id="add-online-event-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal" data-form-type="online">Добавить онлайн мероприятие</button>
-    <button id="add-offline-event-btn" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addEventModal" data-form-type="offline">Добавить оффлайн мероприятие</button>
+        <p> <h1>Личный кабинет</h1> </p>        
+        <a href="/admin/events_available/events_online/add/" class="btn btn-secondary" role="button">
+            Добавить онлайн мероприятие
+        </a>
     
-    <!-- Модальное окно -->
-    <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl"> <!-- Увеличиваем ширину модального окна -->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addEventModalLabel">Добавить мероприятие</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Форма будет отображена здесь -->
-                    <div id="form-container" class="container-fluid">
-                        <!-- Форма будет подгружаться сюда в зависимости от выбранной кнопки -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <a href="/admin/events_available/events_offline/add/" class="btn btn-secondary" role="button">
+            Добавить оффлайн мероприятие
+        </a>
 
-</div>
+        <a href="/admin/events_cultural/attractions/add/" class="btn btn-secondary" role="button">
+            Добавить достопримечательность
+        </a>
 
-<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+        <a href="/admin/events_cultural/events_for_visiting/add/" class="btn btn-secondary" role="button">
+            Добавить доступное для посещения мероприятие
+        </a>
+    
+            <h2 class="mt-4">Ваши мероприятия</h2>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const addOnlineEventBtn = document.getElementById('add-online-event-btn');
-        const addOfflineEventBtn = document.getElementById('add-offline-event-btn');
-        const addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
-
-        function loadForm(url) {
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('#form-container').innerHTML = data.form_html;
-                    addEventModal.show();
-                });
-        }
-
-        addOnlineEventBtn.addEventListener('click', function () {
-            loadForm("{% url 'personal:add_online_event' %}");
-        });
-
-        addOfflineEventBtn.addEventListener('click', function () {
-            loadForm("{% url 'personal:add_offline_event' %}");
-        });
-    });
-</script>
  
 {% endblock %}
+
+{% block admins_events %}
+    <div class="container mt-5">
+        <a href="
+        {% if events.category  == 'Онлайн' %}
+            {% url 'admin:events_available_events_online_change' events.id %}" 
+        {% elif events.category  == 'Оффлайн' %}
+            {% url 'admin:events_available_events_offline_change' events.id %}" 
+        {% elif events.category  == 'Достопримечательности' %}
+            {% url 'admin:events_cultural_attractions_change' events.id %}" 
+        {% elif events.category  == 'Доступные к посещению' %}
+            {% url 'admin:events_cultural_events_for_visiting_change' events.id %}" 
+        {% endif %}" 
+        class="btn btn-sm btn-primary" target="_blank"> Редактировать </a>
+    </div>
+{% endblock admins_events %}
+
+
+    
+    
+
