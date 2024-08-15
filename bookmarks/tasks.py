@@ -64,7 +64,11 @@ def schedule_notifications():
         Q(online__start_datetime__gte=now) |
         Q(offline__start_datetime__gte=now) |
         Q(attractions__start_datetime__gte=now) |
-        Q(for_visiting__start_datetime__gte=now)
+        Q(for_visiting__start_datetime__gte=now) |
+        Q(online__end_datetime__gte=now) |  # Учитываем события, которые уже идут.
+        Q(offline__end_datetime__gte=now) |
+        Q(attractions__end_datetime__gte=now) |
+        Q(for_visiting__end_datetime__gte=now)
     )
 
     for event in registered_events:
@@ -72,7 +76,7 @@ def schedule_notifications():
             event_type, event_obj = determine_event_type_and_object(event)
             event_name = event_obj.name
 
-            # Временные промежутки
+            # Временные промежутки для отправки уведомлений перед началом
             timeframes = {
                 '1 день': timedelta(days=1),
                 '1 час': timedelta(hours=1),
@@ -89,13 +93,10 @@ def schedule_notifications():
                         eta=now + timedelta(seconds=10)
                     )
 
-            # Логика отправки запроса на отзыв
+            # Если мероприятие закончится в ближайшую минуту, сразу планируем запрос на отзыв
             review_eta_time = round_to_minute(event_obj.end_datetime.astimezone(current_tz)) + timedelta(minutes=1)
-            review_window_start = review_eta_time - notification_window
-            review_window_end = review_eta_time + notification_window
-
-            # Фильтруем мероприятия, которые уже завершились и не обработаны
-            if review_window_start <= now < review_window_end:
+            if review_eta_time > now and review_eta_time <= now + timedelta(minutes=1):
+                logger.info(f"Запланирована отправка запроса на отзыв по мероприятию '{event_name}' (ID: {event_obj.unique_id}) на {review_eta_time}")
                 send_review_request.apply_async(
                     (str(event_obj.unique_id), event.user.id, event_name, event_type),
                     eta=review_eta_time
