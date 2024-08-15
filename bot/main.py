@@ -175,7 +175,6 @@ async def toggle_notification(callback_query: types.CallbackQuery):
 @router.message(ReviewForm.waiting_for_review)
 async def receive_review(message: types.Message, state: FSMContext):
     from django.shortcuts import get_object_or_404
-    from django.contrib.contenttypes.models import ContentType
     from events_cultural.models import Review, Attractions, Events_for_visiting
     from events_available.models import Events_online, Events_offline
 
@@ -186,7 +185,7 @@ async def receive_review(message: types.Message, state: FSMContext):
         return
 
     data = await state.get_data()
-    event_id = data.get("event_id")
+    event_unique_id = data.get("event_id")
     event_type = data.get("event_type")
 
     comment = message.text
@@ -208,11 +207,8 @@ async def receive_review(message: types.Message, state: FSMContext):
         return
 
     try:
-        # Проверяем, что event_id - это UUID
-        event = await sync_to_async(get_object_or_404)(model, unique_id=event_id)
-
+        event = await sync_to_async(get_object_or_404)(model, unique_id=event_unique_id)
         content_type = await sync_to_async(ContentType.objects.get_for_model)(model)
-
         review = await sync_to_async(Review.objects.create)(
             user=user,
             content_type=content_type,
@@ -228,15 +224,14 @@ async def receive_review(message: types.Message, state: FSMContext):
     finally:
         await state.clear()
 
-
 @router.callback_query(F.data.startswith("review:"))
 async def handle_leave_review(callback_query: types.CallbackQuery, state: FSMContext):
     try:
-        _, event_id, event_type = callback_query.data.split(":")
+        _, event_unique_id, event_type = callback_query.data.split(":")
 
-        # Проверяем, что event_id является валидным UUID
+        # Проверяем, что event_unique_id является валидным UUID
         try:
-            uuid_obj = uuid.UUID(event_id)
+            uuid_obj = uuid.UUID(event_unique_id)
         except ValueError:
             await callback_query.answer("Некорректный UUID для события.")
             return

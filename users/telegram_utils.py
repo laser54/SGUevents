@@ -147,30 +147,14 @@ import json
 
 logger = logging.getLogger('my_debug_logger')
 
-def inline_keyboard_to_dict(inline_keyboard):
-    """
-    Преобразует объект InlineKeyboardMarkup в словарь.
-    """
-    keyboard = []
-    for row in inline_keyboard.inline_keyboard:
-        row_buttons = []
-        for button in row:
-            button_data = {
-                "text": button.text,
-                "callback_data": button.callback_data
-            }
-            row_buttons.append(button_data)
-        keyboard.append(row_buttons)
-    return {"inline_keyboard": keyboard}
-
-def send_message_to_user_with_review_buttons(telegram_id, message, event_id, event_type):
+def send_message_to_user_with_review_buttons(telegram_id, message, event_unique_id, event_type):
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
 
-    # Проверяем, что event_id является валидным UUID
+    # Проверяем, что event_unique_id является валидным UUID
     try:
-        uuid_obj = uuid.UUID(event_id)  # Проверка UUID
+        uuid_obj = uuid.UUID(event_unique_id)  # Проверка UUID
     except ValueError:
-        print(f"Некорректный UUID: {event_id}")
+        logger.error(f"Некорректный UUID: {event_unique_id}")
         return
 
     # Создаем клавиатуру
@@ -191,6 +175,19 @@ def send_message_to_user_with_review_buttons(telegram_id, message, event_id, eve
 
     response = requests.post(send_url, json=data)
     if response.ok:
-        print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
+        logger.info(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
     else:
-        print(f"Ошибка отправки сообщения пользователю: {response.text}")
+        logger.error(f"Ошибка отправки сообщения пользователю: {response.text}")
+
+def inline_keyboard_to_dict(inline_keyboard):
+    keyboard = []
+    for row in inline_keyboard.inline_keyboard:
+        row_buttons = []
+        for button in row:
+            button_data = {
+                "text": button.text,
+                "callback_data": button.callback_data
+            }
+            row_buttons.append(button_data)
+        keyboard.append(row_buttons)
+    return {"inline_keyboard": keyboard}

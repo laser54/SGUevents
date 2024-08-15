@@ -36,15 +36,15 @@ def send_notification(event_id, user_id, event_name, timeframe):
 
 
 @shared_task
-def send_review_request(event_id, user_id, event_name, event_type):
+def send_review_request(event_unique_id, user_id, event_name, event_type):
     try:
         user = User.objects.get(id=user_id)
         message = f"Мероприятие '{event_name}' завершилось. Пожалуйста, оставьте отзыв."
-        send_message_to_user_with_review_buttons(user.telegram_id, message, event_id, event_type)
+        send_message_to_user_with_review_buttons(user.telegram_id, message, str(event_unique_id), event_type)
     except User.DoesNotExist:
-        logger.error(f"User with id {user_id} does not exist. Event ID: {event_id}, Event Type: {event_type}")
+        logger.error(f"User with id {user_id} does not exist. Event Unique ID: {event_unique_id}, Event Type: {event_type}")
     except Exception as e:
-        logger.error(f"Error sending review request for Event ID: {event_id}, Event Type: {event_type}. Exception: {e}")
+        logger.error(f"Error sending review request for Event Unique ID: {event_unique_id}, Event Type: {event_type}. Exception: {e}")
 
 def determine_event_type_and_object(registered_event):
     if registered_event.online:
@@ -87,7 +87,7 @@ def schedule_notifications():
                 try:
                     event_type, event_obj = determine_event_type_and_object(event)
                 except ValueError as e:
-                    logger.error(f"Error determining event type for event ID: {event.id}. Exception: {e}")
+                    logger.error(f"Error determining event type for event with Unique ID: {event_obj.unique_id}. Exception: {e}")
                     continue
 
                 start_datetime = round_to_minute(event_obj.start_datetime.astimezone(current_tz))
@@ -97,12 +97,12 @@ def schedule_notifications():
                 eta_time = start_datetime - delta
 
                 if eta_time >= previous_minute:
-                    send_notification.apply_async((event.id, event.user.id, event_name, timeframe), eta=now)
+                    send_notification.apply_async((str(event_obj.unique_id), event.user.id, event_name, timeframe), eta=now)
                 else:
-                    logger.warning(f"Время {eta_time} для события {event.id} уже прошло, уведомление не запланировано.")
+                    logger.warning(f"Время {eta_time} для события {event_obj.unique_id} уже прошло, уведомление не запланировано.")
 
                 review_eta_time = end_datetime + timedelta(minutes=1)
                 if review_eta_time > now:
-                    send_review_request.apply_async((event.id, event.user.id, event_name, event_type), eta=review_eta_time)
+                    send_review_request.apply_async((str(event_obj.unique_id), event.user.id, event_name, event_type), eta=review_eta_time)
                 else:
-                    logger.warning(f"Время {review_eta_time} для события {event.id} уже прошло, запрос на отзыв не запланирован.")
+                    logger.warning(f"Время {review_eta_time} для события {event_obj.unique_id} уже прошло, запрос на отзыв не запланирован.")
