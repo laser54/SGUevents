@@ -58,7 +58,7 @@ def determine_event_type_and_object(registered_event):
 def schedule_notifications():
     now = round_to_minute(localtime(tz_now()))
     current_tz = get_current_timezone()
-    notification_window = timedelta(minutes=1)  # Задаем окно для отправки уведомлений
+    notification_window = timedelta(minutes=1)  # Окно для отправки уведомлений
 
     registered_events = Registered.objects.filter(
         Q(online__start_datetime__gte=now) |
@@ -79,22 +79,26 @@ def schedule_notifications():
                 '5 минут': timedelta(minutes=5)
             }
 
-            # Проверяем и отправляем уведомления только один раз за указанные промежутки
+            # Отправляем уведомления только один раз за указанные промежутки
             for timeframe_label, delta in timeframes.items():
                 notification_time = round_to_minute(event_obj.start_datetime.astimezone(current_tz) - delta)
 
-                # Проверяем, попадает ли текущее время в диапазон уведомления
                 if now <= notification_time < now + notification_window:
                     send_notification.apply_async(
                         (event.id, event.user.id, event_name, timeframe_label),
                         eta=now + timedelta(seconds=10)
                     )
 
-            # Запрос отзыва отправляется один раз через 1 минуту после завершения мероприятия
+            # Логика отправки запроса на отзыв
             review_eta_time = round_to_minute(event_obj.end_datetime.astimezone(current_tz)) + timedelta(minutes=1)
-            if now <= review_eta_time < now + notification_window:
+            review_window_start = review_eta_time - notification_window
+            review_window_end = review_eta_time + notification_window
+
+            # Фильтруем мероприятия, которые уже завершились и не обработаны
+            if review_window_start <= now < review_window_end:
                 send_review_request.apply_async(
-                    (str(event_obj.unique_id), event.user.id, event_name, event_type), eta=review_eta_time
+                    (str(event_obj.unique_id), event.user.id, event_name, event_type),
+                    eta=review_eta_time
                 )
 
         except ValueError as e:
