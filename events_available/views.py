@@ -9,6 +9,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.contenttypes.models import ContentType
 from events_cultural.models import Review
+from users.models import Department, User
+from django.db.models import Q
+
 
 @login_required
 def online(request):
@@ -22,6 +25,7 @@ def online(request):
     time_to_start = request.GET.get('time_to_start', None)
     time_to_end = request.GET.get('time_to_end', None)
     query = request.GET.get('q', None)
+    user = request.user
 
     all_info = Events_online.objects.all()
     speakers_info = [event.speakers for event in all_info]
@@ -35,6 +39,15 @@ def online(request):
         events_available = Events_online.objects.order_by('date')
     else:
         events_available = q_search_online(query)
+
+    #Фильтрация по скрытым мероприятиям
+    if user.is_superuser or user.department.department_name in ['Administration', 'Superuser']:
+        pass 
+    else:
+        if user.department:
+            events_available = events_available.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+        else:
+            events_available = events_available.filter(secret__isnull=True).distinct()
 
     if f_date:
         events_available = events_available.filter(date__month=1)
@@ -95,6 +108,12 @@ def online_card(request, event_slug=False, event_id=False):
 
     events = Events_online.objects.all()
     
+    favorites = Favorite.objects.filter(user=request.user, online__in=events)
+    favorites_dict = {favorite.online.id: favorite.id for favorite in favorites}
+
+    registered = Registered.objects.filter(user=request.user, online__in=events)
+    registered_dict = {reg.online.id: reg.id for reg in registered}
+
     reviews = {}
 
     for event_rew in events:
@@ -103,7 +122,9 @@ def online_card(request, event_slug=False, event_id=False):
 
     context = {
         'event': event,
-        'reviews': reviews, 
+        'reviews': reviews,
+        'registered': registered_dict,
+        'favorites': favorites_dict, 
     }
     return render(request, 'events_available/card.html', context=context)
 
@@ -119,6 +140,7 @@ def offline(request):
     query_name = request.GET.get('qn', None)
     date_start = request.GET.get('date_start', None)
     date_end = request.GET.get('date_end', None)
+    user = request.user
 
     all_info = Events_offline.objects.all()
     speakers_info = [event.speakers for event in all_info]
@@ -137,6 +159,15 @@ def offline(request):
         events_available = events_available.order_by('time_start')
     else:
         events_available = q_search_offline(query)
+
+    #Фильтрация по скрытым мероприятиям
+    if user.is_superuser or user.department.department_name in ['Administration', 'Superuser']:
+        pass 
+    else:
+        if user.department:
+            events_available = events_available.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+        else:
+            events_available = events_available.filter(secret__isnull=True).distinct()
 
     if f_date:
         events_available = events_available.filter(date__month=1)
@@ -201,9 +232,17 @@ def offline_card(request, event_slug=False, event_id=False):
         content_type = ContentType.objects.get_for_model(event)
         reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
 
+    favorites = Favorite.objects.filter(user=request.user, offline__in=events)
+    favorites_dict = {favorite.offline.id: favorite.id for favorite in favorites}
+    
+    registered = Registered.objects.filter(user=request.user, offline__in=events)
+    registered_dict = {reg.offline.id: reg.id for reg in registered}
+
     context = {
         'event': event,
         'reviews': reviews, 
+        'registered': registered_dict,
+        'favorites': favorites_dict,
     }
 
     return render(request, 'events_available/card.html', context=context)

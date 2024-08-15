@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import redirect
+from users.models import User, Department
+from django.db.models import Q
 
 @login_required
 def attractions(request):
@@ -16,11 +18,21 @@ def attractions(request):
     f_attractions = request.GET.get('f_attractions', None)
     order_by = request.GET.get('order_by', None)
     query = request.GET.get('q', None)
+    user = request.user
     
     if not query:
         events_cultural = Attractions.objects.order_by('time_start')
     else:
         events_cultural = q_search_attractions(query)
+
+    #Фильтрация по скрытым мероприятиям
+    if user.is_superuser or user.department.department_name in ['Administration', 'Superuser']:
+        pass 
+    else:
+        if user.department:
+            events_cultural = events_cultural.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+        else:
+            events_cultural = events_cultural.filter(secret__isnull=True).distinct()
 
     if f_attractions:
         events_cultural = events_cultural.filter(date__month=1)
@@ -59,6 +71,9 @@ def attractions_card(request, event_slug=False, event_id=False):
 
     events = Attractions.objects.all()
     
+    favorites = Favorite.objects.filter(user=request.user, attractions__in=events)
+    favorites_dict = {favorite.attractions.id: favorite.id for favorite in favorites}
+    
     reviews = {}
 
     for event_rew in events:
@@ -68,6 +83,7 @@ def attractions_card(request, event_slug=False, event_id=False):
     context = {
         'event': event,
         'reviews': reviews, 
+        'favorites': favorites_dict,
     }
     return render(request, 'events_cultural/card.html', context=context)
 
@@ -77,6 +93,7 @@ def events_for_visiting(request):
     f_events_for_visiting = request.GET.get('f_events_for_visiting', None)
     order_by = request.GET.get('order_by', None)
     query = request.GET.get('q', None)
+    user = request.user
 
     if not query:
         events_cultural = Events_for_visiting.objects.order_by('time_start')
@@ -86,6 +103,15 @@ def events_for_visiting(request):
     if f_events_for_visiting:
         events_cultural = events_cultural.filter(date__month=1)
     
+    #Фильтрация по скрытым мероприятиям
+    if user.is_superuser or user.department.department_name in ['Administration', 'Superuser']:
+        pass 
+    else:
+        if user.department:
+            events_cultural = events_cultural.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+        else:
+            events_cultural = events_cultural.filter(secret__isnull=True).distinct()
+
     if order_by and order_by != "default":
         events_cultural = events_cultural.order_by(order_by)
 
@@ -119,8 +145,24 @@ def for_visiting_card(request, event_slug=False, event_id=False):
     else:
         event = Events_for_visiting.objects.get(slug=event_slug)
 
+    events = Events_for_visiting.objects.all()
+
+    favorites = Favorite.objects.filter(user=request.user, for_visiting__in=events)
+    favorites_dict = {favorite.for_visiting.id: favorite.id for favorite in favorites}
+
+    registered = Registered.objects.filter(user=request.user, for_visiting__in=events)
+    registered_dict = {reg.for_visiting.id: reg.id for reg in registered}
+
+    reviews = {}
+    for event_rew in events:
+        content_type = ContentType.objects.get_for_model(event)
+        reviews[event_rew.unique_id] = Review.objects.filter(content_type=content_type, object_id=event.id)
+
     context = {
         'event': event,
+        'reviews': reviews,
+        'registered': registered_dict,
+        'favorites': favorites_dict, 
     }
     return render(request, 'events_cultural/card.html', context=context)
 

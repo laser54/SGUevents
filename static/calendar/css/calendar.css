@@ -1,0 +1,42 @@
+body,
+html {
+	height: 100%;
+	margin: 0;
+}
+
+.calendar-container {
+	height: calc(100vh - 56px);
+	/* Высота экрана минус высота навигационной панели */
+	display: flex;
+	flex-direction: column;
+}
+
+#calendar {
+	flex-grow: 1;
+}
+
+.fc-day-grid-event .fc-time,
+.fc-day-grid-event .fc-title {
+	white-space: normal;
+}
+
+.fc-today {
+	background-color: rgb(58, 145, 251) !important;
+}
+
+.fc-event {
+	color: white !important;
+	/* Цвет текста */
+}
+
+.fc-toolbar h2 {
+	text-transform: capitalize;
+}
+
+.fc-event-yellow {
+	background-color: yellow !important;
+}
+
+.fc-event-pink {
+	background-color: pink !important;
+}

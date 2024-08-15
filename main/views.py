@@ -6,6 +6,7 @@ from events_cultural.models import Attractions, Events_for_visiting, Review
 from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 
 from main.utils import q_search_all
 
@@ -15,7 +16,23 @@ def index(request):
     available1 = Events_offline.objects.order_by('date')
     cultural = Attractions.objects.order_by('date')
     cultural1 = Events_for_visiting.objects.order_by('date')
-    all_content = list(chain(available, available1, cultural, cultural1))
+    user = request.user
+
+    if user.is_superuser or user.department.department_name not in ['Administration', 'Superuser']:
+        all_content = list(chain(available, available1, cultural, cultural1))
+    else:
+        if user.department:
+            available = available.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+            available1 = available1.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+            cultural = cultural.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+            cultural1 = cultural1.filter(Q(secret__isnull=True) | Q(secret=user.department)).distinct()
+        else:
+            available = available.filter(secret__isnull=True).distinct()
+            available1 = available1.filter(secret__isnull=True).distinct()
+            cultural = cultural.filter(secret__isnull=True).distinct()
+            cultural1 = cultural1.filter(secret__isnull=True).distinct()
+        
+        all_content = list(chain(available, available1, cultural, cultural1))
 
     page = request.GET.get('page', 1)
     f_all = request.GET.get('f_all', None)
