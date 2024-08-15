@@ -1,4 +1,48 @@
 {% extends 'events/card.html' %} 
 {% load static %} 
+{% load events_cultural_tags %}
+{% load events_available_tags %}
+
+{% block heart %}
+
+{% if event.category == "Доступные к посещению" %}
+	{% if event.id in favorites %}
+		<a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites|get_item:event.id }}">
+			<img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+		</a>
+	{% else %}
+		<a href="#" class="btn add-to-cart" data-event-slug="{{ event.slug }}">
+			<img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+		</a>
+	{% endif %}
+{% elif event.category == "Достопримечательности" %}
+	{% if event.id in favorites %}
+		<a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites|get_item:event.id }}">
+			<img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+		</a>
+	{% else %}
+		<a href="#" class="btn add-to-cart" data-event-slug="{{ event.slug }}">
+			<img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+		</a>
+	{% endif %}
+{% endif %}
+
+{% endblock heart %}
+
 {% block content %}
+{% if event.category == "Доступные к посещению" %}
+	{% if event.id in registered %}
+		<a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:event.id }}">
+			Отмена регистрации
+		</a>
+	{% else %}
+		<a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ event.slug }}">
+			Регистрация
+		</a>
+	{% endif %}
+
+	<button class="btn btn-primary btn-comment" data-event-id="{{ event.id }}" data-model-type="for_visiting">Оставить отзыв</button>
+{% elif event.category == "Достопримечательности" %}
+	<button class="btn btn-primary btn-comment" data-event-id="{{ event.id }}" data-model-type="attractions">Оставить отзыв</button>
+{% endif %}
 {% endblock content %}

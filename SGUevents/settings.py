@@ -1,15 +1,15 @@
 import os
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 from pathlib import Path
+import logging
+import logging.config
 
 load_dotenv()
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -20,11 +20,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='p&l%385148kslhtyn^##a1)ilz@4z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-
-
-
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -36,18 +32,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
-	'main',
-	'users',
-	'events_available',
-	'events_calendar',
-	'events_cultural',
-	'bookmarks',
-	'application_for_admin_rights',
-	'support',
-	'personal',
+    'main',
+    'users',
+    'events_available',
+    'events_calendar',
+    'events_cultural',
+    'bookmarks',
+    'application_for_admin_rights',
+    'support',
+    'personal',
     'debug_toolbar',
-    'django_apscheduler',
-]
+    'SGUevents',
+    'django_celery_beat',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,7 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'SGUevents.urls'
@@ -79,8 +76,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'SGUevents.wsgi.application'
-
-
 
 # Значение по умолчанию для разработки
 DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development')
@@ -126,7 +121,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -151,19 +145,19 @@ SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Novosibirsk'
 
 USE_I18N = True
 
 USE_TZ = True
 
 LOGIN_URL = 'users:login'
-
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -179,12 +173,9 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = 'media/'
 
-
-
 MEDIA_ROOT = BASE_DIR / 'media'
 
 INTERNAL_IPS = [
-    # ...
     "127.0.0.1",
     # ...
 ]
@@ -193,4 +184,53 @@ INTERNAL_IPS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Настройки Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Novosibirsk'
+CELERY_ENABLE_UTC = False
+
+CELERY_BEAT_SCHEDULE = {
+    'schedule-notifications-every-hour': {
+        'task': 'bookmarks.tasks.schedule_notifications',
+        'schedule': crontab(minute=0),  # запуск каждый час
+    },
+    'schedule-notifications-every-10-minutes': {
+        'task': 'bookmarks.tasks.schedule_notifications',
+        'schedule': crontab(minute='*/10'),  # запуск каждые 10 минут
+    },
+    'schedule-notifications-every-minute': {
+        'task': 'bookmarks.tasks.schedule_notifications',
+        'schedule': crontab(minute='*/1'),  # запуск каждую минуту
+    },
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'my_debug_filter': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': lambda record: record.levelname == 'DEBUG' and 'my_debug' in record.msg,
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['my_debug_filter'],
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'my_debug_logger': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 

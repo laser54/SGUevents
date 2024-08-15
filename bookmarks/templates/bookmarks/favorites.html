@@ -60,22 +60,37 @@
                                             {% if favorite.online.town %}{{ favorite.online.town }}{% endif %} {% if favorite.online.street %}{{ evefavorite.onlinents.street }}{% endif %} {% if favorite.online.cabinet %}{{ favorite.online.cabinet }}{% endif %}
                                         </p>
                                         <p>{{ speakers }}</p>
-                                    
-                                        {% if reviews %}
-                                            <div class="reviews">
-                                                {% if reviews|get_item:favorite.online.id %}
-                                                    <ul>
-                                                        {% for review in reviews|get_item:favorite.online.id %}
-                                                            <li>
-                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                <p>{{ review.comment }}</p>
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% endif %}
-                                            </div>
+                                        
+
+                                        {% if favorite.online.id in registered.online %}
+                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.online.id }}">
+                                                Отмена регистрации
+                                            </a>
+                                        {% else %}
+                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.online.slug }}">
+                                                Регистрация
+                                            </a>
                                         {% endif %}
 
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.online.id }}" data-model-type="online">Оставить отзыв</button>
+
+                                        {% if reviews %}
+                                            <div class="reviews">          
+                                                    <ul>
+                                                        {% for review in reviews|get_item:favorite.online.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if favorite.online.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    </ul>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -137,18 +152,34 @@
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        
+                                        {% if favorite.offline.id in registered.offline %}
+                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.offline.id }}">
+                                                Отмена регистрации
+                                            </a>
+                                        {% else %}
+                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.offline.slug }}">
+                                                Регистрация
+                                            </a>
+                                        {% endif %}
+
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.offline.id }}" data-model-type="offline">Оставить отзыв</button>
+
                                         {% if reviews %}
-                                            <div class="reviews">
-                                                {% if reviews|get_item:favorite.offline.id %}
+                                            <div class="reviews">          
                                                     <ul>
-                                                        {% for review in reviews|get_item:favorite.offline.id %}
-                                                            <li>
-                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                <p>{{ review.comment }}</p>
-                                                            </li>
+                                                        {% for review in reviews|get_item:favorite.offline.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if favorite.offline.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         {% endfor %}
                                                     </ul>
-                                                {% endif %}
                                             </div>
                                         {% endif %}
                                     </div>
@@ -212,18 +243,23 @@
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.attractions.id }}" data-model-type="attractions">Оставить отзыв</button>
+
                                         {% if reviews %}
-                                            <div class="reviews">
-                                                {% if reviews|get_item:favorite.attractions.id %}
+                                            <div class="reviews">          
                                                     <ul>
-                                                        {% for review in reviews|get_item:favorite.attractions.id %}
-                                                            <li>
-                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                <p>{{ review.comment }}</p>
-                                                            </li>
+                                                        {% for review in reviews|get_item:favorite.attractions.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if favorite.attractions.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         {% endfor %}
                                                     </ul>
-                                                {% endif %}
                                             </div>
                                         {% endif %}
                                     </div>
@@ -287,21 +323,35 @@
                                         </p>
                                         <p>{{ speakers }}</p>
                                         
+                                        {% if favorite.for_visiting.id in registered.for_visiting %}
+                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.for_visiting.id }}">
+                                                Отмена регистрации
+                                            </a>
+                                        {% else %}
+                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.for_visiting.slug }}">
+                                                Регистрация
+                                            </a>
+                                        {% endif %}
+                                        
+                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.for_visiting.id }}" data-model-type="for_visiting">Оставить отзыв</button>
+
                                         {% if reviews %}
-                                            <div class="reviews">
-                                                {% if reviews|get_item:favorite.for_visiting.id %}
+                                            <div class="reviews">          
                                                     <ul>
-                                                        {% for review in reviews|get_item:favorite.for_visiting.id %}
-                                                            <li>
-                                                                <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                <p>{{ review.comment }}</p>
-                                                            </li>
+                                                        {% for review in reviews|get_item:favorite.for_visiting.unique_id %}
+                                                            {% for i in reviews %}
+                                                                {% if favorite.for_visiting.unique_id == i %}
+                                                                    <li>
+                                                                        <h5>Отзыв:</h5>
+                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
+                                                                        <p>{{ review.comment }}</p>
+                                                                    </li>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         {% endfor %}
                                                     </ul>
-                                                {% endif %}
                                             </div>
                                         {% endif %}
-
                                     </div>
                                 </div>
                             </div>
@@ -312,7 +362,6 @@
         {% endfor %}
     </ul>
 </div>
-
 {% endblock favorite %}
 
 

@@ -1,6 +1,9 @@
 import uuid
 from django.db import models
 from datetime import datetime
+from django.utils.timezone import make_aware, get_default_timezone
+from django.contrib.contenttypes.fields import GenericRelation
+from users.models import Department
 
 class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -21,11 +24,15 @@ class Events_online(models.Model):
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Онлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
+    reviews = GenericRelation('events_cultural.Review', related_query_name='online_reviews')
+    start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
+    secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
 
     class Meta:
         db_table = 'Events_online'
         verbose_name = 'Онлайн мероприятие'
-        verbose_name_plural = 'Онлайн'
+        verbose_name_plural = 'Онлайн мероприятия'
 
     def __str__(self):
         return self.name
@@ -34,13 +41,13 @@ class Events_online(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.category = "Онлайн"
-        super(Events_online, self).save(*args, **kwargs)
+        combined_start_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
 
-    @property
-    def start_time(self):
-        return datetime.combine(self.date, self.time_start)
+        combined_end_datetime = datetime.combine(self.date, self.time_end)
+        self.end_datetime = make_aware(combined_end_datetime, timezone=get_default_timezone())
+
+        super(Events_online, self).save(*args, **kwargs)
 
 class Events_offline(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -54,7 +61,7 @@ class Events_offline(models.Model):
     member = models.TextField(unique=False, blank=False, null=False, verbose_name='Участники')
     tags = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Теги')
     town = models.CharField(max_length=200, unique=False, blank=False, null=False, verbose_name='Город')
-    street= models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Улица')
+    street = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Улица')
     cabinet = models.CharField(max_length=50, unique=False, blank=False, null=False, verbose_name='Кабинет')
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
@@ -63,11 +70,15 @@ class Events_offline(models.Model):
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Оффлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
+    reviews = GenericRelation('events_cultural.Review', related_query_name='offline_reviews')
+    start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
+    end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
+    secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
 
     class Meta:
         db_table = 'Events_offline'
         verbose_name = 'Оффлайн мероприятие'
-        verbose_name_plural = 'Оффлайн'
+        verbose_name_plural = 'Оффлайн мероприятия'
 
     def __str__(self):
         return self.name
@@ -76,10 +87,10 @@ class Events_offline(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.category = "Оффлайн"
-        super(Events_offline, self).save(*args, **kwargs)
+        combined_start_datetime = datetime.combine(self.date, self.time_start)
+        self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
 
-    @property
-    def start_time(self):
-        return datetime.combine(self.date, self.time_start)
+        combined_end_datetime = datetime.combine(self.date, self.time_end)
+        self.end_datetime = make_aware(combined_end_datetime, timezone=get_default_timezone())
+
+        super(Events_offline, self).save(*args, **kwargs)

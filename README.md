@@ -51,6 +51,9 @@
 
 - Для работоспособности Telegram login Widget требуется [ngrok](https://dashboard.ngrok.com/get-started/setup/windows)
 - Делаем по инструкции потом запускаем `ngrok http http://localhost:8000`
+- Для запуска celery локально - запускаем Redis в докере `docker run --name redis -p 6379:6379 -d redis:latest`
+- В одном окне из venv `celery -A SGUevents worker -l info -P solo` (-P solo - костыль для Windows)
+- В другом окне аналогично `celery -A SGUevents beat -l info`
 
 ## Заполнение БД:
 
@@ -70,6 +73,8 @@
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/attractions.json`
 7. Загружаем информацию для страницы доступные к посещению:
    - Выполнить команду: `python3 manage.py loaddata fixtures/events_cultural/events_for_visiting.json`
+8. Загружаем информацию об отделах:
+   - Выполнить команду: `python3 manage.py loaddata fixtures/departments.json`
 
 ## При запуске на сервере:
 1. Из каталога с файлом docker-compose.yml:
@@ -82,4 +87,4 @@
    - `DROP SCHEMA public CASCADE;`
    - `CREATE SCHEMA public;`
    - Для выхода из psql используйте команду \q, и для выхода из оболочки контейнера используйте exit.
-   - Далее миграции, superuser и fixtures.
+   - Далее миграции, superuser и fixtures
