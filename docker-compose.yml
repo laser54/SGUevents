@@ -46,7 +46,7 @@ services:
 
   celery:
     image: la5er/events:latest
-    command: celery -A SGUevents worker --loglevel=info
+    command: bash -c "celery -A SGUevents purge -f && celery -A SGUevents worker --loglevel=info"
     restart: always
     depends_on:
       - db

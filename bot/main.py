@@ -14,7 +14,6 @@ from aiogram.types import CallbackQuery, Update
 from asgiref.sync import sync_to_async
 from dotenv import load_dotenv
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from django.contrib.contenttypes.models import ContentType
 from aiogram.client.bot import DefaultBotProperties
 
 
@@ -175,6 +174,7 @@ async def toggle_notification(callback_query: types.CallbackQuery):
 @router.message(ReviewForm.waiting_for_review)
 async def receive_review(message: types.Message, state: FSMContext):
     from django.shortcuts import get_object_or_404
+    from django.contrib.contenttypes.models import ContentType
     from events_cultural.models import Review, Attractions, Events_for_visiting
     from events_available.models import Events_online, Events_offline
 

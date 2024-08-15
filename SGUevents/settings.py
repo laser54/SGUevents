@@ -195,14 +195,6 @@ CELERY_TIMEZONE = 'Asia/Novosibirsk'
 CELERY_ENABLE_UTC = False
 
 CELERY_BEAT_SCHEDULE = {
-    'schedule-notifications-every-hour': {
-        'task': 'bookmarks.tasks.schedule_notifications',
-        'schedule': crontab(minute=0),  # запуск каждый час
-    },
-    'schedule-notifications-every-10-minutes': {
-        'task': 'bookmarks.tasks.schedule_notifications',
-        'schedule': crontab(minute='*/10'),  # запуск каждые 10 минут
-    },
     'schedule-notifications-every-minute': {
         'task': 'bookmarks.tasks.schedule_notifications',
         'schedule': crontab(minute='*/1'),  # запуск каждую минуту
