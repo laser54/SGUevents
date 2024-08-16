@@ -57,6 +57,16 @@
                     <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="date" {% if request.GET.order_by == 'date' %}checked{% endif %}>
                     <label class="form-check-label" for="flexRadioDefault3">Сначала старые</label>
                 </div>
+
+                {% comment %} Для объединения фильтров {% endcomment %}
+                {% for key, value in request.GET.items %}
+                    {% if key != 'f_date' and key != 'date_start' and key != 'date_end' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+
+
+
                 <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
             </form>
         </div>

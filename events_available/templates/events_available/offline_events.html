@@ -164,6 +164,14 @@
                             <br>
                         {% endfor %}
                     </div>
+
+                        {% comment %} Для объединения фильтров {% endcomment %}
+                    {% for key, value in request.GET.items %}
+                        {% if key != 'f_speakers' %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
+                    {% endfor %}
+
                     <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
                 </form>
             </div>
@@ -189,10 +197,23 @@
                             <br>
                         {% endfor %}
                     </div>
+
+                        {% comment %} Для объединения фильтров {% endcomment %}
+                    {% for key, value in request.GET.items %}
+                        {% if key != 'f_speakers' %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
+                    {% endfor %}
+
                     <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
                 </form>
             </div>
         </div>
+    </div>
+    <div class="col-lg-2">
+        <form action="{% url 'events_available:offline' %}" method="get">
+        <button class="btn btn-primary" type="submit">Сбросить</button>
+    </form>
     </div>
 </div>
 {% endblock filters %}

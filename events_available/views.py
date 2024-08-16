@@ -138,9 +138,9 @@ def online_card(request, event_slug=False, event_id=False):
 @login_required
 def offline(request):
     page = request.GET.get('page', 1)
-    f_date = request.GET.get('f_date', None)
-    f_speakers = request.GET.get('f_speakers', None)
-    f_tags = request.GET.get('f_tags', None)
+    f_date = request.GET.getlist('f_date', None)
+    f_speakers = request.GET.getlist('f_speakers', None)
+    f_tags = request.GET.getlist('f_tags', None)
     order_by = request.GET.get('order_by', None)
     query = request.GET.get('q', None)
     query_name = request.GET.get('qn', None)
@@ -150,11 +150,13 @@ def offline(request):
 
     all_info = Events_offline.objects.all()
     speakers_info = [event.speakers for event in all_info]
-    speakers = []
+    speakers_set= set()
     for name in speakers_info:
         names_list = name.split()
         for i in range(0, len(names_list), 3):
-            speakers.append(' '.join(names_list[i:i+3]))
+            speakers_set.append(' '.join(names_list[i:i+3]))
+
+    speakers = list(speakers_set)
 
     if not query_name:
         events_available = Events_offline.objects.order_by('time_start')
@@ -180,19 +182,26 @@ def offline(request):
 
     if date_start:
         date_start_formatted = datetime.strptime(date_start, '%Y-%m-%d').date()
-        events_available = events_available.filter(date__gt=date_start_formatted)
+        events_available = events_available.filter(date__gte=date_start_formatted) 
 
     if date_end:
         date_end_formatted = datetime.strptime(date_end, '%Y-%m-%d').date()
-        events_available = events_available.filter(date__lt=date_end_formatted)
+        events_available = events_available.filter(date__lte=date_end_formatted)
+
 
     if f_speakers:
-        events_available = Events_offline.objects.filter(speakers__icontains=f_speakers)
+        speakers_query = Q()
+        for speaker in f_speakers:
+            speakers_query |= Q(speakers__icontains=speaker)
+        events_available = events_available.filter(speakers_query)
 
     tags = [event.tags for event in all_info]
 
     if f_tags:
-        events_available = Events_offline.objects.filter(tags__icontains=f_tags)
+        tags_query = Q()
+        for tag in f_tags:
+            tags_query |= Q(tags__icontains=tag)
+        events_available = events_available.filter(tags_query)
 
     if order_by and order_by != "default":
         events_available = events_available.order_by(order_by)
