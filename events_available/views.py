@@ -17,8 +17,8 @@ from django.db.models import Q
 def online(request):
     page = request.GET.get('page', 1)
     f_date = request.GET.get('f_date', None)
-    f_speakers = request.GET.get('f_speakers', None)
-    f_tags = request.GET.get('f_tags', None)
+    f_speakers = request.GET.getlist('f_speakers', None)
+    f_tags = request.GET.getlist('f_tags', None)
     order_by = request.GET.get('order_by', None)
     date_start = request.GET.get('date_start', None)
     date_end = request.GET.get('date_end', None)
@@ -53,12 +53,18 @@ def online(request):
         events_available = events_available.filter(date__month=1)
 
     if f_speakers:
-        events_available = Events_online.objects.filter(speakers__icontains=f_speakers)
+        speakers_query = Q()
+        for speaker in f_speakers:
+            speakers_query |= Q(speakers__icontains=speaker)
+        events_available = events_available.filter(speakers_query)
 
     tags = [event.tags for event in all_info]
 
     if f_tags:
-        events_available = events_available.filter(tags__icontains=f_tags)
+        tags_query = Q()
+        for tag in f_tags:
+            tags_query |= Q(tags__icontains=tag)
+        events_available = events_available.filter(tags_query)
 
     if order_by and order_by != "default":
         events_available = events_available.order_by(order_by)
