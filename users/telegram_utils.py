@@ -228,3 +228,23 @@ def send_custom_notification_with_toggle(telegram_id, message, event_unique_id, 
             f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id} для мероприятия с ID: {event_unique_id}")
     else:
         logger.error(f"Ошибка отправки сообщения пользователю с telegram_id: {telegram_id}. Ответ: {response.text}")
+
+
+def send_simple_notification(telegram_id, message):
+    """
+    Отправка простого сообщения пользователю без кнопок.
+
+    :param telegram_id: Telegram ID пользователя
+    :param message: Сообщение для отправки
+    """
+    send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    data = {
+        "chat_id": telegram_id,
+        "text": message,
+    }
+
+    response = requests.post(send_url, data=data)
+    if response.ok:
+        logger.info(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
+    else:
+        logger.error(f"Ошибка отправки сообщения пользователю: {response.text}")

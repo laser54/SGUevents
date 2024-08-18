@@ -8,6 +8,11 @@ from events_cultural.models import Attractions, Events_for_visiting, Review
 from users.telegram_utils import send_message_to_user
 from events_cultural.views import submit_review
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from bookmarks.forms import SendMessageForm
+from users.telegram_utils import send_simple_notification
+from bookmarks.models import Registered
 
 @login_required
 def events_add(request, event_slug):
@@ -74,7 +79,7 @@ def favorites(request):
             events.append(fav.attractions)
         elif fav.for_visiting:
             events.append(fav.for_visiting)
-    
+
     reviews = {}
     for event in events:
         content_type = ContentType.objects.get_for_model(event)
@@ -124,7 +129,7 @@ def events_registered(request, event_slug):
     event_type = None
     favorites = Favorite.objects.filter(user=request.user)
 
-    
+
 
     try:
         event = Events_online.objects.get(slug=event_slug)
@@ -261,4 +266,34 @@ def submit_review(request, event_id):
         })
     return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
 
+@staff_member_required
+def send_message_to_participants(request):
+    if not (request.user.is_superuser or request.user.is_staff):
+        messages.error(request, "У вас нет прав для отправки сообщений.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = SendMessageForm(request.POST)
+        if form.is_valid():
+            event = form.cleaned_data['event']
+            message = form.cleaned_data['message']
+            event_type = form.cleaned_data['event_type']
+
+            # Получаем всех зарегистрированных участников для данного мероприятия
+            registered_users = Registered.objects.filter(
+                **{event_type: event}
+            )
+
+            for registration in registered_users:
+                if registration.user.telegram_id:
+                    send_simple_notification(
+                        telegram_id=registration.user.telegram_id,
+                        message=message
+                    )
+            messages.success(request, "Сообщения успешно отправлены участникам.")
+            return redirect('bookmarks:send_message_to_participants')
+    else:
+        form = SendMessageForm()
+
+    return render(request, 'bookmarks/send_message.html', {'form': form})
 
