@@ -230,21 +230,36 @@ def send_custom_notification_with_toggle(telegram_id, message, event_unique_id, 
         logger.error(f"Ошибка отправки сообщения пользователю с telegram_id: {telegram_id}. Ответ: {response.text}")
 
 
-def send_simple_notification(telegram_id, message):
+def send_notification_with_toggle(telegram_id, message, event_id, notifications_enabled):
     """
-    Отправка простого сообщения пользователю без кнопок.
+    Отправка сообщения пользователю с кнопкой для включения/отключения уведомлений.
 
     :param telegram_id: Telegram ID пользователя
     :param message: Сообщение для отправки
+    :param event_id: UUID мероприятия
+    :param notifications_enabled: Состояние уведомлений (True для включенных, False для отключенных)
     """
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
+    button_text = "\U0001F534 Отключить уведомления" if notifications_enabled else "\U0001F7E2 Включить уведомления"
+    callback_data = f"notify_toggle_{event_id}"  # Используем UUID и префикс "notify_toggle_" для обработки в новом хендлере
+    inline_keyboard = {
+        "inline_keyboard": [[
+            {
+                "text": button_text,
+                "callback_data": callback_data
+            }
+        ]]
+    }
+
     data = {
         "chat_id": telegram_id,
         "text": message,
+        "reply_markup": json.dumps(inline_keyboard)
     }
 
     response = requests.post(send_url, data=data)
     if response.ok:
-        logger.info(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
+        print(f"Сообщение успешно отправлено пользователю с telegram_id: {telegram_id}")
     else:
-        logger.error(f"Ошибка отправки сообщения пользователю: {response.text}")
+        print(f"Ошибка отправки сообщения пользователю: {response.text}")
+

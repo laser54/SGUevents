@@ -246,6 +246,55 @@ async def handle_leave_review(callback_query: types.CallbackQuery, state: FSMCon
     except Exception as e:
         await callback_query.answer(f"Произошла ошибка: {e}")
 
+
+@router.callback_query(F.data.startswith("notify_toggle_"))
+async def toggle_event_notification(callback_query: types.CallbackQuery):
+    event_unique_id = callback_query.data.split("_")[2]
+    user = await get_user_profile(callback_query.from_user.id)
+
+    if user:
+        from bookmarks.models import Registered
+        registration = None
+
+        # Попробуем найти регистрацию по каждому типу события
+        try:
+            registration = await sync_to_async(Registered.objects.get)(
+                user=user, online__unique_id=event_unique_id
+            )
+        except Registered.DoesNotExist:
+            try:
+                registration = await sync_to_async(Registered.objects.get)(
+                    user=user, offline__unique_id=event_unique_id
+                )
+            except Registered.DoesNotExist:
+                try:
+                    registration = await sync_to_async(Registered.objects.get)(
+                        user=user, attractions__unique_id=event_unique_id
+                    )
+                except Registered.DoesNotExist:
+                    try:
+                        registration = await sync_to_async(Registered.objects.get)(
+                            user=user, for_visiting__unique_id=event_unique_id
+                        )
+                    except Registered.DoesNotExist:
+                        await callback_query.answer("Событие не найдено.")
+                        return
+
+        # Переключаем состояние уведомлений
+        registration.notifications_enabled = not registration.notifications_enabled
+        await sync_to_async(registration.save)()
+
+        # Обновляем текст кнопки и отправляем новое сообщение
+        new_button_text = "\U0001F7E2 Включить уведомления" if not registration.notifications_enabled else "\U0001F534 Отключить уведомления"
+        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text=new_button_text, callback_data=f"notify_toggle_{event_unique_id}")]
+        ])
+        await callback_query.message.edit_reply_markup(reply_markup=inline_keyboard)
+        await callback_query.answer(f"Уведомления {'включены' if registration.notifications_enabled else 'отключены'}.")
+    else:
+        await callback_query.answer("Вы не зарегистрированы на портале.")
+
+
 # Функция запуска бота
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 async def run_bot():

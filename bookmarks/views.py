@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from bookmarks.forms import SendMessageForm
-from users.telegram_utils import send_simple_notification
+from users.telegram_utils import send_notification_with_toggle
 from bookmarks.models import Registered
 
 @login_required
@@ -285,10 +285,12 @@ def send_message_to_participants(request):
             )
 
             for registration in registered_users:
-                if registration.user.telegram_id:
-                    send_simple_notification(
+                if registration.user.telegram_id and registration.notifications_enabled:
+                    send_notification_with_toggle(
                         telegram_id=registration.user.telegram_id,
-                        message=message
+                        message=message,
+                        event_id=event.unique_id,
+                        notifications_enabled=registration.notifications_enabled
                     )
             messages.success(request, "Сообщения успешно отправлены участникам.")
             return redirect('bookmarks:send_message_to_participants')
@@ -296,4 +298,3 @@ def send_message_to_participants(request):
         form = SendMessageForm()
 
     return render(request, 'bookmarks/send_message.html', {'form': form})
-

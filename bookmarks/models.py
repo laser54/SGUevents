@@ -78,59 +78,59 @@ def notify_user_on_registration(sender, instance, created, **kwargs):
             logger.warning(f"У пользователя {instance.user.username} нет telegram_id")
 
 
-# Логика уведомления при изменении времени мероприятия
-class EventSignalHandler:
-    event_model = None  # Модель события, определяется в дочерних классах
-
-    @staticmethod
-    def send_update_notification(user, event, new_start_time):
-        message = f"Изменились детали мероприятия: дата и время начала изменилось на {new_start_time}."
-        user_telegram_id = user.telegram_id
-        if user_telegram_id:
-            logger.info(f"Отправка уведомления пользователю {user.username} о событии {event.name}")
-            send_custom_notification_with_toggle(user_telegram_id, message, event.unique_id, True)
-        else:
-            logger.warning(f"У пользователя {user.username} нет telegram_id")
-
-    @classmethod
-    def handle_event_update(cls, instance, **kwargs):
-        if not instance.pk:
-            return
-
-        try:
-            old_instance = cls.event_model.objects.get(pk=instance.pk)
-        except cls.event_model.DoesNotExist:
-            return
-
-        if old_instance.start_datetime != instance.start_datetime:
-            registered_users = Registered.objects.filter(
-                online=instance if cls.event_model == Events_online else None,
-                offline=instance if cls.event_model == Events_offline else None,
-                attractions=instance if cls.event_model == Attractions else None,
-                for_visiting=instance if cls.event_model == Events_for_visiting else None
-            )
-
-            for registration in registered_users:
-                cls.send_update_notification(registration.user, instance, instance.start_datetime)
-
-
-# Подключение обработчиков сигналов для каждого типа события
-@receiver(post_save, sender=Events_online)
-def handle_online_event_update(sender, instance, **kwargs):
-    EventSignalHandler.event_model = Events_online
-    EventSignalHandler.handle_event_update(instance)
-
-@receiver(post_save, sender=Events_offline)
-def handle_offline_event_update(sender, instance, **kwargs):
-    EventSignalHandler.event_model = Events_offline
-    EventSignalHandler.handle_event_update(instance)
-
-@receiver(post_save, sender=Attractions)
-def handle_attractions_event_update(sender, instance, **kwargs):
-    EventSignalHandler.event_model = Attractions
-    EventSignalHandler.handle_event_update(instance)
-
-@receiver(post_save, sender=Events_for_visiting)
-def handle_visiting_event_update(sender, instance, **kwargs):
-    EventSignalHandler.event_model = Events_for_visiting
-    EventSignalHandler.handle_event_update(instance)
+# Логика уведомления при изменении времени мероприятия (в работе)
+# class EventSignalHandler:
+#     event_model = None  # Модель события, определяется в дочерних классах
+#
+#     @staticmethod
+#     def send_update_notification(user, event, new_start_time):
+#         message = f"Изменились детали мероприятия: дата и время начала изменилось на {new_start_time}."
+#         user_telegram_id = user.telegram_id
+#         if user_telegram_id:
+#             logger.info(f"Отправка уведомления пользователю {user.username} о событии {event.name}")
+#             send_custom_notification_with_toggle(user_telegram_id, message, event.unique_id, True)
+#         else:
+#             logger.warning(f"У пользователя {user.username} нет telegram_id")
+#
+#     @classmethod
+#     def handle_event_update(cls, instance, **kwargs):
+#         if not instance.pk:
+#             return
+#
+#         try:
+#             old_instance = cls.event_model.objects.get(pk=instance.pk)
+#         except cls.event_model.DoesNotExist:
+#             return
+#
+#         if old_instance.start_datetime != instance.start_datetime:
+#             registered_users = Registered.objects.filter(
+#                 online=instance if cls.event_model == Events_online else None,
+#                 offline=instance if cls.event_model == Events_offline else None,
+#                 attractions=instance if cls.event_model == Attractions else None,
+#                 for_visiting=instance if cls.event_model == Events_for_visiting else None
+#             )
+#
+#             for registration in registered_users:
+#                 cls.send_update_notification(registration.user, instance, instance.start_datetime)
+#
+#
+# # Подключение обработчиков сигналов для каждого типа события
+# @receiver(post_save, sender=Events_online)
+# def handle_online_event_update(sender, instance, **kwargs):
+#     EventSignalHandler.event_model = Events_online
+#     EventSignalHandler.handle_event_update(instance)
+#
+# @receiver(post_save, sender=Events_offline)
+# def handle_offline_event_update(sender, instance, **kwargs):
+#     EventSignalHandler.event_model = Events_offline
+#     EventSignalHandler.handle_event_update(instance)
+#
+# @receiver(post_save, sender=Attractions)
+# def handle_attractions_event_update(sender, instance, **kwargs):
+#     EventSignalHandler.event_model = Attractions
+#     EventSignalHandler.handle_event_update(instance)
+#
+# @receiver(post_save, sender=Events_for_visiting)
+# def handle_visiting_event_update(sender, instance, **kwargs):
+#     EventSignalHandler.event_model = Events_for_visiting
+#     EventSignalHandler.handle_event_update(instance)
