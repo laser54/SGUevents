@@ -29,11 +29,15 @@ def online(request):
 
     all_info = Events_online.objects.all()
     speakers_info = [event.speakers for event in all_info]
-    speakers = []
+    speakers_set = set()
+
     for name in speakers_info:
         names_list = name.split()
         for i in range(0, len(names_list), 3):
-            speakers.append(' '.join(names_list[i:i+3]))
+            speakers_set.add(' '.join(names_list[i:i+3]))
+
+    # Преобразуем множество обратно в список, если нужно
+    speakers = list(speakers_set)
 
     if not query:
         events_available = Events_online.objects.order_by('date')
@@ -150,12 +154,14 @@ def offline(request):
 
     all_info = Events_offline.objects.all()
     speakers_info = [event.speakers for event in all_info]
-    speakers_set= set()
+    speakers_set = set()
+
     for name in speakers_info:
         names_list = name.split()
         for i in range(0, len(names_list), 3):
-            speakers_set.append(' '.join(names_list[i:i+3]))
+            speakers_set.add(' '.join(names_list[i:i+3]))
 
+    # Преобразуем множество обратно в список, если нужно
     speakers = list(speakers_set)
 
     if not query_name:
