@@ -49,6 +49,14 @@ typing_extensions==4.12.2
 tzdata==2024.1
 tzlocal==5.2
 urllib3==2.2.1
-vine==5.1.0
-wcwidth==0.2.13
-yarl==1.9.4
+aiogram==3.11.0
+sqlparse==0.4.4
+psycopg2-binary==2.9.9
+transliterate
+requests
+freezegun
+django_celery_beat
+celery
+redis
+
+
