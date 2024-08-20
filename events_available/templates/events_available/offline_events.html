@@ -107,43 +107,66 @@
     <div class="col-lg-2">
         <div class="row">
             <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Место проведения
-                </button>
-                <form action="#" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
-                    <div class="form-check text-white mx-3">
-                        <input type="text" id="address-input" name="address" placeholder="Введите адрес">
-                        <div id="address-list"></div>
-                        <script>
-                            $(document).ready(function() {
-                                $('#address-input').on('input', function() {
-                                    var inputText = $(this).val();
-                                    if (inputText.length >= 3) { // Минимальная длина ввода для начала поиска
-                                        $.ajax({
-                                            url: '/events_available/offline/',
-                                            method: 'GET',
-                                            data: { term: inputText },
-                                            success: function(data) {
-                                                $('#town').val(data.town);
-                                                $('#street').val(data.street);
-                                                $('#cabinet').val(data.cabinet);
-                                            },
-                                            error: function(xhr, status, error) {
-                                                console.error(error); // Печать ошибки в консоль для отладки
-                                            }
-                                        });
-                                    } else {
-                                        $('#address-list').empty();
-                                    }
-                                });
-                            });
-                        </script>
+                <form action="{% url 'events_available:offline' %}" method="get">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Место проведения
+                    </button>
+                    <div class="dropdown-menu bg-dark p-3" data-bs-theme="dark" style="width: 300px;">
+                        <input type="text" id="address-input" name="f_place" placeholder="Введите адрес" class="form-control w-100" list="citylist">
+                        <datalist id="citylist">
+                            {% for result in results %}
+                                <option value="{{ result }}">
+                            {% endfor %}
+                        </datalist>
+                        <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
                     </div>
-                    <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
                 </form>
             </div>
         </div>
     </div>
+    
+    
+    
+    {% comment %} <script>
+        $(document).ready(function() {
+            $('#place_input').select2({
+                placeholder: 'Выберите место проведения',
+                allowClear: true
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#place_input').select2({
+                placeholder: 'Выберите место проведения',
+                allowClear: true, 
+                ajax: {
+                    url: '{% url "events_available:autocomplete_places" %}',
+                    dataType: 'json',
+                    delay: 10000,
+                    data: function (params) {
+                        return {
+                            term: params.term // поисковый запрос
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (item) {
+                                return {
+                                    id: item,
+                                    text: item
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+        });
+        
+    </script>
+     {% endcomment %}
+    
     <div class="col-lg-2">
         <div class="row">
             <div class="dropdown">
