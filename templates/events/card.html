@@ -19,84 +19,88 @@
 	</head>
 	<body>
 		<header>
-			<nav class="navbar navbar-expand-lg bg-dark text-white">
-				<div class="container-fluid">
-					<a class="navbar-brand" href={% url "main:index" %}>Home</a>
-					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-						aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-						<span class="navbar-toggler-icon"></span>
-					</button>
-					<div class="collapse navbar-collapse" id="navbarSupportedContent">
-						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-							{% if not user.is_authenticated %}
-							<li class="nav-item">
-								<a class="nav-link text-white" href="{% url 'users:login' %}">Войти</a>
-							</li>
-							{% else %}
-							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-									aria-expanded="false">
-									Доступные мероприятия
-								</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href={% url "events_available:online" %}>Онлайн мероприятия</a></li>
-									<li><a class="dropdown-item" href={% url "events_available:offline" %}>Оффлайн мероприятия</a></li>
-								</ul>
-							</li>
-							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-									aria-expanded="false">
-									Культурные мероприятия
-								</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
-									
-									<li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
-								</ul>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" aria-current="page" href={% url "events_calendar:index" %}>Календарь мероприятий</a>
-							</li>
-							
-							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Мой профиль </a>
-								<ul class="dropdown-menu">
-									<li>
-										<a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный кабинет</a>
-									</li>
-									<li>
-										<a class="dropdown-item text-black" href={% url "bookmarks:registered" %}>Зарегистрированные</a>
-									</li>
-									<li>
-										<a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
-									</li>
-									<li>
-										<a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
-									</li>
-									{% if user.is_admin or user.is_superuser %}
-									<li>
-										<a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
-									</li>
-									{% endif %}
-									<li><hr class="dropdown-divider" /></li>
-									<li>
-										<a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a>
-									</li>
-								</ul>
-							</li>
-							
-							{% endif %}
-						</ul>
-						<form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">
-							<input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
-							<button class="btn btn-outline-success" type="submit">
-								<img src="{% static "general/icons/search.svg" %}" alt="S">
-							</button>
-						</form>
-					</div>
-				</div>
-			</nav>
-		</header>
+            <nav class="navbar navbar-expand-lg bg-dark text-white">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href={% url "main:index" %}>Home</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            {% if not user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'users:login' %}">Войти</a>
+                            </li>
+                            {% else %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Доступные мероприятия
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href={% url "events_available:online" %}>Онлайн мероприятия</a></li>
+                                    <li><a class="dropdown-item" href={% url "events_available:offline" %}>Оффлайн мероприятия</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Культурные мероприятия
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
+                                    
+                                    <li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href={% url "events_calendar:index" %}>Календарь мероприятий</a>
+                            </li>
+                            
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Мой профиль </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный кабинет</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-black" href={% url "bookmarks:registered" %}>Зарегистрированные</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
+                                    </li>
+                                    {% if user.is_admin or user.is_superuser %}
+                                    <li>
+                                        <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
+                                    </li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            
+                            {% endif %}
+                        </ul>
+                        <form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">
+                            <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success" type="submit">
+                                <img src="{% static "general/icons/search.svg" %}" alt="S">
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    
 		
 		<section>
 			<div class="container-fluid">

@@ -71,9 +71,12 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
                                 </li>
-                                {% if user.is_admin or user.is_superuser %}
+                                {% if user.is_admin or user.is_superuser or user.is_staff %}
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
                                 </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider" /></li>
@@ -95,6 +98,7 @@
             </div>
         </nav>
     </header>
+
 
 	<section>
 		{% block content %}{% endblock content %}

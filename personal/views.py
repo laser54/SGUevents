@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
+from django.contrib.auth.models import Group
 
 # @login_required
 # def add_online_event(request):
@@ -47,6 +48,12 @@ def personal(request):
         attractions = []
         for_visiting = []
 
+    is_online_group = current_user.groups.filter(name="Онлайн мероприятия").exists()
+    is_offline_group = current_user.groups.filter(name="Оффлайн мероприятия").exists()
+    is_attraction_group = current_user.groups.filter(name="Достопримечательности").exists()
+    is_for_visiting_group = current_user.groups.filter(name="Доступные к посещению").exists()
+
+
     
     events = list(chain(online_events, offline_events, attractions, for_visiting))
 
@@ -54,6 +61,10 @@ def personal(request):
         'event_card_views': events,
         'online_events': online_events,
         'offline_events': offline_events,
+        'is_online_group': is_online_group,
+        'is_offline_group': is_offline_group,
+        'is_attraction_group': is_attraction_group,
+        'is_for_visiting_group': is_for_visiting_group,
     }
     
     return render(request, 'personal/personal.html', context)
