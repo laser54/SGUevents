@@ -1,9 +1,11 @@
+
 import uuid
 from django.db import models
 from datetime import datetime
 from django.utils.timezone import make_aware, get_default_timezone
 from django.contrib.contenttypes.fields import GenericRelation
-from users.models import Department
+from users.models import Department, User
+
 
 class Events_online(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -20,7 +22,7 @@ class Events_online(models.Model):
     link = models.URLField(unique=False, blank=False, null=False, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/online', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default="1", verbose_name="Администратор")
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Онлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
@@ -43,6 +45,8 @@ class Events_online(models.Model):
         combined_datetime = datetime.combine(self.date, self.time_start)
         self.start_datetime = make_aware(combined_datetime, timezone=get_default_timezone())
         super(Events_online, self).save(*args, **kwargs)
+    
+ 
 
 class Events_offline(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name='Уникальный ID')
@@ -62,7 +66,7 @@ class Events_offline(models.Model):
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default="1", verbose_name="Администратор")
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Оффлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')

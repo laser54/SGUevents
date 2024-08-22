@@ -38,10 +38,10 @@ from django.contrib.auth.models import Group
 def personal(request):
     current_user = request.user
     if current_user.is_staff:
-        online_events = Events_online.objects.filter(events_admin=current_user.username)
-        offline_events = Events_offline.objects.filter(events_admin=current_user.username)
-        attractions = Attractions.objects.filter(events_admin=current_user.username)
-        for_visiting = Events_for_visiting.objects.filter(events_admin=current_user.username)
+        online_events = Events_online.objects.filter(events_admin=current_user.pk)
+        offline_events = Events_offline.objects.filter(events_admin=current_user.pk)
+        attractions = Attractions.objects.filter(events_admin=current_user.pk)
+        for_visiting = Events_for_visiting.objects.filter(events_admin=current_user.pk)
     else:
         online_events = []
         offline_events = []

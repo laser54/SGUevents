@@ -19,7 +19,7 @@
 			"link": null,
 			"qr": "",
 			"image": "events_available_images/offline/workplace_ak9APHP.jpg",
-			"events_admin": "Иванов Иван Иванович",
+			"events_admin": "1",
 			"documents": "",
 			"category": "Оффлайн"
 		}
@@ -44,7 +44,7 @@
 			"link": null,
 			"qr": "",
 			"image": "events_available_images/offline/conference.jpg",
-			"events_admin": "Иванов Иван Иванович",
+			"events_admin": "2",
 			"documents": "",
 			"category": "Оффлайн"
 		}
@@ -69,7 +69,7 @@
 			"link": null,
 			"qr": "",
 			"image": "",
-			"events_admin": "Евпатий Коловрат",
+			"events_admin": "3",
 			"documents": "",
 			"category": "Оффлайн"
 		}
@@ -94,7 +94,7 @@
 			"link": null,
 			"qr": "",
 			"image": "events_available_images/offline/images.jpeg",
-			"events_admin": "Павловская Ольга Витальевна",
+			"events_admin": "4",
 			"documents": "",
 			"category": "Оффлайн"
 		}
@@ -119,7 +119,7 @@
 			"link": null,
 			"qr": "",
 			"image": "events_available_images/offline/ia1o146uks.jpg",
-			"events_admin": "Смирнова Каролина Михайловна",
+			"events_admin": "5",
 			"documents": "",
 			"category": "Оффлайн"
 		}
@@ -144,7 +144,7 @@
 			"link": null,
 			"qr": "",
 			"image": "events_available_images/offline/73609.jpg",
-			"events_admin": "Богданова Елизавета Степановна",
+			"events_admin": "2",
 			"documents": "",
 			"category": "Оффлайн"
 		}
@@ -169,7 +169,7 @@
 			"link": "https://www.cbr.ru/press/event/?id=18619",
 			"qr": "",
 			"image": "events_available_images/offline/image1s.jpeg",
-			"events_admin": "Смирнова Ирина Ильинична",
+			"events_admin": "3",
 			"documents": "",
 			"category": "Оффлайн"
 		}

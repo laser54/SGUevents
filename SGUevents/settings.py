@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'SGUevents',
     'django_celery_beat',
     'django_select2',
+    'rest_framework',
     ]
 
 MIDDLEWARE = [

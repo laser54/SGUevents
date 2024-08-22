@@ -14,6 +14,7 @@
 			"link": "https://novat.ru/theatre/theatre/",
 			"qr": "",
 			"image": "events_available_images/offline/novat.jpg",
+			"events_admin": "1",
 			"rating": "4.97",
 			"documents": "",
 			"category": "Достопримечательности"
@@ -34,6 +35,7 @@
 			"link": "https://hcsibir.ru/arena/info/",
 			"qr": "",
 			"image": "events_available_images/offline/Sibir-Arena.jpg",
+			"events_admin": "2",
 			"rating": "9.07",
 			"documents": "",
 			"category": "Достопримечательности"
@@ -54,6 +56,7 @@
 			"link": "https://zoonovosib.ru/",
 			"qr": "",
 			"image": "events_available_images/offline/zoo1.jpg",
+			"events_admin": "3",
 			"rating": "0.08",
 			"documents": "",
 			"category": "Достопримечательности"
@@ -74,6 +77,7 @@
 			"link": "http://rzd.ru",
 			"qr": "",
 			"image": "events_available_images/offline/photo_vokzal_stantsii_novosibirsk_glavnyy_detail_vokzal__G9bWrwC.jpg",
+			"events_admin": "4",
 			"rating": "0.09",
 			"documents": "",
 			"category": "Достопримечательности"
@@ -94,6 +98,7 @@
 			"link": "https://novo-sibirsk.ru/about/for-visitors/attractions/760/",
 			"qr": "",
 			"image": "events_available_images/offline/photo_teatr_globus_detail_teatr_globus.jpg",
+			"events_admin": "5",
 			"rating": "-0.01",
 			"documents": "",
 			"category": "Достопримечательности"
@@ -114,6 +119,7 @@
 			"link": "https://novo-sibirsk.ru/about/for-visitors/attractions/763/",
 			"qr": "",
 			"image": "events_available_images/offline/kraevedcheskiy_muzey.jpg",
+			"events_admin": "4",
 			"rating": "0.10",
 			"documents": "",
 			"category": "Достопримечательности"
@@ -134,6 +140,7 @@
 			"link": "https://novo-sibirsk.ru/about/for-visitors/attractions/777/",
 			"qr": "",
 			"image": "events_available_images/offline/photo_muzey_sssr_muzey_sibirskaya_beresta_detail_img_4065.jpg",
+			"events_admin": "5",
 			"rating": "1.50",
 			"documents": "",
 			"category": "Достопримечательности"

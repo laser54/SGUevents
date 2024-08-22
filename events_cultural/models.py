@@ -21,7 +21,7 @@ class Attractions(models.Model):
     link = models.URLField(blank=False, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default="1", verbose_name="Администратор")
     rating = models.DecimalField(default=0.00, max_digits=4, decimal_places=2, blank=False, verbose_name='Рейтинг 1-10')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Достопримечательности'
@@ -60,7 +60,7 @@ class Events_for_visiting(models.Model):
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default="1", verbose_name="Администратор")
     place_limit = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество мест')
     place_free = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество свободных мест')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
