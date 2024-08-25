@@ -41,6 +41,7 @@ class Events_online(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
+        self._current_user = kwargs.pop('user', None)  # Сохраняем пользователя для использования в сигнале
         combined_start_datetime = datetime.combine(self.date, self.time_start)
         self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
 
@@ -88,6 +89,7 @@ class Events_offline(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
+        self._current_user = kwargs.pop('user', None)  # Сохраняем пользователя для использования в сигнале
         combined_start_datetime = datetime.combine(self.date, self.time_start)
         self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
 
