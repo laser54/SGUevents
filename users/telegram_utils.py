@@ -205,7 +205,7 @@ def send_custom_notification_with_toggle(telegram_id, message, event_unique_id, 
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
 
     button_text = "\U0001F534 Отключить уведомления" if notifications_enabled else "\U0001F7E2 Включить уведомления"
-    callback_data = f"toggle_{event_unique_id}"
+    callback_data = f"notify_toggle_{event_unique_id}"
 
     inline_keyboard = {
         "inline_keyboard": [[

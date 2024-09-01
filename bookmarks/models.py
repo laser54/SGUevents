@@ -85,66 +85,58 @@ def notify_user_on_registration(sender, instance, created, **kwargs):
                 instance.attractions.name if instance.attractions else instance.for_visiting.name))
         message = f"Вы зарегистрировались на мероприятие: {event_name}."
         user_telegram_id = instance.user.telegram_id
+
+        # Проверка наличия Telegram ID
         if user_telegram_id:
             logger.info(f"Отправка сообщения о регистрации пользователю {instance.user.username} с telegram_id: {user_telegram_id}")
             send_message_to_user_with_toggle_button(user_telegram_id, message, instance.id, instance.notifications_enabled)
         else:
-            logger.warning(f"У пользователя {instance.user.username} нет telegram_id")
+            logger.warning(f"У пользователя {instance.user.username} нет telegram_id, пропускаем отправку.")
 
 
-# Логика уведомления при изменении времени мероприятия (в работе)
-# class EventSignalHandler:
-#     event_model = None  # Модель события, определяется в дочерних классах
-#
-#     @staticmethod
-#     def send_update_notification(user, event, new_start_time):
-#         message = f"Изменились детали мероприятия: дата и время начала изменилось на {new_start_time}."
-#         user_telegram_id = user.telegram_id
-#         if user_telegram_id:
-#             logger.info(f"Отправка уведомления пользователю {user.username} о событии {event.name}")
-#             send_custom_notification_with_toggle(user_telegram_id, message, event.unique_id, True)
-#         else:
-#             logger.warning(f"У пользователя {user.username} нет telegram_id")
-#
-#     @classmethod
-#     def handle_event_update(cls, instance, **kwargs):
-#         if not instance.pk:
-#             return
-#
-#         try:
-#             old_instance = cls.event_model.objects.get(pk=instance.pk)
-#         except cls.event_model.DoesNotExist:
-#             return
-#
-#         if old_instance.start_datetime != instance.start_datetime:
-#             registered_users = Registered.objects.filter(
-#                 online=instance if cls.event_model == Events_online else None,
-#                 offline=instance if cls.event_model == Events_offline else None,
-#                 attractions=instance if cls.event_model == Attractions else None,
-#                 for_visiting=instance if cls.event_model == Events_for_visiting else None
-#             )
-#
-#             for registration in registered_users:
-#                 cls.send_update_notification(registration.user, instance, instance.start_datetime)
-#
-#
-# # Подключение обработчиков сигналов для каждого типа события
-# @receiver(post_save, sender=Events_online)
-# def handle_online_event_update(sender, instance, **kwargs):
-#     EventSignalHandler.event_model = Events_online
-#     EventSignalHandler.handle_event_update(instance)
-#
-# @receiver(post_save, sender=Events_offline)
-# def handle_offline_event_update(sender, instance, **kwargs):
-#     EventSignalHandler.event_model = Events_offline
-#     EventSignalHandler.handle_event_update(instance)
-#
-# @receiver(post_save, sender=Attractions)
-# def handle_attractions_event_update(sender, instance, **kwargs):
-#     EventSignalHandler.event_model = Attractions
-#     EventSignalHandler.handle_event_update(instance)
-#
-# @receiver(post_save, sender=Events_for_visiting)
-# def handle_visiting_event_update(sender, instance, **kwargs):
-#     EventSignalHandler.event_model = Events_for_visiting
-#     EventSignalHandler.handle_event_update(instance)
+
+def send_update_notification(user, event, new_start_time):
+    message = f"Изменились детали мероприятия: дата и время начала изменилось на {new_start_time}."
+    user_telegram_id = user.telegram_id
+
+    # Проверка наличия и корректности Telegram ID
+    if user_telegram_id and len(user_telegram_id) > 0:
+        try:
+            logger.info(f"Пробуем отправить уведомление пользователю {user.username} с telegram_id: {user_telegram_id}")
+            response = send_custom_notification_with_toggle(user_telegram_id, message, event.unique_id, True)
+            if not response.ok:
+                logger.error(f"Ошибка отправки сообщения пользователю с telegram_id {user_telegram_id}: {response.text}")
+        except Exception as e:
+            logger.error(f"Ошибка отправки сообщения пользователю с telegram_id {user_telegram_id}: {e}")
+    else:
+        logger.warning(f"У пользователя {user.username} нет корректного telegram_id, пропускаем отправку.")
+
+def handle_event_update(event_model, instance):
+    if not instance.pk:
+        return
+
+    try:
+        old_instance = event_model.objects.get(pk=instance.pk)
+    except event_model.DoesNotExist:
+        return
+
+    # Проверяем, изменилось ли время начала мероприятия
+    if old_instance.start_datetime != instance.start_datetime:
+        registered_users = Registered.objects.filter(
+            online=instance if isinstance(instance, Events_online) else None,
+            offline=instance if isinstance(instance, Events_offline) else None,
+            attractions=instance if isinstance(instance, Attractions) else None,
+            for_visiting=instance if isinstance(instance, Events_for_visiting) else None
+        )
+
+        for registration in registered_users:
+            send_update_notification(registration.user, instance, instance.start_datetime)
+
+# Обработчик для всех типов событий
+@receiver(post_save, sender=Events_online)
+@receiver(post_save, sender=Events_offline)
+@receiver(post_save, sender=Attractions)
+@receiver(post_save, sender=Events_for_visiting)
+def handle_event_update_signal(sender, instance, **kwargs):
+    handle_event_update(sender, instance)
+
