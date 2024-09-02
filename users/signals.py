@@ -32,14 +32,16 @@ def notify_author_and_participants_on_event_update(sender, instance, **kwargs):
         for_visiting=instance if isinstance(instance, Events_for_visiting) else None
     )
 
+    old_instance = sender.objects.filter(pk=instance.pk).first()
+
     for registration in registered_users:
         if registration.user.telegram_id:
             # Проверка, изменилось ли время начала мероприятия
-            old_instance = sender.objects.filter(pk=instance.pk).first()
             if old_instance and old_instance.start_datetime != instance.start_datetime:
                 message = f"Изменилось время начала мероприятия '{instance.name}'. Новое время: {instance.start_datetime.strftime('%d.%m.%Y %H:%M')}."
             else:
-                message = f"Изменились детали мероприятия '{instance.name}'."
+                # Всегда включаем время в сообщение, даже если оно не изменилось
+                message = f"Изменились детали мероприятия '{instance.name}'. Текущее время начала: {instance.start_datetime.strftime('%d.%m.%Y %H:%M')}."
 
             send_custom_notification_with_toggle(
                 registration.user.telegram_id, message, instance.unique_id, registration.notifications_enabled
