@@ -48,6 +48,7 @@ async def get_user_profile(telegram_id):
         return None
 
 async def get_user_events(user):
+    from django.utils.timezone import localtime
     from bookmarks.models import Registered
     events = await sync_to_async(list)(Registered.objects.filter(user=user))
     event_details = []
@@ -69,7 +70,8 @@ async def get_user_events(user):
             start_datetime = None
 
         if start_datetime:
-            event_details.append(f"{event_name}\n\U0001F5D3 {start_datetime.strftime('%d.%m.%Y %H:%M')}")
+            start_datetime_local = localtime(start_datetime)
+            event_details.append(f"{event_name}\n\U0001F5D3 {start_datetime_local.strftime('%d.%m.%Y %H:%M')}")
         else:
             event_details.append(event_name)
 
