@@ -171,19 +171,21 @@ def events_registered(request, event_slug):
 def registered_remove(request, event_id):
     if request.method == 'POST':
         event = get_object_or_404(Registered, id=event_id, user=request.user)
-        event_slug = event.for_visiting.slug if event.for_visiting else (
-            event.online.slug if event.online else (
-                event.offline.slug if event.offline else (
-                    event.attractions.slug if event.attractions else None
+        event_name = (
+            event.for_visiting.name if event.for_visiting else (
+                event.online.name if event.online else (
+                    event.offline.name if event.offline else (
+                        event.attractions.name if event.attractions else None
+                    )
                 )
             )
         )
         event.delete()
         telegram_id = request.user.telegram_id
         if telegram_id:
-            message = f"Вы успешно отменили регистрацию на мероприятие: {event_slug}"
+            message = f"\U0000274C Вы успешно отменили регистрацию на мероприятие: {event_name}"
             send_message_to_user(telegram_id, message)
-        return JsonResponse({'removed': True, 'event_slug': event_slug})
+        return JsonResponse({'removed': True, 'event_name': event_name})
     return JsonResponse({'removed': False, 'error': 'Invalid request method'}, status=400)
 
 @login_required

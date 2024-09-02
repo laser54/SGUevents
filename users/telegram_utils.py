@@ -23,7 +23,7 @@ logger = logging.getLogger('my_debug_logger')
 ADMIN_TG_NAME = os.getenv("ADMIN_TG_NAME")
 
 def send_login_details_sync(telegram_id, login, password):
-    message_text = f"Ваши учетные данные для входа:\nЛогин: {login}\nПароль: {password}"
+    message_text = f"\U0001FAAA Ваши учетные данные для входа:\nЛогин: {login}\nПароль: {password}"
     send_url = f"https://api.telegram.org/bot{settings.ACTIVE_TELEGRAM_BOT_TOKEN}/sendMessage"
     data = {
         "chat_id": telegram_id,
