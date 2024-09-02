@@ -95,7 +95,7 @@
 </li>
 <script>
 function requestPasswordChange() {
-    fetch('/change-password/', {
+    fetch('{% url "users:change_password" %}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ function requestPasswordChange() {
 
 function requestAdminRights() {
     const reason = document.getElementById('reason').value;
-    fetch('/request-admin-rights/', {
+    fetch('{% url "users:request_admin_rights" %}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
