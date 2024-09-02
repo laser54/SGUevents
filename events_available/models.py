@@ -41,6 +41,7 @@ class Events_online(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
+        self._current_user = kwargs.pop('user', None)  # Сохраняем пользователя для использования в сигнале
         combined_start_datetime = datetime.combine(self.date, self.time_start)
         self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
 
@@ -62,7 +63,8 @@ class Events_offline(models.Model):
     tags = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Теги')
     town = models.CharField(max_length=200, unique=False, blank=False, null=False, verbose_name='Город')
     street = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Улица')
-    cabinet = models.CharField(max_length=50, unique=False, blank=False, null=False, verbose_name='Кабинет')
+    house = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Дом')
+    cabinet = models.CharField(max_length=50, unique=False, blank=True, null=True, verbose_name='Кабинет')
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
@@ -87,6 +89,7 @@ class Events_offline(models.Model):
         return f'{self.id:05}'
 
     def save(self, *args, **kwargs):
+        self._current_user = kwargs.pop('user', None)  # Сохраняем пользователя для использования в сигнале
         combined_start_datetime = datetime.combine(self.date, self.time_start)
         self.start_datetime = make_aware(combined_start_datetime, timezone=get_default_timezone())
 

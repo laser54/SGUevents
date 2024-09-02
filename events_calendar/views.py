@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
 from bookmarks.models import Registered, Favorite
+from django.urls import reverse
 import json
 
 @login_required
@@ -29,7 +30,8 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Онлайн',
-            'backgroundColor': 'rgb(30, 141, 30)'  # Зеленый цвет по умолчанию
+            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'url': reverse('events_available:online_card', args=[event.slug])
         }
         if event.id in registered_online_ids:
             event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий
@@ -43,7 +45,8 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Оффлайн',
-            'backgroundColor': 'rgb(30, 141, 30)'  # Зеленый цвет по умолчанию
+            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'url': reverse('events_available:offline_card', args=[event.slug])
         }
         if event.id in registered_offline_ids:
             event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий
@@ -57,7 +60,8 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Достопримечательность',
-            'backgroundColor': 'rgb(30, 141, 30)'  # Зеленый цвет по умолчанию
+            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'url': reverse('events_cultural:attractions_card', args=[event.slug])
         }
         if event.id in registered_attractions_ids:
             event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий
@@ -71,7 +75,8 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Для посещения',
-            'backgroundColor': 'rgb(30, 141, 30)'  # Зеленый цвет по умолчанию
+            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'url': reverse('events_cultural:events_for_visiting_card', args=[event.slug])
         }
         if event.id in registered_for_visiting_ids:
             event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий

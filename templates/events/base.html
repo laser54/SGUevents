@@ -12,7 +12,18 @@
     <link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
     <link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+    {% comment %} autocomplete {% endcomment %}
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Document</title>
+    <!-- select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+
+    
+
 </head>
 
 <body>
@@ -75,6 +86,9 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
+                                </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
@@ -117,16 +131,22 @@
 							<h2 class="mt-4">По запросу ничего не найдено</h2>
 						{% endif %}
 					{% endif %}
+
+                    {% comment %} Для панели администратора {% endcomment %}
+                    
+                    {% block form_events %}{% endblock form_events %}
                     {% for events in event_card_views %}
+                        
+                        
                         <div class="row mt-2 event_cards">
                             <div class="col-lg-12">
                                 <div class="card mb-3">
                                     <div class="row g-0">
                                         <div class="col-md-4">
                                             {% if events.image %}
-                                                <img src="{{ events.image.url }}" class="img-fluid rounded-start " alt="{{ events.name }}">
+                                                <img src="{{ events.image.url }}" class="img-fluid rounded-start" alt="{{ events.name }}">
                                             {% else %} 
-                                                <img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start " alt="{{ events.name }}">
+                                                <img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start" alt="{{ events.name }}">
                                             {% endif %}
                                             
                                             {% if name_page != "Главная" %}
@@ -225,13 +245,17 @@
                                                     </small>
                                                 </p>
                                                 <p>
-                                                    {% if events.town %}{{ events.town }}{% endif %} {% if events.street %}{{ events.street }}{% endif %} {% if events.cabinet %}{{ events.cabinet }}{% endif %}
+                                                    {% if events.town %}г.{{ events.town }}{% endif %} {% if events.street %}ул.{{ events.street }}{% endif %} {% if events.house %} д.{{ events.house }}{% endif %}{% if events.cabinet %} кабинет {{ events.cabinet }}{% endif %}
                                                 </p>
+                                                
                                                 <p>
-                                                    {{ speakers }}
+                                                    <h6><strong>Спикеры:</strong> </h6>
+                                                    {{events.speakers}}
                                                 </p> 
+                                                
+                                                
                                                 {% block content %}{% endblock content %}
-
+                                                {% block admins_events %}{% endblock admins_events %}
                                                 {% if reviews %}
                                                     <div class="reviews">
                                                         {% if reviews|get_item:events.unique_id %}
@@ -258,6 +282,7 @@
  
                     {% block favorite %}{% endblock favorite %}
                     {% block register %}{% endblock register %}
+                    
 					
 				</div>
 				<div class="col-lg-1"></div>
@@ -269,35 +294,37 @@
     <pagination>
         {% if user.is_authenticated %}
             {% if event_card_views %}
-                <nav aria-label="Page navigation example" >
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
-                            <a class="page-link" href="
-                            {% if event_card_views.has_previous %}  
-                                ?{% change_params page=event_card_views.previous_page_number %}
-                            {% else %} 
-                                #
-                            {% endif %}">Назад </a>
-                        </li>
-                        {% for page in event_card_views.paginator.page_range %}		
-                            {% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
-                                <li class="page-item {% if event_card_views.number == page %} active {% endif %}">
-                                    <a class="page-link" href="
-                                    ?{% change_params page=page %}">
-                                    {{ page }}</a>
-                                </li>
-                            {% endif %}		
-                        {% endfor %}
-                        <li class="page-item {% if not event_card_views.has_next %} disabled {% else %}{% endif %}">
-                            <a class="page-link" href="
-                            {% if event_card_views.has_next %}
-                                ?{% change_params page=event_card_views.next_page_number %}
-                            {% else %} 
-                                #
-                            {% endif %}">Следующая </a>
-                        </li>
-                    </ul>
-                </nav>
+                {% if event_card_views.paginator.page_range %}
+                    <nav aria-label="Page navigation example" >
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
+                                <a class="page-link" href="
+                                {% if event_card_views.has_previous %}  
+                                    ?{% change_params page=event_card_views.previous_page_number %}
+                                {% else %} 
+                                    #
+                                {% endif %}">Назад </a>
+                            </li>
+                            {% for page in event_card_views.paginator.page_range %}		
+                                {% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
+                                    <li class="page-item {% if event_card_views.number == page %} active {% endif %}">
+                                        <a class="page-link" href="
+                                        ?{% change_params page=page %}">
+                                        {{ page }}</a>
+                                    </li>
+                                {% endif %}		
+                            {% endfor %}
+                            <li class="page-item {% if not event_card_views.has_next %} disabled {% else %}{% endif %}">
+                                <a class="page-link" href="
+                                {% if event_card_views.has_next %}
+                                    ?{% change_params page=event_card_views.next_page_number %}
+                                {% else %} 
+                                    #
+                                {% endif %}">Следующая </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %} 
             {% endif %}
         {% endif %}
     </pagination>
@@ -305,6 +332,14 @@
     <script src={% static "js/bootstrap-datepicker.min.js" %}></script>
     <script src={% static "js/bootstrap-datepicker.ru.min.js" %}></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+
+    <script src="{% static 'django_select2/django_select2.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.django-select2').djangoSelect2();
+        });
+    </script>
     {% block javascript_files %}
 
 <!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ И УДАЛЕНИЕ ИЗ ИЗБРАННЫХ -->

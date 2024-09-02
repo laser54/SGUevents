@@ -1,0 +1,70 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{% block title %} Admin {% endblock %}
+{% block form_events %}
+<link rel="stylesheet" href="{% static "general/css/admin.css" %}"
+    `   
+    <p> <h1>Личный кабинет</h1> </p>        
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <a href="/admin/events_available/events_online/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                Добавить онлайн мероприятие
+            </a>
+        </div>
+    
+        <div class="col-md-6 mb-2">
+            <a href="/admin/events_available/events_offline/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                Добавить оффлайн мероприятие
+            </a>
+        </div>
+    
+        <div class="col-md-6 mb-2">
+            <a href="/admin/events_cultural/attractions/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                Добавить достопримечательность
+            </a>
+        </div>
+    
+        <div class="col-md-6 mb-2">
+            <a href="/admin/events_cultural/events_for_visiting/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                Добавить доступное к посещению
+            </a>
+        </div>
+    </div>
+    
+    <h2 class="mt-4">Ваши мероприятия</h2>
+    
+ 
+{% endblock %}
+
+{% block admins_events %}
+    <div class="container mt-5">
+        <a href="
+        {% if events.category  == 'Онлайн' %}
+            {% url 'admin:events_available_events_online_change' events.id %}" 
+        {% elif events.category  == 'Оффлайн' %}
+            {% url 'admin:events_available_events_offline_change' events.id %}" 
+        {% elif events.category  == 'Достопримечательности' %}
+            {% url 'admin:events_cultural_attractions_change' events.id %}" 
+        {% elif events.category  == 'Доступные к посещению' %}
+            {% url 'admin:events_cultural_events_for_visiting_change' events.id %}" 
+        {% endif %}" 
+        class="btn btn-sm btn-primary" target="_blank"> Редактировать </a>
+
+        <a href="
+        {% if events.category  == 'Онлайн' %}
+            {% url 'admin:events_available_events_online_delete' events.id %}" 
+        {% elif events.category  == 'Оффлайн' %}
+            {% url 'admin:events_available_events_offline_delete' events.id %}" 
+        {% elif events.category  == 'Достопримечательности' %}
+            {% url 'admin:events_cultural_attractions_delete' events.id %}" 
+        {% elif events.category  == 'Доступные к посещению' %}
+            {% url 'admin:events_cultural_events_for_visiting_delete' events.id %}" 
+        {% endif %}" 
+        class="btn btn-sm btn-danger" target="_blank"> Удалить </a>
+    </div>
+{% endblock admins_events %}
+
+
+    
+    
+

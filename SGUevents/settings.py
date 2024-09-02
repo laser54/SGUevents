@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'SGUevents',
     'django_celery_beat',
+    'django_select2',
     ]
 
 MIDDLEWARE = [
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'users.middleware.CurrentUserMiddleware',
 ]
 
 ROOT_URLCONF = 'SGUevents.urls'

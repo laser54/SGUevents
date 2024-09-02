@@ -5,10 +5,12 @@ from django.utils.timezone import make_aware, get_default_timezone
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
 from users.models import User
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from users.telegram_utils import send_message_to_user_with_toggle_button
+from users.telegram_utils import send_message_to_user_with_toggle_button, send_custom_notification_with_toggle
 import logging
+from django.utils import timezone
+from pytz import timezone as pytz_timezone
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,13 @@ class Favorite(models.Model):
     offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True, blank=True)
     attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
     for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
-    created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+    created_timestamp = models.DateTimeField(verbose_name="Дата добавления")
+
+    def save(self, *args, **kwargs):
+        if not self.created_timestamp:
+            local_timezone = pytz_timezone('Asia/Novosibirsk')
+            self.created_timestamp = timezone.now().astimezone(local_timezone)
+        super(Favorite, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Избранные"
@@ -40,14 +48,17 @@ class Favorite(models.Model):
 class Registered(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, verbose_name="Пользователь")
     online = models.ForeignKey(to=Events_online, on_delete=models.CASCADE, verbose_name="Онлайн", null=True, blank=True)
-    offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True,
-                                blank=True)
-    attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности",
-                                    null=True, blank=True)
-    for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE,
-                                     verbose_name="Доступные для посещения", null=True, blank=True)
+    offline = models.ForeignKey(to=Events_offline, on_delete=models.CASCADE, verbose_name="Оффлайн", null=True, blank=True)
+    attractions = models.ForeignKey(to=Attractions, on_delete=models.CASCADE, verbose_name="Достопримечательности", null=True, blank=True)
+    for_visiting = models.ForeignKey(to=Events_for_visiting, on_delete=models.CASCADE, verbose_name="Доступные для посещения", null=True, blank=True)
     created_timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
     notifications_enabled = models.BooleanField(default=True, verbose_name="Уведомления включены")
+
+    def save(self, *args, **kwargs):
+        if not self.created_timestamp:
+            local_timezone = pytz_timezone('Asia/Novosibirsk')
+            self.created_timestamp = timezone.now().astimezone(local_timezone)
+        super(Registered, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Зарегистрированные"
@@ -65,6 +76,7 @@ class Registered(models.Model):
                 except:
                     return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
 
+
 @receiver(post_save, sender=Registered)
 def notify_user_on_registration(sender, instance, created, **kwargs):
     if created:
@@ -73,8 +85,58 @@ def notify_user_on_registration(sender, instance, created, **kwargs):
                 instance.attractions.name if instance.attractions else instance.for_visiting.name))
         message = f"Вы зарегистрировались на мероприятие: {event_name}."
         user_telegram_id = instance.user.telegram_id
+
+        # Проверка наличия Telegram ID
         if user_telegram_id:
             logger.info(f"Отправка сообщения о регистрации пользователю {instance.user.username} с telegram_id: {user_telegram_id}")
             send_message_to_user_with_toggle_button(user_telegram_id, message, instance.id, instance.notifications_enabled)
         else:
-            logger.warning(f"У пользователя {instance.user.username} нет telegram_id")
+            logger.warning(f"У пользователя {instance.user.username} нет telegram_id, пропускаем отправку.")
+
+
+
+def send_update_notification(user, event, new_start_time):
+    message = f"Изменились детали мероприятия: дата и время начала изменилось на {new_start_time}."
+    user_telegram_id = user.telegram_id
+
+    # Проверка наличия и корректности Telegram ID
+    if user_telegram_id and len(user_telegram_id) > 0:
+        try:
+            logger.info(f"Пробуем отправить уведомление пользователю {user.username} с telegram_id: {user_telegram_id}")
+            response = send_custom_notification_with_toggle(user_telegram_id, message, event.unique_id, True)
+            if not response.ok:
+                logger.error(f"Ошибка отправки сообщения пользователю с telegram_id {user_telegram_id}: {response.text}")
+        except Exception as e:
+            logger.error(f"Ошибка отправки сообщения пользователю с telegram_id {user_telegram_id}: {e}")
+    else:
+        logger.warning(f"У пользователя {user.username} нет корректного telegram_id, пропускаем отправку.")
+
+def handle_event_update(event_model, instance):
+    if not instance.pk:
+        return
+
+    try:
+        old_instance = event_model.objects.get(pk=instance.pk)
+    except event_model.DoesNotExist:
+        return
+
+    # Проверяем, изменилось ли время начала мероприятия
+    if old_instance.start_datetime != instance.start_datetime:
+        registered_users = Registered.objects.filter(
+            online=instance if isinstance(instance, Events_online) else None,
+            offline=instance if isinstance(instance, Events_offline) else None,
+            attractions=instance if isinstance(instance, Attractions) else None,
+            for_visiting=instance if isinstance(instance, Events_for_visiting) else None
+        )
+
+        for registration in registered_users:
+            send_update_notification(registration.user, instance, instance.start_datetime)
+
+# Обработчик для всех типов событий
+@receiver(post_save, sender=Events_online)
+@receiver(post_save, sender=Events_offline)
+@receiver(post_save, sender=Attractions)
+@receiver(post_save, sender=Events_for_visiting)
+def handle_event_update_signal(sender, instance, **kwargs):
+    handle_event_update(sender, instance)
+

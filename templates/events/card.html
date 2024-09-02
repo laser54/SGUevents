@@ -118,13 +118,10 @@
 									<div class="row g-0">
 										<div class="col-md-4">
 											{% if event.image %}
-											<img
-												src="{{ event.image.url }}"
-												class="img-fluid rounded-start"
-												alt="{{ event.name }}"
-											/>
-											{% else %} <img src="{% static "general/images/img.png"
-											%}" class="img-fluid rounded-start " alt="{{ event.name}}"> {% endif %}
+											    <img src="{{ event.image.url }}" class="img-fluid rounded-start" alt="{{ event.name }}"/>
+											{% else %} 
+                                                <img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start" alt="{{ event.name }}"> 
+                                            {% endif %}
 											{% block heart %}{% endblock heart %}
 											<div class="card-img-info">
 												<p>id: {{ event.display_id }}</p>

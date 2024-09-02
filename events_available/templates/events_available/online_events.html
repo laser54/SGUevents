@@ -13,6 +13,7 @@
                 <div class="form-check text-white">
                     <input class="form-control me-3" type="search" name="q" placeholder="Search" aria-label="Search">
                 </div>
+
                 <button class="btn btn-outline-success d-inline" type="submit">
                     Найти <img src="{% static 'general/icons/search.svg' %}" alt="S">
                 </button>
@@ -56,6 +57,16 @@
                     <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="date" {% if request.GET.order_by == 'date' %}checked{% endif %}>
                     <label class="form-check-label" for="flexRadioDefault3">Сначала старые</label>
                 </div>
+
+                {% comment %} Для объединения фильтров {% endcomment %}
+                {% for key, value in request.GET.items %}
+                    {% if key != 'f_date' and key != 'date_start' and key != 'date_end' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+
+
+
                 <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
             </form>
         </div>
@@ -102,7 +113,7 @@
             <form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark" style="max-height: 200px; overflow-y: auto;">
                 <div class="form-check text-white mx-3">
                     {% for speaker in speakers %}
-                        <input class="form-check-input" type="checkbox" name="f_speakers" id="flexCheckDefault{{ forloop.counter }}" value="{{ speaker }}" {% if request.GET.f_date == speaker %}checked{% endif %}>
+                        <input class="form-check-input" type="checkbox" name="f_speakers" id="flexCheckDefault{{ forloop.counter }}" value="{{ speaker }}" {% if request.GET.f_speakers == speaker %}checked{% endif %}>
                         {% if request.GET.q %}
                             <input type="hidden" name="q" value="{{ request.GET.q }}">
                         {% endif %}
@@ -110,6 +121,14 @@
 						<br>
                     {% endfor %}
                 </div>
+
+                {% comment %} Для объединения фильтров {% endcomment %}
+                {% for key, value in request.GET.items %}
+                    {% if key != 'f_speakers' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+                
                 <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
             </form>
         </div>
@@ -122,7 +141,7 @@
             <form action="" method="get" class="dropdown-menu bg-dark" data-bs-theme="dark" style="max-height: 200px; overflow-y: auto;">
                 <div class="form-check text-white mx-3">
                     {% for tag in tags %}
-                        <input class="form-check-input" type="checkbox" name="f_tags" id="flexCheckDefault{{ forloop.counter }}" value="{{ tag }}" {% if request.GET.f_date == tag %}checked{% endif %}>
+                        <input class="form-check-input" type="checkbox" name="f_tags" id="flexCheckDefault{{ forloop.counter }}" value="{{ tag }}" {% if request.GET.f_tags == tag %}checked{% endif %}>
                         {% if request.GET.q %}
                             <input type="hidden" name="q" value="{{ request.GET.q }}">
                         {% endif %}
@@ -130,14 +149,21 @@
 						<br>
                     {% endfor %}
                 </div>
+
+                {% for key, value in request.GET.items %}
+                    {% if key != 'f_tags' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+
                 <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
             </form>
         </div>
     </div>
     <div class="col-lg-2">
-        <form action="{% url 'events_available:online' %}">
-            <button class="btn btn-primary" type="reset" data-bs-toggle="dropdown" aria-expanded="false">сбросить</button>
-        </form>
+        <form action="{% url 'events_available:online' %}" method="get">
+        <button class="btn btn-primary" type="submit">Сбросить</button>
+    </form>
     </div>
 </div>
 {% endblock filters %}
