@@ -83,7 +83,7 @@ def notify_user_on_registration(sender, instance, created, **kwargs):
         event_name = instance.online.name if instance.online else (
             instance.offline.name if instance.offline else (
                 instance.attractions.name if instance.attractions else instance.for_visiting.name))
-        message = f"Вы зарегистрировались на мероприятие: {event_name}."
+        message = f"\U00002705 Вы зарегистрировались на мероприятие: {event_name}."
         user_telegram_id = instance.user.telegram_id
 
         # Проверка наличия Telegram ID

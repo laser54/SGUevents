@@ -54,15 +54,25 @@ async def get_user_events(user):
     for event in events:
         if await sync_to_async(lambda: event.online)():
             event_name = await sync_to_async(lambda: event.online.name)()
+            start_datetime = await sync_to_async(lambda: event.online.start_datetime)()
         elif await sync_to_async(lambda: event.offline)():
             event_name = await sync_to_async(lambda: event.offline.name)()
+            start_datetime = await sync_to_async(lambda: event.offline.start_datetime)()
         elif await sync_to_async(lambda: event.attractions)():
             event_name = await sync_to_async(lambda: event.attractions.name)()
+            start_datetime = await sync_to_async(lambda: event.attractions.start_datetime)()
         elif await sync_to_async(lambda: event.for_visiting)():
             event_name = await sync_to_async(lambda: event.for_visiting.name)()
+            start_datetime = await sync_to_async(lambda: event.for_visiting.start_datetime)()
         else:
             event_name = "Неизвестное мероприятие"
-        event_details.append(event_name)
+            start_datetime = None
+
+        if start_datetime:
+            event_details.append(f"{event_name}\n\U0001F5D3 {start_datetime.strftime('%d.%m.%Y %H:%M')}")
+        else:
+            event_details.append(event_name)
+
     return event_details
 
 
@@ -102,8 +112,8 @@ async def my_events(message: types.Message):
     if user:
         event_details = await get_user_events(user)
         if event_details:
-            for event_name in event_details:
-                response_text = f"Мероприятие: {event_name}"
+            for event_detail in event_details:
+                response_text = f"Мероприятие: {event_detail}"
                 await message.answer(response_text)
         else:
             await message.answer("Вы не зарегистрированы на какие-либо мероприятия.")
@@ -115,7 +125,7 @@ async def my_events(message: types.Message):
 async def help_request(message: types.Message, state: FSMContext):
     user = await get_user_profile(message.from_user.id)
     if user:
-        await message.answer("Пожалуйста, введите ваш вопрос:")
+        await message.answer("\U00002754 Пожалуйста, введите ваш вопрос:")
         await state.set_state(SupportRequestForm.waiting_for_question)
     else:
         await message.answer("Вы не зарегистрированы на портале.")

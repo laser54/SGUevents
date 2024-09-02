@@ -19,7 +19,7 @@ def send_notification(event_registered_id, user_id, event_name, timeframe):
         user = User.objects.get(id=user_id)
         registered_event = Registered.objects.get(id=event_registered_id)
         if registered_event.notifications_enabled:
-            message = f"Напоминаем, что мероприятие '{event_name}' начнется через {timeframe}."
+            message = f"\U0001F550 Напоминаем, что мероприятие '{event_name}' начнется через {timeframe}."
             if user.telegram_id:
                 send_message_to_user_with_toggle_button(user.telegram_id, message, event_registered_id, True)
             else:

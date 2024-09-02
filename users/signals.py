@@ -18,7 +18,7 @@ def notify_author_and_participants_on_event_update(sender, instance, **kwargs):
 
     # Уведомление автора
     if user and hasattr(user, 'telegram_id') and user.telegram_id:
-        message = f"Изменения в мероприятие '{instance.name}' были успешно сохранены."
+        message = f"\U0001F4BE Изменения в мероприятие '{instance.name}' были успешно сохранены."
         send_message_to_user(user.telegram_id, message)
         logger.info(f"Уведомление об изменениях отправлено пользователю {user.username}")
     else:
