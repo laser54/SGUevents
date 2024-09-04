@@ -66,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'users.middleware.CurrentUserMiddleware',
 ]
 
 ROOT_URLCONF = 'SGUevents.urls'
@@ -206,48 +207,34 @@ CELERY_TIMEZONE = 'Asia/Novosibirsk'
 CELERY_ENABLE_UTC = False
 
 CELERY_BEAT_SCHEDULE = {
-    'schedule-notifications-every-hour': {
-        'task': 'bookmarks.tasks.schedule_notifications',
-        'schedule': crontab(minute=0),  # запуск каждый час
-    },
-    'schedule-notifications-every-10-minutes': {
-        'task': 'bookmarks.tasks.schedule_notifications',
-        'schedule': crontab(minute='*/10'),  # запуск каждые 10 минут
-    },
     'schedule-notifications-every-minute': {
         'task': 'bookmarks.tasks.schedule_notifications',
         'schedule': crontab(minute='*/1'),  # запуск каждую минуту
     },
 }
 
-# Настройки логирования (раскомментировать, если нужно)
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'DEBUG',
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         'celery': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         'bookmarks': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#     },
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'my_debug_filter': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': lambda record: record.levelname == 'DEBUG' and 'my_debug' in record.msg,
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['my_debug_filter'],
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'my_debug_logger': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+

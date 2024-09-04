@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import uuid
 
 import requests
 import json
@@ -9,10 +10,12 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Update
 from asgiref.sync import sync_to_async
 from dotenv import load_dotenv
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.client.bot import DefaultBotProperties
+
 
 load_dotenv()
 from bot.django_initializer import setup_django_environment
@@ -27,9 +30,14 @@ SUPPORT_CHAT_ID = settings.ACTIVE_TELEGRAM_SUPPORT_CHAT_ID
 storage = MemoryStorage()
 dp = Dispatcher()
 router = Router()
+logger = logging.getLogger(__name__)
 
 class SupportRequestForm(StatesGroup):
     waiting_for_question = State()
+
+class ReviewForm(StatesGroup):
+    waiting_for_review = State()
+
 
 
 async def get_user_profile(telegram_id):
@@ -40,21 +48,33 @@ async def get_user_profile(telegram_id):
         return None
 
 async def get_user_events(user):
+    from django.utils.timezone import localtime
     from bookmarks.models import Registered
     events = await sync_to_async(list)(Registered.objects.filter(user=user))
     event_details = []
     for event in events:
         if await sync_to_async(lambda: event.online)():
             event_name = await sync_to_async(lambda: event.online.name)()
+            start_datetime = await sync_to_async(lambda: event.online.start_datetime)()
         elif await sync_to_async(lambda: event.offline)():
             event_name = await sync_to_async(lambda: event.offline.name)()
+            start_datetime = await sync_to_async(lambda: event.offline.start_datetime)()
         elif await sync_to_async(lambda: event.attractions)():
             event_name = await sync_to_async(lambda: event.attractions.name)()
+            start_datetime = await sync_to_async(lambda: event.attractions.start_datetime)()
         elif await sync_to_async(lambda: event.for_visiting)():
             event_name = await sync_to_async(lambda: event.for_visiting.name)()
+            start_datetime = await sync_to_async(lambda: event.for_visiting.start_datetime)()
         else:
             event_name = "Неизвестное мероприятие"
-        event_details.append(event_name)
+            start_datetime = None
+
+        if start_datetime:
+            start_datetime_local = localtime(start_datetime)
+            event_details.append(f"{event_name}\n\U0001F5D3 {start_datetime_local.strftime('%d.%m.%Y %H:%M')}")
+        else:
+            event_details.append(event_name)
+
     return event_details
 
 
@@ -94,8 +114,8 @@ async def my_events(message: types.Message):
     if user:
         event_details = await get_user_events(user)
         if event_details:
-            for event_name in event_details:
-                response_text = f"Мероприятие: {event_name}"
+            for event_detail in event_details:
+                response_text = f"Мероприятие: {event_detail}"
                 await message.answer(response_text)
         else:
             await message.answer("Вы не зарегистрированы на какие-либо мероприятия.")
@@ -107,7 +127,7 @@ async def my_events(message: types.Message):
 async def help_request(message: types.Message, state: FSMContext):
     user = await get_user_profile(message.from_user.id)
     if user:
-        await message.answer("Пожалуйста, введите ваш вопрос:")
+        await message.answer("\U00002754 Пожалуйста, введите ваш вопрос:")
         await state.set_state(SupportRequestForm.waiting_for_question)
     else:
         await message.answer("Вы не зарегистрированы на портале.")
@@ -153,7 +173,7 @@ async def toggle_notification(callback_query: types.CallbackQuery):
         registration.notifications_enabled = not registration.notifications_enabled
         await sync_to_async(registration.save)()
 
-        new_button_text = "Включить уведомления" if not registration.notifications_enabled else "Отключить уведомления"
+        new_button_text = "\U0001F7E2 Включить уведомления" if not registration.notifications_enabled else "\U0001F534 Отключить уведомления"
         inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text=new_button_text, callback_data=f"toggle_{event_id}")]
         ])
@@ -162,8 +182,133 @@ async def toggle_notification(callback_query: types.CallbackQuery):
     else:
         await callback_query.answer("Вы не зарегистрированы на портале.")
 
+
+@router.message(ReviewForm.waiting_for_review)
+async def receive_review(message: types.Message, state: FSMContext):
+    from django.shortcuts import get_object_or_404
+    from django.contrib.contenttypes.models import ContentType
+    from events_cultural.models import Review, Attractions, Events_for_visiting
+    from events_available.models import Events_online, Events_offline
+
+    user = await get_user_profile(message.from_user.id)
+    if not user:
+        await message.answer("Произошла ошибка, попробуйте снова.")
+        await state.clear()
+        return
+
+    data = await state.get_data()
+    event_unique_id = data.get("event_id")
+    event_type = data.get("event_type")
+
+    comment = message.text
+
+    if not comment:
+        await message.answer("Комментарий не может быть пустым")
+        return
+
+    model_map = {
+        "online": Events_online,
+        "offline": Events_offline,
+        "attractions": Attractions,
+        "for_visiting": Events_for_visiting
+    }
+
+    model = model_map.get(event_type)
+    if not model:
+        await message.answer("Некорректный тип мероприятия")
+        return
+
+    try:
+        event = await sync_to_async(get_object_or_404)(model, unique_id=event_unique_id)
+        content_type = await sync_to_async(ContentType.objects.get_for_model)(model)
+        review = await sync_to_async(Review.objects.create)(
+            user=user,
+            content_type=content_type,
+            object_id=event.id,  # Используем внутренний ID для создания отзыва
+            comment=comment
+        )
+
+        await message.answer("Спасибо за ваш отзыв!")
+    except model.DoesNotExist:
+        await message.answer("Не удалось найти событие. Возможно, оно было удалено.")
+    except ValueError:
+        await message.answer("Некорректный UUID для события.")
+    finally:
+        await state.clear()
+
+@router.callback_query(F.data.startswith("review:"))
+async def handle_leave_review(callback_query: types.CallbackQuery, state: FSMContext):
+    try:
+        _, event_unique_id, event_type = callback_query.data.split(":")
+
+        # Проверяем, что event_unique_id является валидным UUID
+        try:
+            uuid_obj = uuid.UUID(event_unique_id)
+        except ValueError:
+            await callback_query.answer("Некорректный UUID для события.")
+            return
+
+        user = await get_user_profile(callback_query.from_user.id)
+        if user:
+            await callback_query.message.answer("Пожалуйста, напишите ваш отзыв:")
+            await state.set_state(ReviewForm.waiting_for_review)
+            await state.update_data(event_id=str(uuid_obj), event_type=event_type)
+        else:
+            await callback_query.answer("Вы не зарегистрированы на портале.")
+    except Exception as e:
+        await callback_query.answer(f"Произошла ошибка: {e}")
+
+
+@router.callback_query(F.data.startswith("notify_toggle_"))
+async def toggle_event_notification(callback_query: types.CallbackQuery):
+    event_unique_id = callback_query.data.split("_")[2]
+    user = await get_user_profile(callback_query.from_user.id)
+
+    if user:
+        from bookmarks.models import Registered
+        registration = None
+
+        # Попробуем найти регистрацию по каждому типу события
+        try:
+            registration = await sync_to_async(Registered.objects.get)(
+                user=user, online__unique_id=event_unique_id
+            )
+        except Registered.DoesNotExist:
+            try:
+                registration = await sync_to_async(Registered.objects.get)(
+                    user=user, offline__unique_id=event_unique_id
+                )
+            except Registered.DoesNotExist:
+                try:
+                    registration = await sync_to_async(Registered.objects.get)(
+                        user=user, attractions__unique_id=event_unique_id
+                    )
+                except Registered.DoesNotExist:
+                    try:
+                        registration = await sync_to_async(Registered.objects.get)(
+                            user=user, for_visiting__unique_id=event_unique_id
+                        )
+                    except Registered.DoesNotExist:
+                        await callback_query.answer("Событие не найдено.")
+                        return
+
+        # Переключаем состояние уведомлений
+        registration.notifications_enabled = not registration.notifications_enabled
+        await sync_to_async(registration.save)()
+
+        # Обновляем текст кнопки и отправляем новое сообщение
+        new_button_text = "\U0001F7E2 Включить уведомления" if not registration.notifications_enabled else "\U0001F534 Отключить уведомления"
+        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text=new_button_text, callback_data=f"notify_toggle_{event_unique_id}")]
+        ])
+        await callback_query.message.edit_reply_markup(reply_markup=inline_keyboard)
+        await callback_query.answer(f"Уведомления {'включены' if registration.notifications_enabled else 'отключены'}.")
+    else:
+        await callback_query.answer("Вы не зарегистрированы на портале.")
+
+
 # Функция запуска бота
-bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 async def run_bot():
     try:
         dp.include_router(router)
