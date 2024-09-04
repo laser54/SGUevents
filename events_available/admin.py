@@ -14,7 +14,7 @@ class Events_onlineAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs 
-        return qs.filter(events_admin=request.user.username)
+        return qs.filter(events_admin=request.user.pk)
 
     def has_change_permission(self, request, obj=None):
         if obj is not None and not request.user.is_superuser:
