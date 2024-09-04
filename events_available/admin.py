@@ -40,10 +40,10 @@ class RestrictedAdminMixin:
 @admin.register(Events_online)
 class Events_onlineAdmin(RestrictedAdminMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
-    filter_horizontal = ('secret',)
+    filter_horizontal = ('secret', 'speakers')
 
 
 @admin.register(Events_offline)
 class Events_offlineAdmin(RestrictedAdminMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
-    filter_horizontal = ('secret',)
+    filter_horizontal = ('secret', 'speakers')

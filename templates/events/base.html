@@ -249,11 +249,15 @@
                                                 <p>
                                                     {% if events.town %}г.{{ events.town }}{% endif %} {% if events.street %}ул.{{ events.street }}{% endif %} {% if events.house %} д.{{ events.house }}{% endif %}{% if events.cabinet %} кабинет {{ events.cabinet }}{% endif %}
                                                 </p>
-                                                {% if events.speakers %}
+                                                
+                                                
+                                                {% if events.speakers.all %}
                                                     <p>
-                                                        <h6><strong>Спикеры:</strong> </h6>
-                                                        {{events.speakers}}
-                                                    </p> 
+                                                        <h6><strong>Спикеры:</strong></h6>
+                                                        {% for speaker in events.speakers.all %}
+                                                            {{ speaker.last_name }} {{ speaker.first_name }}{% if speaker.middle_name %} {{ speaker.middle_name }}{% endif %}{% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </p>
                                                 {% endif %}
                                                 
                                                 
