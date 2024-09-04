@@ -1,0 +1,50 @@
+[
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "Онлайн мероприятия",
+            "permissions": [
+                45,
+                46,
+                47
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 2,
+        "fields": {
+            "name": "Оффлайн мероприятия",
+            "permissions": [
+                41,
+                42,
+                43
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 3,
+        "fields": {
+            "name": "Доступные к посещению",
+            "permissions": [
+                53,
+                54,
+                55
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 4,
+        "fields": {
+            "name": "Достопримечательности",
+            "permissions": [
+                49,
+                50,
+                51
+            ]
+        }
+    }
+]

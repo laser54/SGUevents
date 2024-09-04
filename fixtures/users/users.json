@@ -30,7 +30,7 @@
             "username": "user1",
             "first_name": "Евпатий",
             "last_name": "Коловрат",
-            "is_staff": false,
+            "is_staff": true,
             "is_active": true,
             "date_joined": "2024-08-22T04:04:23.856Z",
             "middle_name": "Андреевич",

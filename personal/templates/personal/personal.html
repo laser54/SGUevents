@@ -2,11 +2,10 @@
 {% load static %}
 {% block title %} Admin {% endblock %}
 {% block form_events %}
-<link rel="stylesheet" href="{% static "general/css/admin.css" %}"
-    `   
+<link rel="stylesheet" href="{% static "general/css/admin.css" %}">
     <p> <h1>Личный кабинет</h1> </p>        
     <div class="row">
-        {% if is_online_group or user.is_admin or user.is_superuser %}
+        {% if is_online_group or request.user.is_superuser %}
             <div class="col-md-6 mb-2">
                 <a href="/admin/events_available/events_online/add/" class="btn btn-secondary w-100" role="button" target="_blank">
                     Добавить онлайн мероприятие
@@ -14,7 +13,7 @@
             </div>
         {% endif %}
         
-        {% if is_offline_group or user.is_admin or user.is_superuser %}
+        {% if is_offline_group or request.user.is_superuser %}
             <div class="col-md-6 mb-2">
                 <a href="/admin/events_available/events_offline/add/" class="btn btn-secondary w-100" role="button" target="_blank">
                     Добавить оффлайн мероприятие
@@ -22,7 +21,7 @@
             </div>
         {% endif %}
         
-        {% if is_attraction_group or user.is_admin or user.is_superuser%}
+        {% if is_attraction_group or request.user.is_superuser %}
             <div class="col-md-6 mb-2">
                 <a href="/admin/events_cultural/attractions/add/" class="btn btn-secondary w-100" role="button" target="_blank">
                     Добавить достопримечательность
@@ -30,7 +29,7 @@
             </div>
         {% endif %}
         
-        {% if is_for_visiting_group or user.is_admin or user.is_superuser %}
+        {% if is_for_visiting_group or request.user.is_superuser %}
             <div class="col-md-6 mb-2">
                 <a href="/admin/events_cultural/events_for_visiting/add/" class="btn btn-secondary w-100" role="button" target="_blank">
                     Добавить доступное к посещению
@@ -41,7 +40,6 @@
     
     <h2 class="mt-4">Ваши мероприятия</h2>
     
- 
 {% endblock %}
 
 {% block admins_events %}

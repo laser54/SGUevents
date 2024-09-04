@@ -249,11 +249,12 @@
                                                 <p>
                                                     {% if events.town %}г.{{ events.town }}{% endif %} {% if events.street %}ул.{{ events.street }}{% endif %} {% if events.house %} д.{{ events.house }}{% endif %}{% if events.cabinet %} кабинет {{ events.cabinet }}{% endif %}
                                                 </p>
-                                                
-                                                <p>
-                                                    <h6><strong>Спикеры:</strong> </h6>
-                                                    {{events.speakers}}
-                                                </p> 
+                                                {% if events.speakers %}
+                                                    <p>
+                                                        <h6><strong>Спикеры:</strong> </h6>
+                                                        {{events.speakers}}
+                                                    </p> 
+                                                {% endif %}
                                                 
                                                 
                                                 {% block content %}{% endblock content %}
