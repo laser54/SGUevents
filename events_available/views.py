@@ -38,6 +38,14 @@ def online(request):
             speakers_set.add(speaker.get_full_name())
 
     speakers = list(speakers_set)
+
+    # Получаем всех админов через отношение ManyToMany
+    events_admin_set = set()
+    for event in all_info:
+        for admin in event.events_admin.all():
+            events_admin_set.add(admin.get_full_name())
+
+    events_admin = list(events_admin_set)
     
     if not query:
         events_available = Events_online.objects.order_by('date')
@@ -101,6 +109,7 @@ def online(request):
         'name_page': 'Онлайн',
         'event_card_views': current_page,
         'speakers': speakers,
+        'events_admin': events_admin,
         'tags': tags,
         'favorites': favorites_dict,
         'registered': registered_dict,
@@ -168,9 +177,16 @@ def offline(request):
         names_list = name.split()
         for i in range(0, len(names_list), 3):
             speakers_set.add(' '.join(names_list[i:i+3]))
-
     
     speakers = list(speakers_set)
+
+    # Получаем всех админов через отношение ManyToMany
+    events_admin_set = set()
+    for event in all_info:
+        for admin in event.events_admin.all():
+            events_admin_set.add(admin.get_full_name())
+
+    events_admin = list(events_admin_set)
 
     if not query_name:
         events_available = Events_offline.objects.order_by('time_start')
@@ -253,6 +269,7 @@ def offline(request):
         'name_page': 'Оффлайн',
         'event_card_views': current_page,
         'speakers': speakers,
+        'events_admin': events_admin,
         'tags': tags,
         'favorites': favorites_dict,
         'registered': registered_dict,

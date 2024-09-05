@@ -34,10 +34,12 @@ class RestrictedAdminMixin:
 @admin.register(Attractions)
 class AttractionsAdmin(RestrictedAdminMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
+    filter_horizontal = ('events_admin',)
 
 @admin.register(Events_for_visiting)
 class Events_for_visitingAdmin(RestrictedAdminMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
+    filter_horizontal = ('events_admin', 'member')
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('formatted_date_submitted', 'user', 'event', 'comment')

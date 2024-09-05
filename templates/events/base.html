@@ -233,7 +233,15 @@
                                                     <split class="card-day"><b>{{ events.date }}</b></split> 
                                                     <split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
                                                 {% comment %} <h6 class="event-place"> {{ events.place }} </h6> {% endcomment %}
-                                                <h7 class="event-place"> <strong>Администратор: {{events.events_admin}}</strong>  </h7>
+                                                
+                                                <h6><strong>Администратор:</strong>
+                                                    {% for admin in events.events_admin.all %}
+                                                        {{admin}}
+                                                    {% endfor %}
+                                                </h6>
+                                                    
+                                                
+                                                {% comment %} <h7 class="event-place"> <strong>Администратор: {{ events.events_admin }}</strong>  </h7> {% endcomment %}
                                                 {% autoescape off %}
                                                     {% if events.bodyline %}
                                                         {{ events.bodyline }}
