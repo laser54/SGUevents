@@ -8,7 +8,7 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.contenttypes.models import ContentType
-from events_cultural.models import Review
+from bookmarks.models import Review
 from users.models import Department, User
 from django.db.models import Q
 from django.db.models import CharField, Value

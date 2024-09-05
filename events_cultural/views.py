@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
 from bookmarks.models import Favorite, Registered
-from events_cultural.models import Attractions, Events_for_visiting, Review
+from events_cultural.models import Attractions, Events_for_visiting
+from bookmarks.models import Review
 from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt

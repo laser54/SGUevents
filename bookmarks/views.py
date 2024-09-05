@@ -2,9 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from bookmarks.models import Favorite, Registered
+from bookmarks.models import Favorite, Registered, Review
 from events_available.models import Events_online, Events_offline
-from events_cultural.models import Attractions, Events_for_visiting, Review
+from events_cultural.models import Attractions, Events_for_visiting
 from users.telegram_utils import send_message_to_user
 from events_cultural.views import submit_review
 from django.views.decorators.csrf import csrf_exempt
@@ -237,36 +237,7 @@ def registered(request):
     return render(request, 'bookmarks/registered.html', context)
 
 
-@login_required
-@csrf_exempt
-def submit_review(request, event_id):
-    if request.method == 'POST':
-        comment = request.POST.get('comment', '')
-        model_type = request.POST.get('model_type', '')
 
-        if not comment:
-            return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
-
-        if model_type == 'online':
-            event = get_object_or_404(Events_online, id=event_id)
-        elif model_type == 'offline':
-            event = get_object_or_404(Events_offline, id=event_id)
-        else:
-            return JsonResponse({'success': False, 'message': 'Некорректный тип мероприятия'}, status=400)
-
-        content_type = ContentType.objects.get_for_model(event)
-        review = Review.objects.create(
-            user=request.user,
-            content_type=content_type,
-            object_id=event.id,
-            comment=comment
-        )
-        return JsonResponse({
-            'success': True,
-            'message': 'Отзыв добавлен',
-            'formatted_date': review.formatted_date()
-        })
-    return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
 
 @staff_member_required
 def send_message_to_participants(request):

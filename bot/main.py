@@ -187,8 +187,9 @@ async def toggle_notification(callback_query: types.CallbackQuery):
 async def receive_review(message: types.Message, state: FSMContext):
     from django.shortcuts import get_object_or_404
     from django.contrib.contenttypes.models import ContentType
-    from events_cultural.models import Review, Attractions, Events_for_visiting
+    from events_cultural.models import Attractions, Events_for_visiting
     from events_available.models import Events_online, Events_offline
+    from bookmarks.models import Review
 
     user = await get_user_profile(message.from_user.id)
     if not user:

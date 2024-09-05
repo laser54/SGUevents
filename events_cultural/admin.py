@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.utils.timezone import localtime
-from pytz import timezone as pytz_timezone
-from events_cultural.models import Attractions, Events_for_visiting, Review
+
+from events_cultural.models import Attractions, Events_for_visiting
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -41,15 +40,5 @@ class Events_for_visitingAdmin(RestrictedAdminMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     filter_horizontal = ('events_admin', 'member')
 
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('formatted_date_submitted', 'user', 'event', 'comment')
-
-    def formatted_date_submitted(self, obj):
-        local_time = localtime(obj.date_submitted, pytz_timezone('Asia/Novosibirsk'))
-        return local_time.strftime('%d.%m.%Y %H:%M')
-
-    formatted_date_submitted.short_description = 'Дата отправки'
-    
-admin.site.register(Review, ReviewAdmin)
 
 

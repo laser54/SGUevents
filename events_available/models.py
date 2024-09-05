@@ -26,7 +26,7 @@ class Events_online(models.Model):
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Онлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
-    reviews = GenericRelation('events_cultural.Review', related_query_name='online_reviews')
+    reviews = GenericRelation('bookmarks.Review', related_query_name='online_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
     end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
     secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
@@ -76,7 +76,7 @@ class Events_offline(models.Model):
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Оффлайн'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
-    reviews = GenericRelation('events_cultural.Review', related_query_name='offline_reviews')
+    reviews = GenericRelation('bookmarks.Review', related_query_name='offline_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
     end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
     secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
