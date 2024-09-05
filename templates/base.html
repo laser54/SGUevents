@@ -7,15 +7,15 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
-	<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
-	{% comment %} <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" /> {% endcomment %}
-    <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
-	<link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
-	<link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
+	<link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
+	<link rel="stylesheet" href="{% static 'general/css/general-page.css' %}">
+	<link rel="stylesheet" href="{% static 'general/css/events_available.css' %}">
+	<link rel="stylesheet" href="{% static 'general/css/jquery-ui.css' %}">
+	<link rel="stylesheet" href="{% static 'scripts/select2.min.css' %}">
+
     
-	{% comment %} <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> {% endcomment %}
-    <link rel="stylesheet" href="{% static "general/css/jquery-ui.css" %}">
-	<title>Document</title>
+
+	{% block title %}{% endblock title %}
 </head>
 
 <body>
@@ -131,29 +131,10 @@
 		{% endif %}
 	</pagination>
 
+    <script src="{% static 'scripts/jquery-3.6.0.min.js' %}"></script>
 	<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-	<script src="{% static "js/bootstrap-datepicker.min.js" %}"></script>
-	<script src="{% static "js/bootstrap-datepicker.ru.min.js" %}"></script>
-	{% comment %} <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> {% endcomment %}
-	<script src="{% static "calendar/js/jquery.min.js" %}"></script>
-	{% comment %} <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> {% endcomment %}
-	<script src="{% static "calendar/js/moment.min.js" %}"></script>
-
-	{% comment %} <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script> {% endcomment %}
-	<script src="{% static "scripts/base2/daterangepicker.min.js" %}"></script>
+	<script src="{% static 'scripts/select2.min.js' %}"></script>
     
-	{% comment %} <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> {% endcomment %}
-	<script src="{% static "scripts/base2/jquery-3.5.1.slim.min.js" %}"></script>
 
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-	{% comment %} <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> {% endcomment %}
-	<script src="{% static "bootstrap/js/bootstrap.bundle.min.js" %}"></script>
-
-	{% block javascript_files %}
-	{% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> {% endcomment %}
-	<script src="{% static "scripts/jquery-3.6.0.min.js" %}"></script>
-
-	
-	{% endblock javascript_files %}
 </body>
 </html>

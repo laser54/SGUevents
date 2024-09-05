@@ -2,9 +2,10 @@
 {% load static %}
 {% load bookmarks_tags %}
 {% user_registered request as event_card_views %}
+{% block title %} <title>Зарегистрированные мероприятия</title> {% endblock %} 
 {% block register %}
 <div class="container-fluid mt-0">
-    <h2>Зарегистрированные</h2>
+    <h2>Зарегистрированные мероприятия</h2>
     <ul>
         {% for register in registered %}
             {% if register.online %}

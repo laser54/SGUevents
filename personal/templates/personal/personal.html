@@ -1,9 +1,9 @@
 {% extends 'events/base.html' %}
 {% load static %}
-{% block title %} Admin {% endblock %}
+{% block title %} <title>Кабинет администратора</title> {% endblock %}
 {% block form_events %}
 <link rel="stylesheet" href="{% static "general/css/admin.css" %}">
-    <p> <h1>Личный кабинет</h1> </p>        
+    <p> <h1>Кабинет администратора</h1> </p>        
     <div class="row">
         {% if is_online_group or request.user.is_superuser %}
             <div class="col-md-6 mb-2">
