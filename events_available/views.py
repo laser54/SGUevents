@@ -34,10 +34,10 @@ def online(request):
     # Получаем всех спикеров через отношение ManyToMany
     speakers_set = set()
     for event in all_info:
-        for speaker in event.speakers.all():  # Получаем спикеров через .all()
+        for speaker in event.speakers.all():
             speakers_set.add(speaker.get_full_name())
 
-    speakers = list(speakers_set)  # Преобразуем множество в спис
+    speakers = list(speakers_set)
     
     if not query:
         events_available = Events_online.objects.order_by('date')
@@ -57,7 +57,7 @@ def online(request):
         events_available = events_available.filter(date__month=1)
 
     if f_speakers:
-        events_available = events_available.filter(speakers__in=f_speakers)  # Используем фильтр ManyToMany
+        events_available = events_available.filter(speakers__in=f_speakers)
     # if f_speakers:
     #     speakers_query = Q()
     #     for speaker in f_speakers:
@@ -156,20 +156,20 @@ def offline(request):
     user = request.user
 
     all_info = Events_offline.objects.all()
-    # Получаем всех спикеров через отношение ManyToMany
+    # Получаем всех спикеров
     speakers_set = set()
     for event in all_info:
-        for speaker in event.speakers.all():  # Получаем спикеров через .all()
+        for speaker in event.speakers.all():
             speakers_set.add(speaker.get_full_name())
 
-    speakers = list(speakers_set)  # Преобразуем множество в спис
+    speakers = list(speakers_set)
 
     for name in speakers:
         names_list = name.split()
         for i in range(0, len(names_list), 3):
             speakers_set.add(' '.join(names_list[i:i+3]))
 
-    # Преобразуем множество обратно в список, если нужно
+    
     speakers = list(speakers_set)
 
     if not query_name:
@@ -209,7 +209,7 @@ def offline(request):
 
 
     if f_speakers:
-        events_available = events_available.filter(speakers__in=f_speakers)  # Используем фильтр ManyToMany
+        events_available = events_available.filter(speakers__in=f_speakers)
     # if f_speakers:
     #     speakers_query = Q()
     #     for speaker in f_speakers:
