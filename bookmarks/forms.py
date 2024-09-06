@@ -2,6 +2,7 @@ from django import forms
 from events_available.models import Events_online, Events_offline
 from events_cultural.models import Attractions, Events_for_visiting
 
+
 class SendMessageForm(forms.Form):
     event_choices = [
         ('online', 'Онлайн мероприятия'),
@@ -11,12 +12,19 @@ class SendMessageForm(forms.Form):
     ]
 
     event_type = forms.ChoiceField(choices=event_choices, label='Тип мероприятия')
-    event = forms.ModelChoiceField(queryset=Events_online.objects.none(), label='Мероприятие')
+    event = forms.ModelChoiceField(queryset=Events_online.objects.none(), label='Мероприятие', required=False)
     message = forms.CharField(widget=forms.Textarea, label='Сообщение')
 
     def __init__(self, *args, **kwargs):
+        event_type = kwargs.pop('event_type', None)  # Извлекаем event_type из kwargs
         super(SendMessageForm, self).__init__(*args, **kwargs)
-        self.fields['event'].queryset = Events_online.objects.all()  # Задаем пустой набор по умолчанию
+
+        if event_type:
+            # Устанавливаем queryset в зависимости от выбранного типа мероприятия
+            self.set_event_queryset(event_type)
+        else:
+            # По умолчанию оставляем queryset пустым
+            self.fields['event'].queryset = Events_online.objects.none()
 
     def set_event_queryset(self, event_type):
         if event_type == 'online':

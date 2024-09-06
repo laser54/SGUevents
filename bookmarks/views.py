@@ -237,7 +237,22 @@ def registered(request):
     return render(request, 'bookmarks/registered.html', context)
 
 
+@staff_member_required
+def get_event_choices(request):
+    event_type = request.GET.get('event_type')
+    events = []
 
+    if event_type == 'online':
+        events = Events_online.objects.all()
+    elif event_type == 'offline':
+        events = Events_offline.objects.all()
+    elif event_type == 'attractions':
+        events = Attractions.objects.all()
+    elif event_type == 'for_visiting':
+        events = Events_for_visiting.objects.all()
+
+    event_data = [{'id': event.id, 'name': event.name} for event in events]
+    return JsonResponse(event_data, safe=False)
 
 @staff_member_required
 def send_message_to_participants(request):
@@ -246,16 +261,22 @@ def send_message_to_participants(request):
         return redirect('home')
 
     if request.method == 'POST':
-        form = SendMessageForm(request.POST)
+        event_type = request.POST.get('event_type')  # Получаем тип мероприятия из POST-запроса
+        form = SendMessageForm(request.POST, event_type=event_type)
         if form.is_valid():
             event = form.cleaned_data['event']
             message = form.cleaned_data['message']
-            event_type = form.cleaned_data['event_type']
+
+            if not event:
+                messages.error(request, "Пожалуйста, выберите мероприятие.")
+                return redirect('bookmarks:send_message_to_participants')
 
             # Получаем всех зарегистрированных участников для данного мероприятия
-            registered_users = Registered.objects.filter(
-                **{event_type: event}
-            )
+            registered_users = Registered.objects.filter(**{event_type: event})
+
+            if not registered_users.exists():
+                messages.error(request, "Нет зарегистрированных участников для выбранного мероприятия.")
+                return redirect('bookmarks:send_message_to_participants')
 
             for registration in registered_users:
                 if registration.user.telegram_id and registration.notifications_enabled:
