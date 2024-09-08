@@ -1,39 +1,45 @@
 {% extends 'events/base.html' %}
 {% load static %}
-{% block title %} Admin {% endblock %}
+{% block title %} <title>Кабинет администратора</title> {% endblock %}
 {% block form_events %}
-<link rel="stylesheet" href="{% static "general/css/admin.css" %}"
-    `   
-    <p> <h1>Личный кабинет</h1> </p>        
+<link rel="stylesheet" href="{% static "general/css/admin.css" %}">
+    <p> <h1>Кабинет администратора</h1> </p>        
     <div class="row">
-        <div class="col-md-6 mb-2">
-            <a href="/admin/events_available/events_online/add/" class="btn btn-secondary w-100" role="button" target="_blank">
-                Добавить онлайн мероприятие
-            </a>
-        </div>
-    
-        <div class="col-md-6 mb-2">
-            <a href="/admin/events_available/events_offline/add/" class="btn btn-secondary w-100" role="button" target="_blank">
-                Добавить оффлайн мероприятие
-            </a>
-        </div>
-    
-        <div class="col-md-6 mb-2">
-            <a href="/admin/events_cultural/attractions/add/" class="btn btn-secondary w-100" role="button" target="_blank">
-                Добавить достопримечательность
-            </a>
-        </div>
-    
-        <div class="col-md-6 mb-2">
-            <a href="/admin/events_cultural/events_for_visiting/add/" class="btn btn-secondary w-100" role="button" target="_blank">
-                Добавить доступное к посещению
-            </a>
-        </div>
+        {% if is_online_group or request.user.is_superuser %}
+            <div class="col-md-6 mb-2">
+                <a href="/admin/events_available/events_online/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                    Добавить онлайн мероприятие
+                </a>
+            </div>
+        {% endif %}
+        
+        {% if is_offline_group or request.user.is_superuser %}
+            <div class="col-md-6 mb-2">
+                <a href="/admin/events_available/events_offline/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                    Добавить оффлайн мероприятие
+                </a>
+            </div>
+        {% endif %}
+        
+        {% if is_attraction_group or request.user.is_superuser %}
+            <div class="col-md-6 mb-2">
+                <a href="/admin/events_cultural/attractions/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                    Добавить достопримечательность
+                </a>
+            </div>
+        {% endif %}
+        
+        {% if is_for_visiting_group or request.user.is_superuser %}
+            <div class="col-md-6 mb-2">
+                <a href="/admin/events_cultural/events_for_visiting/add/" class="btn btn-secondary w-100" role="button" target="_blank">
+                    Добавить доступное к посещению
+                </a>
+            </div>
+        {% endif %}
     </div>
     
     <h2 class="mt-4">Ваши мероприятия</h2>
     
- 
 {% endblock %}
 
 {% block admins_events %}

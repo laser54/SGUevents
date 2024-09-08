@@ -6,7 +6,6 @@ html {
 
 .calendar-container {
 	height: calc(100vh - 56px);
-	/* Высота экрана минус высота навигационной панели */
 	display: flex;
 	flex-direction: column;
 }
@@ -33,10 +32,34 @@ html {
 	text-transform: capitalize;
 }
 
-.fc-event-yellow {
-	background-color: yellow !important;
+/* Новые классы для событий */
+
+.event-online {
+	background-color: rgb(30, 141, 30);
+	/* Зеленый для онлайн событий */
 }
 
-.fc-event-pink {
+.event-offline {
+	background-color: rgb(30, 141, 30);
+	/* Зеленый для оффлайн событий */
+}
+
+.event-attractions {
+	background-color: rgb(30, 141, 30);
+	/* Зеленый для достопримечательностей */
+}
+
+.event-visiting {
+	background-color: rgb(30, 141, 30);
+	/* Зеленый для событий для посещения */
+}
+
+.event-registered {
+	background-color: yellow !important;
+	/* Желтый для зарегистрированных */
+}
+
+.event-favorite {
 	background-color: pink !important;
+	/* Розовый для избранных */
 }

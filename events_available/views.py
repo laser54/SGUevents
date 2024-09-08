@@ -8,7 +8,7 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.contenttypes.models import ContentType
-from events_cultural.models import Review
+from bookmarks.models import Review
 from users.models import Department, User
 from django.db.models import Q
 from django.db.models import CharField, Value
@@ -31,17 +31,22 @@ def online(request):
     user = request.user
 
     all_info = Events_online.objects.all()
-    speakers_info = [event.speakers for event in all_info]
+    # Получаем всех спикеров через отношение ManyToMany
     speakers_set = set()
+    for event in all_info:
+        for speaker in event.speakers.all():
+            speakers_set.add(speaker.get_full_name())
 
-    for name in speakers_info:
-        names_list = name.split()
-        for i in range(0, len(names_list), 3):
-            speakers_set.add(' '.join(names_list[i:i+3]))
-
-    # Преобразуем множество обратно в список, если нужно
     speakers = list(speakers_set)
 
+    # Получаем всех админов через отношение ManyToMany
+    events_admin_set = set()
+    for event in all_info:
+        for admin in event.events_admin.all():
+            events_admin_set.add(admin.get_full_name())
+
+    events_admin = list(events_admin_set)
+    
     if not query:
         events_available = Events_online.objects.order_by('date')
     else:
@@ -60,10 +65,12 @@ def online(request):
         events_available = events_available.filter(date__month=1)
 
     if f_speakers:
-        speakers_query = Q()
-        for speaker in f_speakers:
-            speakers_query |= Q(speakers__icontains=speaker)
-        events_available = events_available.filter(speakers_query)
+        events_available = events_available.filter(speakers__in=f_speakers)
+    # if f_speakers:
+    #     speakers_query = Q()
+    #     for speaker in f_speakers:
+    #         speakers_query |= Q(speakers__icontains=speaker)
+    #     events_available = events_available.filter(speakers_query)
 
     tags = [event.tags for event in all_info]
 
@@ -102,6 +109,7 @@ def online(request):
         'name_page': 'Онлайн',
         'event_card_views': current_page,
         'speakers': speakers,
+        'events_admin': events_admin,
         'tags': tags,
         'favorites': favorites_dict,
         'registered': registered_dict,
@@ -157,16 +165,28 @@ def offline(request):
     user = request.user
 
     all_info = Events_offline.objects.all()
-    speakers_info = [event.speakers for event in all_info]
+    # Получаем всех спикеров
     speakers_set = set()
+    for event in all_info:
+        for speaker in event.speakers.all():
+            speakers_set.add(speaker.get_full_name())
 
-    for name in speakers_info:
+    speakers = list(speakers_set)
+
+    for name in speakers:
         names_list = name.split()
         for i in range(0, len(names_list), 3):
             speakers_set.add(' '.join(names_list[i:i+3]))
-
-    # Преобразуем множество обратно в список, если нужно
+    
     speakers = list(speakers_set)
+
+    # Получаем всех админов через отношение ManyToMany
+    events_admin_set = set()
+    for event in all_info:
+        for admin in event.events_admin.all():
+            events_admin_set.add(admin.get_full_name())
+
+    events_admin = list(events_admin_set)
 
     if not query_name:
         events_available = Events_offline.objects.order_by('time_start')
@@ -205,10 +225,12 @@ def offline(request):
 
 
     if f_speakers:
-        speakers_query = Q()
-        for speaker in f_speakers:
-            speakers_query |= Q(speakers__icontains=speaker)
-        events_available = events_available.filter(speakers_query)
+        events_available = events_available.filter(speakers__in=f_speakers)
+    # if f_speakers:
+    #     speakers_query = Q()
+    #     for speaker in f_speakers:
+    #         speakers_query |= Q(speakers__icontains=speaker)
+    #     events_available = events_available.filter(speakers_query)
 
     tags = [event.tags for event in all_info]
 
@@ -247,6 +269,7 @@ def offline(request):
         'name_page': 'Оффлайн',
         'event_card_views': current_page,
         'speakers': speakers,
+        'events_admin': events_admin,
         'tags': tags,
         'favorites': favorites_dict,
         'registered': registered_dict,

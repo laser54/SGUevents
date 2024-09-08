@@ -1,3 +1,4 @@
+import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
@@ -80,10 +81,11 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class User(AbstractUser):
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     middle_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='Отчество')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, verbose_name='Отдел')
     telegram_id = models.CharField(max_length=100, unique=True, null=True, blank=True, verbose_name='Telegram ID')
-    email = models.EmailField('email address', blank=True, null=True, unique=True)
+    email = models.EmailField('email address', blank=True, null=True)
 
     objects = CustomUserManager()
 

@@ -1,7 +1,7 @@
 {% extends 'events/base.html' %}
 {% load static %}
 {% load events_available_tags %}
-{% block title %} Главная страница {% endblock %}
+{% block title %} <title>Оффлайн мероприятия</title> {% endblock %}
 {% block filters %}
 <div class="row filter-events-row mt-2">
     <div class="col-lg-2">
@@ -124,48 +124,6 @@
             </div>
         </div>
     </div>
-    
-    
-    
-    {% comment %} <script>
-        $(document).ready(function() {
-            $('#place_input').select2({
-                placeholder: 'Выберите место проведения',
-                allowClear: true
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-            $('#place_input').select2({
-                placeholder: 'Выберите место проведения',
-                allowClear: true, 
-                ajax: {
-                    url: '{% url "events_available:autocomplete_places" %}',
-                    dataType: 'json',
-                    delay: 10000,
-                    data: function (params) {
-                        return {
-                            term: params.term // поисковый запрос
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: $.map(data, function (item) {
-                                return {
-                                    id: item,
-                                    text: item
-                                };
-                            })
-                        };
-                    },
-                    cache: true
-                }
-            });
-        });
-        
-    </script>
-     {% endcomment %}
     
     <div class="col-lg-2">
         <div class="row">

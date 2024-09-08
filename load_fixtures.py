@@ -4,11 +4,15 @@ import sys
 
 # Список файлов фикстур
 fixtures = [
+    'fixtures/departments.json',
+    'fixtures/users/users.json',
+    'fixtures/groups.json',
     'fixtures/events_available/events_offline.json',
     'fixtures/events_available/events_online.json',
     'fixtures/events_cultural/attractions.json',
     'fixtures/events_cultural/events_for_visiting.json',
-    'fixtures/departments.json',
+    'fixtures/bookmarks/favorites.json',
+    'fixtures/bookmarks/registered.json',
 ]
 
 def load_fixtures():

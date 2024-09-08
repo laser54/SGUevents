@@ -9,21 +9,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
     <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
-    <link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
-    <link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-
-    {% comment %} autocomplete {% endcomment %}
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <title>Document</title>
-    <!-- select2 -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="{% static 'general/css/general-page.css' %}">
+    <link rel="stylesheet" href="{% static 'general/css/events_available.css' %}">
+    <link rel="stylesheet" href="{% static 'general/css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'scripts/select2.min.css' %}">
 
     
 
+    {% block title %}{% endblock title %}
 </head>
 
 <body>
@@ -82,10 +75,12 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
                                 </li>
-                                {% if user.is_admin or user.is_superuser %}
-                                <li>
-                                    <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
-                                </li>
+                                {% if user.is_staff %}
+                                    {% if user.is_admin or user.is_superuser %}
+                                        <li>
+                                            <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
+                                        </li>
+                                    {% endif %}
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
                                 </li>
@@ -227,8 +222,16 @@
                                                 <h6 class="card-date"> 
                                                     <split class="card-day"><b>{{ events.date }}</b></split> 
                                                     <split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
-                                                <h6 class="event-place"> {{ events.place }} </h6>
-                                                <h6 class="event-place"> {{ events.speakers }} </h6>
+                                                {% comment %} <h6 class="event-place"> {{ events.place }} </h6> {% endcomment %}
+                                                
+                                                <h6><strong>Администратор:</strong>
+                                                    {% for admin in events.events_admin.all %}
+                                                        {{admin}}
+                                                    {% endfor %}
+                                                </h6>
+                                                    
+                                                
+                                                {% comment %} <h7 class="event-place"> <strong>Администратор: {{ events.events_admin }}</strong>  </h7> {% endcomment %}
                                                 {% autoescape off %}
                                                     {% if events.bodyline %}
                                                         {{ events.bodyline }}
@@ -248,10 +251,15 @@
                                                     {% if events.town %}г.{{ events.town }}{% endif %} {% if events.street %}ул.{{ events.street }}{% endif %} {% if events.house %} д.{{ events.house }}{% endif %}{% if events.cabinet %} кабинет {{ events.cabinet }}{% endif %}
                                                 </p>
                                                 
-                                                <p>
-                                                    <h6><strong>Спикеры:</strong> </h6>
-                                                    {{events.speakers}}
-                                                </p> 
+                                                
+                                                {% if events.speakers.all %}
+                                                    <p>
+                                                        <h6><strong>Спикеры:</strong></h6>
+                                                        {% for speaker in events.speakers.all %}
+                                                            {{ speaker.last_name }} {{ speaker.first_name }}{% if speaker.middle_name %} {{ speaker.middle_name }}{% endif %}{% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </p>
+                                                {% endif %}
                                                 
                                                 
                                                 {% block content %}{% endblock content %}
@@ -271,6 +279,7 @@
                                                         {% endif %}
                                                     </div>
                                                 {% endif %}
+                                                
                                                 
                                             </div>
                                         </div>
@@ -328,13 +337,18 @@
             {% endif %}
         {% endif %}
     </pagination>
+    
+
+    <script src="{% static 'scripts/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src={% static "js/bootstrap-datepicker.min.js" %}></script>
-    <script src={% static "js/bootstrap-datepicker.ru.min.js" %}></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-
-
+    <script src="{% static 'scripts/select2.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.ru.min.js' %}"></script>
+    <script src="{% static 'scripts/moment.min.js' %}"></script>
     <script src="{% static 'django_select2/django_select2.js' %}"></script>
+
+
+
     <script type="text/javascript">
         $(document).ready(function() {
             $('.django-select2').djangoSelect2();

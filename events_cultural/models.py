@@ -21,12 +21,12 @@ class Attractions(models.Model):
     link = models.URLField(blank=False, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.ManyToManyField(User, limit_choices_to={'is_staff': True}, blank=False, related_name='admin_attractions', verbose_name="Администратор")
     rating = models.DecimalField(default=0.00, max_digits=4, decimal_places=2, blank=False, verbose_name='Рейтинг 1-10')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Достопримечательности'
     category = models.CharField(default=const_category, max_length=30, blank=False, verbose_name='Тип мероприятия')
-    reviews = GenericRelation('Review', related_query_name='attraction_reviews')
+    reviews = GenericRelation('bookmarks.Review', related_query_name='attraction_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
     end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
     secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
@@ -60,19 +60,19 @@ class Events_for_visiting(models.Model):
     time_start = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время начала')
     time_end = models.TimeField(unique=False, blank=False, null=False, verbose_name='Время окончания')
     description = models.TextField(unique=False, blank=False, null=False, verbose_name='Описание')
-    member = models.TextField(unique=False, blank=False, null=False, verbose_name='Участники')
+    member =  models.ManyToManyField(User, blank=True, related_name='member_visiting', verbose_name='Участники')
     town = models.CharField(max_length=200, unique=False, blank=False, null=False, verbose_name='Город')
     street = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Улица')
     link = models.URLField(unique=False, blank=True, null=True, verbose_name='Ссылка')
     qr = models.FileField(blank=True, null=True, verbose_name='QR-код')
     image = models.ImageField(upload_to='events_available_images/offline', blank=True, null=True, verbose_name='Изображение')
-    events_admin = models.CharField(max_length=100, unique=False, blank=False, null=False, verbose_name='Администратор')
+    events_admin = models.ManyToManyField(User, limit_choices_to={'is_staff': True}, blank=False, related_name='admin_visiting', verbose_name="Администратор")
     place_limit = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество мест')
     place_free = models.IntegerField(unique=False, blank=False, null=False, verbose_name='Количество свободных мест')
     documents = models.FileField(blank=True, null=True, verbose_name='Документы')
     const_category = 'Доступные к посещению'
     category = models.CharField(default=const_category, max_length=30, unique=False, blank=False, null=False, verbose_name='Тип мероприятия')
-    reviews = GenericRelation('Review', related_query_name='visiting_reviews')
+    reviews = GenericRelation('bookmarks.Review', related_query_name='visiting_reviews')
     start_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время начала')
     end_datetime = models.DateTimeField(editable=False, null=True, blank=True, verbose_name='Дата и время окончания')
     secret = models.ManyToManyField(Department, blank=True, verbose_name='Ключ для мероприятия')
@@ -98,32 +98,6 @@ class Events_for_visiting(models.Model):
 
         super(Events_for_visiting, self).save(*args, **kwargs)
 
-from django.utils import timezone
-from pytz import timezone as pytz_timezone
 
-class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    event = GenericForeignKey('content_type', 'object_id')
-    comment = models.TextField(verbose_name='Комментарий')
-    date_submitted = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')
-
-    def save(self, *args, **kwargs):
-        local_timezone = pytz_timezone('Asia/Novosibirsk')
-        self.date_submitted = timezone.now().astimezone(local_timezone)
-        super(Review, self).save(*args, **kwargs)
-
-    class Meta:
-        db_table = 'reviews'
-        verbose_name = 'Отзыв'
-        verbose_name_plural = 'Отзывы'
-
-    def __str__(self):
-        return f'{self.formatted_date()} Отзыв от {self.user.username} на {self.event}'
-
-    def formatted_date(self):
-        local_timezone = pytz_timezone('Asia/Novosibirsk')
-        return self.date_submitted.astimezone(local_timezone).strftime("%d.%m.%y %H:%M")
 
 

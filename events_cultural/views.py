@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.core.paginator import Paginator
 from bookmarks.models import Favorite, Registered
-from events_cultural.models import Attractions, Events_for_visiting, Review
+from events_cultural.models import Attractions, Events_for_visiting
+from bookmarks.models import Review
 from events_cultural.utils import q_search_events_for_visiting, q_search_attractions
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -20,6 +21,15 @@ def attractions(request):
     query = request.GET.get('q', None)
     user = request.user
     
+    all_info = Attractions.objects.all()
+    # Получаем всех админов через отношение ManyToMany
+    events_admin_set = set()
+    for event in all_info:
+        for admin in event.events_admin.all():
+            events_admin_set.add(admin.get_full_name())
+
+    events_admin = list(events_admin_set)
+
     if not query:
         events_cultural = Attractions.objects.order_by('time_start')
     else:
@@ -58,6 +68,7 @@ def attractions(request):
         'event_card_views': current_page,
         'favorites': favorites_dict,
         'reviews': reviews, 
+        'events_admin': events_admin,
     }
     return render(request, 'events_cultural/attractions.html', context)
 
@@ -94,6 +105,15 @@ def events_for_visiting(request):
     order_by = request.GET.get('order_by', None)
     query = request.GET.get('q', None)
     user = request.user
+
+    all_info = Events_for_visiting.objects.all()
+    # Получаем всех админов через отношение ManyToMany
+    events_admin_set = set()
+    for event in all_info:
+        for admin in event.events_admin.all():
+            events_admin_set.add(admin.get_full_name())
+
+    events_admin = list(events_admin_set)
 
     if not query:
         events_cultural = Events_for_visiting.objects.order_by('time_start')
@@ -135,6 +155,7 @@ def events_for_visiting(request):
         'favorites': favorites_dict,
         'registered': registered_dict,
         'reviews': reviews,
+        'events_admin': events_admin,
     }
     return render(request, 'events_cultural/events_for_visiting.html', context)
 

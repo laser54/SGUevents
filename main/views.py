@@ -1,8 +1,8 @@
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.core.paginator import Paginator
-from bookmarks.models import Favorite, Registered
+from bookmarks.models import Favorite, Registered, Review
 from events_available.models import Events_offline, Events_online
-from events_cultural.models import Attractions, Events_for_visiting, Review
+from events_cultural.models import Attractions, Events_for_visiting
 from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType

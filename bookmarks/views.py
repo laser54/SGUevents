@@ -2,9 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from bookmarks.models import Favorite, Registered
+from bookmarks.models import Favorite, Registered, Review
 from events_available.models import Events_online, Events_offline
-from events_cultural.models import Attractions, Events_for_visiting, Review
+from events_cultural.models import Attractions, Events_for_visiting
 from users.telegram_utils import send_message_to_user
 from events_cultural.views import submit_review
 from django.views.decorators.csrf import csrf_exempt
@@ -237,36 +237,22 @@ def registered(request):
     return render(request, 'bookmarks/registered.html', context)
 
 
-@login_required
-@csrf_exempt
-def submit_review(request, event_id):
-    if request.method == 'POST':
-        comment = request.POST.get('comment', '')
-        model_type = request.POST.get('model_type', '')
+@staff_member_required
+def get_event_choices(request):
+    event_type = request.GET.get('event_type')
+    events = []
 
-        if not comment:
-            return JsonResponse({'success': False, 'message': 'Комментарий не может быть пустым'})
+    if event_type == 'online':
+        events = Events_online.objects.all()
+    elif event_type == 'offline':
+        events = Events_offline.objects.all()
+    elif event_type == 'attractions':
+        events = Attractions.objects.all()
+    elif event_type == 'for_visiting':
+        events = Events_for_visiting.objects.all()
 
-        if model_type == 'online':
-            event = get_object_or_404(Events_online, id=event_id)
-        elif model_type == 'offline':
-            event = get_object_or_404(Events_offline, id=event_id)
-        else:
-            return JsonResponse({'success': False, 'message': 'Некорректный тип мероприятия'}, status=400)
-
-        content_type = ContentType.objects.get_for_model(event)
-        review = Review.objects.create(
-            user=request.user,
-            content_type=content_type,
-            object_id=event.id,
-            comment=comment
-        )
-        return JsonResponse({
-            'success': True,
-            'message': 'Отзыв добавлен',
-            'formatted_date': review.formatted_date()
-        })
-    return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
+    event_data = [{'id': event.id, 'name': event.name} for event in events]
+    return JsonResponse(event_data, safe=False)
 
 @staff_member_required
 def send_message_to_participants(request):
@@ -275,16 +261,22 @@ def send_message_to_participants(request):
         return redirect('home')
 
     if request.method == 'POST':
-        form = SendMessageForm(request.POST)
+        event_type = request.POST.get('event_type')  # Получаем тип мероприятия из POST-запроса
+        form = SendMessageForm(request.POST, event_type=event_type)
         if form.is_valid():
             event = form.cleaned_data['event']
             message = form.cleaned_data['message']
-            event_type = form.cleaned_data['event_type']
+
+            if not event:
+                messages.error(request, "Пожалуйста, выберите мероприятие.")
+                return redirect('bookmarks:send_message_to_participants')
 
             # Получаем всех зарегистрированных участников для данного мероприятия
-            registered_users = Registered.objects.filter(
-                **{event_type: event}
-            )
+            registered_users = Registered.objects.filter(**{event_type: event})
+
+            if not registered_users.exists():
+                messages.error(request, "Нет зарегистрированных участников для выбранного мероприятия.")
+                return redirect('bookmarks:send_message_to_participants')
 
             for registration in registered_users:
                 if registration.user.telegram_id and registration.notifications_enabled:

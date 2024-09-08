@@ -30,13 +30,13 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Онлайн',
-            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'css_class': 'event-online',  # Класс по умолчанию для онлайн событий
             'url': reverse('events_available:online_card', args=[event.slug])
         }
         if event.id in registered_online_ids:
-            event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий
+            event_data['css_class'] += ' event-registered'  # Добавляем класс для зарегистрированных событий
         elif event.id in favorite_online_ids:
-            event_data['backgroundColor'] = 'pink'  # Розовый цвет для избранных мероприятий
+            event_data['css_class'] += ' event-favorite'  # Добавляем класс для избранных событий
         events.append(event_data)
 
     for event in events_offline:
@@ -45,13 +45,13 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Оффлайн',
-            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'css_class': 'event-offline',  # Класс по умолчанию для оффлайн событий
             'url': reverse('events_available:offline_card', args=[event.slug])
         }
         if event.id in registered_offline_ids:
-            event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий
+            event_data['css_class'] += ' event-registered'
         elif event.id in favorite_offline_ids:
-            event_data['backgroundColor'] = 'pink'  # Розовый цвет для избранных мероприятий
+            event_data['css_class'] += ' event-favorite'
         events.append(event_data)
 
     for event in attractions:
@@ -60,13 +60,13 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Достопримечательность',
-            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'css_class': 'event-attractions',  # Класс по умолчанию для достопримечательностей
             'url': reverse('events_cultural:attractions_card', args=[event.slug])
         }
         if event.id in registered_attractions_ids:
-            event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий
+            event_data['css_class'] += ' event-registered'
         elif event.id in favorite_attractions_ids:
-            event_data['backgroundColor'] = 'pink'  # Розовый цвет для избранных мероприятий
+            event_data['css_class'] += ' event-favorite'
         events.append(event_data)
 
     for event in events_for_visiting:
@@ -75,13 +75,13 @@ def calendar_view(request):
             'start': event.date.strftime("%Y-%m-%d"),
             'time': event.time_start.strftime("%H:%M"),
             'category': 'Для посещения',
-            'backgroundColor': 'rgb(30, 141, 30)',  # Зеленый цвет по умолчанию
+            'css_class': 'event-visiting',  # Класс по умолчанию для событий для посещения
             'url': reverse('events_cultural:events_for_visiting_card', args=[event.slug])
         }
         if event.id in registered_for_visiting_ids:
-            event_data['backgroundColor'] = 'yellow'  # Желтый цвет для зарегистрированных мероприятий
+            event_data['css_class'] += ' event-registered'
         elif event.id in favorite_for_visiting_ids:
-            event_data['backgroundColor'] = 'pink'  # Розовый цвет для избранных мероприятий
+            event_data['css_class'] += ' event-favorite'
         events.append(event_data)
 
     context = {

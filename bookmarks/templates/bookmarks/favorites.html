@@ -2,6 +2,7 @@
 {% load static %}
 {% load bookmarks_tags %}
 {% user_favorites request as event_card_views %}
+{% block title %} <title>Избранные мероприятия</title> {% endblock %} 
 {% block favorite %}
 <div class="container-fluid">
     <h2>Избранные мероприятия</h2>

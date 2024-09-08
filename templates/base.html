@@ -7,12 +7,15 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
-	<link rel="stylesheet" href="daterangepicker/daterangepicker.css">
-	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-	<link rel="stylesheet" href="{% static "general/css/general-page.css" %}">
-	<link rel="stylesheet" href="{% static "general/css/events_available.css" %}">
-	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	<title>Document</title>
+	<link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
+	<link rel="stylesheet" href="{% static 'general/css/general-page.css' %}">
+	<link rel="stylesheet" href="{% static 'general/css/events_available.css' %}">
+	<link rel="stylesheet" href="{% static 'general/css/jquery-ui.css' %}">
+	<link rel="stylesheet" href="{% static 'scripts/select2.min.css' %}">
+    
+    {% block style %}{% endblock style %}
+
+	{% block title %}{% endblock title %}
 </head>
 
 <body>
@@ -71,9 +74,12 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
                                 </li>
-                                {% if user.is_admin or user.is_superuser %}
+                                {% if user.is_admin or user.is_superuser or user.is_staff %}
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
                                 </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider" /></li>
@@ -95,6 +101,7 @@
             </div>
         </nav>
     </header>
+
 
 	<section>
 		{% block content %}{% endblock content %}
@@ -124,18 +131,10 @@
 		{% endif %}
 	</pagination>
 
+    <script src="{% static 'scripts/jquery-3.6.0.min.js' %}"></script>
 	<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-	<script src="{% static "js/bootstrap-datepicker.min.js" %}"></script>
-	<script src="{% static "js/bootstrap-datepicker.ru.min.js" %}"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-	{% block javascript_files %}
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	
-	{% endblock javascript_files %}
+	<script src="{% static 'scripts/select2.min.js' %}"></script>
+    
+
 </body>
 </html>
