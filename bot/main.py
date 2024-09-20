@@ -2,6 +2,7 @@ import asyncio
 import logging
 import requests
 import json
+import uuid
 from aiogram import Bot, Dispatcher, types, F, Router
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
