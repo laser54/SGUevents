@@ -1,153 +1,819 @@
-{% extends "base.html" %}
 {% load static %}
-{% block title %} <title>Личный кабинет</title> {% endblock %}
-{% block style %}
-<style>
-    body {
-        background-color: #343a40;
-        color: #f8f9fa;
-    }
-    .profile-card {
-        background-color: #495057;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        max-width: 600px;
-    }
-    .profile-header {
-        font-size: 1.3rem;
-        margin-bottom: 15px;
-    }
-    .profile-detail {
-        font-size: 1rem;
-        margin-bottom: 10px;
-    }
-    .profile-detail strong {
-        display: inline-block;
-        width: 150px;
-    }
-    .btn-group {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
-</style>
-{% endblock style %}
-{% block content %}
-<div class="container mt-3">
-    <div class="row">
-        <!-- Левый блок -->
-        <div class='col-lg-7'>
-            <div class="profile-card">
-                <!-- Контент профиля -->
-                <div class="profile-header text-center">
-                    Профиль пользователя
-                </div>
-                <div class="profile-detail">
-                    <strong>Имя пользователя:</strong> {{ user.username }}
-                </div>
-                <div class="profile-detail">
-                    <strong>Отдел:</strong> {{ department_name }}
-                </div>
-                <div class="profile-detail">
-                    <strong>Email:</strong> {{ user.email }}
-                </div>
-                <div class="profile-detail">
-                    <strong>Telegram ID:</strong> {{ user.telegram_id }}
-                </div>
-                <div class="profile-detail">
-                    <strong>Метод входа:</strong> {{ login_method }}
-                </div>
-                <div class="profile-detail">
-                    <strong>Статус:</strong> <!-- Пока пустое поле -->
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-warning" onclick="requestPasswordChange()">Сменить пароль</button>
-                </div>
-                <div class="mt-4">
-                    <h2 class="h5">Запрос админских прав</h2>
-                    <input type="text" id="reason" class="form-control" placeholder="Обоснование запроса">
-                    <button class="btn btn-primary mt-2" onclick="requestAdminRights()">Отправить запрос</button>
-                </div>
-                <a href="/" class="btn btn-link mt-3">Вернуться на главную страницу</a>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="ru">
 
-        <!-- Правый блок -->
-        <div class='col-lg-5'>
-            <div class="profile-card">
-                <!-- Дополнительная информация профиля -->
-                <div class="profile-header text-center">
-                    Права пользователя
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'lib/js/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static "css/styles.css" %}">
+    <link rel="stylesheet" href="{% static "css/profile.css" %}?v=3.1416">
+    <style>
+        /* Локальный override, чтобы исключить влияние кэша и других стилей */
+        .photo-frame{height:160px;width:160px;border-radius:50%;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:#e0e0e0}
+        .user-photo-img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        @media (max-width:480px){.photo-frame{height:90px;width:90px}}
+        /* Формы в модальном окне: подпись сверху, поле на всю ширину */
+        .modal .form-label{display:block;margin-bottom:4px}
+        .modal .form-control, .modal select, .modal textarea, .modal input[type="text"], .modal input[type="datetime-local"], .modal input[type="number"], .modal input[type="email"], .modal input[type="tel"]{display:block;width:100%}
+        .modal .form-check{margin-top:2px}
+        /* Единый стиль для кнопок модалки */
+        .modal .modal-action-btn{border-radius:20px;padding:8px 16px;border:1px solid #9aa0aa;box-shadow:2px 2px 4px rgba(0,0,0,.25), -2px 2px 4px rgba(0,0,0,.25);font-family:'Onest';font-weight:600}
+        .modal .modal-action-btn--secondary{background:transparent;color:#fff}
+        .modal .modal-action-btn--secondary:hover{background:rgba(255,255,255,0.08)}
+        .modal .modal-action-btn--primary{background:rgb(39,66,106);border-color:rgb(39,66,106);color:#fff}
+        .modal .modal-action-btn--primary:hover{background:rgb(51,84,136);border-color:rgb(51,84,136)}
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Days+One&display=swap" rel="stylesheet">
+</head>
+
+<body style="background-image: url({% static "images/background.jpg" %});">
+    <header>
+        <nav class="navbar navbar-expand-lg bg-dark text-white">
+            <div class="container-fluid">
+                <a class="navbar-brand" href={% url "main:index" %}><img class="home-icon" src="{% static 'icons/home.png' %}" alt="Home" width="25" height="25"></a> 
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Доступные мероприятия
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href={% url "events_available:online" %}>
+                                    Онлайн мероприятия</a></li>
+                                <li><a class="dropdown-item" href={% url "events_available:offline" %}>
+                                    Оффлайн мероприятия</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Культурные мероприятия
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
+
+                                <li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white calendar" aria-current="page" href={% url "events_calendar:index" %}>Календарь мероприятий</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false"> Мой профиль </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный
+                                        кабинет</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href={% url "bookmarks:registered" %}>Зарегистрированные</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
+                                </li>
+                                {% comment %} <li>
+                                    <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
+                                </li> {% endcomment %}
+                                {% if user.is_staff %}
+                                    {% if user.is_admin or user.is_superuser %}
+                                        <li>
+                                            <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
+                                        </li>
+                                    {% endif %}
+                                <li>
+                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет организатора</a>
+                                </li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a>
+                                </li>
+                            </ul>
+                        </li>
+
+
+                    </ul>
+                    <form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">
+                        <input class="form-control search me-2 " type="search" name="q" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">
+                            <img src="{% static "icons/search.png" %}" alt="S" style="height: 20px; width: 20px;" margin-top: 0;> 
+                        </button>
+                    </form>
                 </div>
-                <div class="profile-detail">
-                    <strong>Роль </strong>
-                    {% if user.is_superuser %}
-                        Суперпользователь
-                    {% elif user.is_staff %}
-                        Администратор
-                    {% else %}
-                        Пользователь
-                    {% endif %}
-                </div>
-                {% if user.is_superuser or user.is_staff %}
-                    <div class="profile-detail">
-                        <strong>Группы </strong>
-                        {% for group in user.groups.all %}
-                            {{ group.name }}
-                        {% empty %}
-                            Вы не состоите в группах
-                        {% endfor %}
+            </div>
+        </nav>
+    </header>
+    <main class="row">
+        <div class="col-lg-1 left-column"></div>
+        <div class="col-lg-10 col-md-12 col-sm-12 feed">
+            <section>
+                <div class="row mt-lg-3" style="margin-bottom: 0;">
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-10 col-md-12 col-sm-12">
+                        <h2 style="color: white;" class="account-title">Профиль пользователя</h2>
+                        <div class="profile-info" style="text-align: center;">
+                            <div class="row mt-3">
+                                <div class="col-lg-1 d-none d-lg-block"></div>
+                                <div class="col-4 col-lg-3 user-photo">
+                                    <div class="photo-frame">
+                                        {% if user.profile_photo %}
+                                            <img class="user-photo-img" src="{{ user.profile_photo.url }}" alt="Фото профиля">
+                                        {% else %}
+                                            <img class="user-photo-img" src="{% static "icons/profile_photo.png" %}" alt="Фото профиля">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-3 col-lg-2">
+                                    <div class="profile-fields">
+                                        <label for="" style="text-indent: 0;">Профиль:</label><br>
+                                        <label for="">Отдел:</label><br>
+                                        {% if user.email %}<label for="">Email:</label><br>{% endif %}
+                                        <label for="">Tg ID:</label><br>
+                                    </div>
+                                </div>
+                                <div class="col-5 col-lg-5 info">
+                                    <div class="account-information">
+                                        <label for="username" style="text-indent: 0;">{{ user.username }}</label><br>
+                                        <label for="department">{{ department_name }}</label><br>
+                                        {% if user.email %}<label for="email" title={{ user.email }}>{{ user.email }}</label><br>{% endif %} 
+                                        <label for="tg">{{ user.telegram_id }}</label><br>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-lg-3">
+                                <div class="col-lg-1 d-none d-lg-block"></div>
+
+                                <div class="col-12 col-lg-4 mt-2" style="text-align: center; align-content: center;">
+                                    <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="uploadPhoto()">
+                                    <div class="photo-buttons-container">
+                                        <button class="btn photo-upload-btn" onclick="document.getElementById('photoInput').click()">
+                                            <i class="upload-icon">📷</i> Загрузить с устройства
+                                        </button>
+                                        <button class="btn photo-upload-btn" onclick="fetchTelegramPhoto()" {% if not user.telegram_id %}disabled title="Привяжите Telegram, чтобы загрузить фото"{% endif %}>
+                                            <img src="{% static 'icons/tg-link.png' %}" alt="TG" style="height:18px; vertical-align: text-bottom;"> Загрузить из Telegram
+                                        </button>
+                                        {% if user.profile_photo %}
+                                            <button class="btn photo-delete-btn" onclick="deletePhoto()">
+                                                <i class="delete-icon">🗑️</i> Удалить фото
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    {% if not user.telegram_id %}
+                                    <div class="mt-2" style="color:#ccc; font-size: 0.9rem;">
+                                        Чтобы загрузить фото из Telegram, войдите через Telegram (кнопка на странице входа).
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-lg-6 button-column mt-2" style="text-align: center; align-content: center;">
+                                    <button id="openPasswordModalBtn" class="btn photo-upload-btn" style="margin-bottom:10px;" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                                        <i class="password-icon">🔒</i> Сменить пароль
+                                    </button>
+                                </div>
+                                <div class="col-lg-1 d-none d-lg-block"></div>                                
+                            </div>
+                        </div>
+
+                        <div class="user-rights">
+                            <div class="row mt-lg-3 mb-3">
+                                <div class="col-12 col-lg-4 user-right-profile">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="admin-request">Запрос прав организатора</div>
+                                            <div class="input-with-button">
+                                                <input class="request-reason form-control" type="text" id="reason" placeholder="Обоснование запроса">
+                                                <button class="send-request" onclick="requestAdminRights()"><img src="{% static "/icons/send-message.png" %}" alt=""> </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2 mt-lg-3">
+                                        <div class="col-1 d-lg-none"></div>
+
+                                        <div class="col-10 col-lg-12 center">
+                                            <table class="rights-table">
+                                                <tr>
+                                                    <td><label for="role" class="role">Роль</label></td>
+                                                    <td><label for="" class="role-info">
+                                                        {% if user.is_superuser %}
+                                                            Суперпользователь
+                                                        {% elif user.is_staff %}
+                                                            Администратор
+                                                        {% else %}
+                                                            Пользователь
+                                                        {% endif %}
+                                                    </label></td>
+                                                </tr>
+                                                {% if user.is_superuser or user.is_staff %}
+                                                <tr>
+                                                    <td><label for="groups" class="groups">Группы</label></td>
+                                                    <td><label for="" class="group-info">
+                                                        {% for group in user.groups.all %}
+                                                            {{ group.name }}<br>
+                                                        {% empty %}
+                                                            Нет
+                                                        {% endfor %}
+                                                    </label></td>
+                                                </tr>
+                                                {% endif %}
+                                            </table>                                            
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                
+                                    <div class="col-12 col-lg-8 movement">
+                                        <div class="movement-header">Перемещения</div>
+                                        {% if logistics %}                           
+                                            <div class="user-movement">
+                                                {% for logist in logistics %}
+                                                    {% if logist.departure_datetime or logist.arrival_datetime  %}
+                                                        <div class="user-movement-info">
+                                                            <span>Время прилёта</span>
+                                                            <span id="logist-{{ logist.id }}-arrival_datetime">{{ logist.arrival_datetime }}</span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-field" data-pk="{{ logist.id }}" data-event="{{ logist.event.id }}" data-field="arrival_datetime" title="Редактировать">✏️</button>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if logist.arrival_airport %}
+                                                        <div class="user-movement-info">
+                                                            <span>Место прилёта</span>
+                                                            <span id="logist-{{ logist.id }}-arrival_airport">{{ logist.arrival_airport }}</span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-field" data-pk="{{ logist.id }}" data-event="{{ logist.event.id }}" data-field="arrival_airport" title="Редактировать">✏️</button>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if logist.departure_airport %}
+                                                        <div class="user-movement-info">
+                                                            <span>Время отлёта</span>
+                                                            <span id="logist-{{ logist.id }}-departure_datetime">{{ logist.departure_datetime }}</span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-field" data-pk="{{ logist.id }}" data-event="{{ logist.event.id }}" data-field="departure_datetime" title="Редактировать">✏️</button>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if logist.arrival_airport %}
+                                                        <div class="user-movement-info">
+                                                            <span>Место отлёта</span>
+                                                            <span id="logist-{{ logist.id }}-departure_airport">{{ logist.departure_airport }}</span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-field" data-pk="{{ logist.id }}" data-event="{{ logist.event.id }}" data-field="departure_airport" title="Редактировать">✏️</button>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if logist.hotel_details %}
+                                                        <div class="user-movement-info">
+                                                            <span>Проживание</span>
+                                                            <span id="logist-{{ logist.id }}-hotel_details">{{ logist.hotel_details }}</span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-field" data-pk="{{ logist.id }}" data-event="{{ logist.event.id }}" data-field="hotel_details" title="Редактировать">✏️</button>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if logist.meeting_person %}
+                                                        <div class="user-movement-info">
+                                                            <span>Встречающий</span>
+                                                            <span id="logist-{{ logist.id }}-meeting_person">{{ logist.meeting_person }}</span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-field" data-pk="{{ logist.id }}" data-event="{{ logist.event.id }}" data-field="meeting_person" title="Редактировать">✏️</button>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if logist.transfer_needed %}
+                                                        <div class="user-movement-info">
+                                                            <span>Трансфер</span>
+                                                            <span id="logist-{{ logist.id }}-transfer_needed">
+                                                                {% if logist.transfer_needed %}
+                                                                    Нужен
+                                                                {% else %}
+                                                                    Не нужен
+                                                                {% endif %}
+                                                            </span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-field" data-pk="{{ logist.id }}" data-event="{{ logist.event.id }}" data-field="transfer_needed" title="Переключить">✏️</button>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if logist.event %}
+                                                        <div class="user-movement-info user-movement-event mb-2">
+                                                            <span>Мероприятие</span>
+                                                            <span><a href="/events_available/offline/{{logist.event.slug}}">{{ logist.event }}</a></span> 
+                                                        </div>  
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <!-- Кнопка, открывающая модалку -->
+                                        <div class="d-flex justify-content-center">
+                                            <button type="button"
+                                                    class="btn photo-upload-btn logistic-btn mt-4"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#logisticsModal">
+                                                Заполнить логистику
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Модальное окно -->
+                                    <div class="modal fade" id="logisticsModal" tabindex="-1" aria-labelledby="logisticsModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                                        <div class="modal-content">
+                                        <form method="post" class="needs-validation" novalidate>
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form_name" value="logistics">
+
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="logisticsModalLabel">Добавить/изменить логистику</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                            <div class="row g-3">
+                                                <!-- Выбор мероприятия -->
+                                                <div class="col-12">
+                                                    <label class="form-label">Оффлайн‑мероприятие</label>
+                                                    {{ logistics_form.event }}
+                                                    {% if logistics_form.event.errors %}
+                                                        <div class="text-danger small mt-1">{{ logistics_form.event.errors.0 }}</div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <!-- Левая колонка - Информация о прибытии -->
+                                                <div class="col-md-6 info-block">
+                                                    <div class="border rounded p-lg-3 p-2 h-100">
+                                                        <h6 class="mb-lg-3 mb-1 text-primary">Информация о прибытии</h6>
+                                                        
+                                                        <div class="mb-lg-3 mb-1">
+                                                            <label class="form-label">Дата и время прибытия</label>
+                                                            {{ logistics_form.arrival_datetime }}
+                                                        </div>
+                                                        
+                                                        <div class="mb-lg-3 mb-1">
+                                                            <label class="form-label">Рейс прибытия</label>
+                                                            {{ logistics_form.arrival_flight_number }}
+                                                        </div>
+                                                        
+                                                        <div class="mb-lg-3 mb-1">
+                                                            <label class="form-label">Место прибытия</label>
+                                                            {{ logistics_form.arrival_airport }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Правая колонка - Информация об убытии -->
+                                                <div class="col-md-6 info-block">
+                                                    <div class="border rounded p-lg-3 p-2 h-100">
+                                                        <h6 class="mb-lg-3 mb-1 text-success">Информация об убытии</h6>
+                                                        
+                                                        <div class="mb-lg-3 mb-1">
+                                                            <label class="form-label">Дата и время убытия</label>
+                                                            {{ logistics_form.departure_datetime }}
+                                                            {% if logistics_form.departure_datetime.errors %}
+                                                                <div class="text-danger small mt-1">{{ logistics_form.departure_datetime.errors.0 }}</div>
+                                                            {% endif %}
+                                                        </div>
+                                                        
+                                                        <div class="mb-lg-3 mb-1">
+                                                            <label class="form-label">Рейс убытия</label>
+                                                            {{ logistics_form.departure_flight_number }}
+                                                        </div>
+                                                        
+                                                        <div class="mb-lg-3 mb-1">
+                                                            <label class="form-label">Место убытия</label>
+                                                            {{ logistics_form.departure_airport }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Общие поля -->
+                                                <div class="col-12 info-block">
+                                                    <div class="border rounded p-lg-3 p-2">
+                                                        <h6 class="mb-lg-3 mb-1 text-info">Дополнительная информация</h6>
+                                                        
+                                                        <div class="row g-3">
+                                                            <div class="col-12 mt-2">
+                                                                <div class="form-check">
+                                                                    {{ logistics_form.transfer_needed }}
+                                                                    <label class="form-check-label">Нужен трансфер</label>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="col-12 mt-1">
+                                                                <label class="form-label">Гостиница проживания</label>
+                                                                {{ logistics_form.hotel_details }}
+                                                            </div>
+                                                            
+                                                            <div class="col-12 mt-1">
+                                                                <label class="form-label">Встречающий</label>
+                                                                {{ logistics_form.meeting_person }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            </div>
+
+                                                <div class="modal-footer d-flex justify-content-end align-items-center gap-2">
+                                                <button type="button" class="modal-action-btn modal-action-btn--secondary" data-bs-dismiss="modal">Отмена</button>
+                                                <button type="submit" class="modal-action-btn modal-action-btn--primary">Сохранить</button>
+                                                </div>
+                                            </form>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <!-- Скрипт автопоказа модалки при ошибках -->
+                                        <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            // Значение придёт из контекста: True, если форма невалидна
+                                            const shouldOpen = {{ open_logistics_modal|yesno:"true,false" }};
+                                            if (shouldOpen) {
+                                            const modalEl = document.getElementById('logisticsModal');
+                                            const modal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+                                            modal.show();
+                                            }
+                                        });
+                                        </script>
+                                        
+                                        <!-- Модальное окно смены пароля -->
+                                        <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content" style="background:#1b1f2a; border:1px solid #2b3244;">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="passwordModalLabel">Сменить пароль</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-2">
+                                                        <label class="form-label" style="color:#cbd2e1;">Новый пароль</label>
+                                                        <input type="password" id="new_password1" class="form-control" placeholder="Введите новый пароль" oninput="updatePasswordStrength(); clearFieldError('new_password1')">
+                                                        <div id="new_password1_error" class="invalid-feedback" style="display:block; color:#ff7676; min-height: 1em;"></div>
+                                                        <div class="progress mt-2" style="height: 6px; background:#2b3244;">
+                                                            <div id="pwd_strength_bar" class="progress-bar" role="progressbar" style="width: 0%; background:#ff7676;"></div>
+                                                        </div>
+                                                        <div id="pwd_strength_text" style="font-size:0.85rem; color:#9aa4ba; margin-top:4px;"></div>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label" style="color:#cbd2e1;">Повторите пароль</label>
+                                                        <input type="password" id="new_password2" class="form-control" placeholder="Повторите новый пароль" oninput="clearFieldError('new_password2')">
+                                                        <div id="new_password2_error" class="invalid-feedback" style="display:block; color:#ff7676; min-height: 1em;"></div>
+                                                    </div>
+                                                    <div id="passwordHelp" style="color:#9aa4ba; font-size:0.9rem; margin-top:6px;">После сохранения вам нужно будет войти заново.</div>
+                                                </div>
+                                                <div class="modal-footer d-flex justify-content-end align-items-center gap-2">
+                                                    <button type="button" class="modal-action-btn modal-action-btn--secondary" data-bs-dismiss="modal">Отмена</button>
+                                                    <button type="button" class="modal-action-btn modal-action-btn--primary" onclick="requestPasswordChange()">Сохранить</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <script>
+                                        document.addEventListener('shown.bs.modal', function (e) {
+                                            if (e.target && e.target.id === 'passwordModal') {
+                                                const p1 = document.getElementById('new_password1');
+                                                if (p1) setTimeout(() => p1.focus(), 150);
+                                            }
+                                        });
+                                        </script>
+
+
+                                <div class="col-lg-3"></div>
+                            </div>
+                        </div>
                     </div>
-                {% endif %}
-
-
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href={% url "bookmarks:send_message_to_participants" %}>Выслать уведомления участникам</a>
-                </li>
-            </div>
+                    <div class="col-lg-1"></div>
+                </div>
+                
+            </section>
         </div>
-    </div>
-</div>
+        <div class="col-lg-1 right-column" style="padding: 0;"></div>
+    </main>
+</body>
+
 
 <script>
-function requestPasswordChange() {
-    fetch('{% url "users:change_password" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-    });
-}
+    function requestPasswordChange() {
+        clearAllErrors();
+        const p1 = document.getElementById('new_password1').value;
+        const p2 = document.getElementById('new_password2').value;
+        fetch('{% url "users:change_password" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ new_password1: p1, new_password2: p2 })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/users/login/';
+            } else {
+                showErrors(data);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            showErrors({ error: 'Произошла ошибка при смене пароля.' });
+        });
+    }
 
-function requestAdminRights() {
-    const reason = document.getElementById('reason').value;
-    fetch('{% url "users:request_admin_rights" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({ reason: reason })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) {
-            document.getElementById('reason').value = ''; // Очистить поле ввода после успешной отправки
-        }
-    })
-    .catch(error => {
-        console.error('Ошибка:', error);
-        alert('Произошла ошибка при отправке запроса на админские права.');
-    });
-}
+    // Перенесено в модальное окно: автофокус добавлен ниже
 
-</script>
-{% endblock content %}
+    function showErrors(data) {
+        // data.error может быть строкой или объектом полевых ошибок
+        if (data.field_errors) {
+            for (const [field, messages] of Object.entries(data.field_errors)) {
+                const el = document.getElementById(`${field}_error`);
+                if (el) el.textContent = Array.isArray(messages) ? messages.join('\n') : messages;
+            }
+        }
+        if (data.error) {
+            const el = document.getElementById('new_password1_error');
+            if (el) el.textContent = data.error;
+        }
+    }
+
+    function clearFieldError(field) {
+        const el = document.getElementById(`${field}_error`);
+        if (el) el.textContent = '';
+    }
+
+    function clearAllErrors() {
+        clearFieldError('new_password1');
+        clearFieldError('new_password2');
+    }
+
+    function updatePasswordStrength() {
+        const pwd = document.getElementById('new_password1').value;
+        const bar = document.getElementById('pwd_strength_bar');
+        const text = document.getElementById('pwd_strength_text');
+
+        const score = passwordScore(pwd);
+        const percent = Math.min(100, Math.max(0, Math.round((score / 7) * 100)));
+        bar.style.width = percent + '%';
+        if (percent < 34) {
+            bar.style.background = '#ff7676';
+            text.textContent = 'Слабый пароль';
+        } else if (percent < 67) {
+            bar.style.background = '#f5c36a';
+            text.textContent = 'Средний пароль';
+        } else {
+            bar.style.background = '#53d86a';
+            text.textContent = 'Надёжный пароль';
+        }
+    }
+
+    function passwordScore(pwd) {
+        if (!pwd) return 0;
+        let score = 0;
+        // длина
+        if (pwd.length >= 8) score += 2; else if (pwd.length >= 6) score += 1;
+        // разные классы символов
+        if (/[a-z]/.test(pwd)) score += 1;
+        if (/[A-Z]/.test(pwd)) score += 1;
+        if (/[0-9]/.test(pwd)) score += 1;
+        if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
+        // штраф за повторяющиеся символы
+        if (/(.)\1{2,}/.test(pwd)) score -= 1;
+        return score;
+    }
+    
+    function requestAdminRights() {
+        const reason = document.getElementById('reason').value;
+        fetch('{% url "users:request_admin_rights" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ reason: reason })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                document.getElementById('reason').value = ''; // Очистить поле ввода после успешной отправки
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при отправке запроса на админские права.');
+        });
+    }
+
+    function uploadPhoto() {
+        const photoInput = document.getElementById('photoInput');
+        const file = photoInput.files[0];
+        
+        if (!file) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('photo', file);
+        
+        fetch('{% url "users:upload_photo" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Фото успешно загружено!');
+                location.reload(); // Перезагрузить страницу для отображения нового фото
+            } else {
+                alert(data.error || 'Произошла ошибка при загрузке фото.');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при загрузке фото.');
+        });
+    }
+
+    function deletePhoto() {
+        if (!confirm('Вы уверены, что хотите удалить фото?')) {
+            return;
+        }
+
+        fetch('{% url "users:delete_photo" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Фото успешно удалено!');
+                location.reload(); // Перезагрузить страницу для обновления отображения
+            } else {
+                alert(data.error || 'Произошла ошибка при удалении фото.');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при удалении фото.');
+        });
+    }
+
+    function fetchTelegramPhoto() {
+        fetch('{% url "users:fetch_telegram_photo" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message || 'Фото из Telegram загружено');
+                location.reload();
+            } else {
+                alert(data.error || 'Не удалось загрузить фото из Telegram');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при загрузке фото из Telegram.');
+        });
+    }
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalEl = document.getElementById('logisticsModal');
+        const eventSelect = document.getElementById('id_event');
+
+        const fld = {
+            arrival_datetime: document.getElementById('id_arrival_datetime'),
+            arrival_flight_number: document.getElementById('id_arrival_flight_number'),
+            arrival_airport: document.getElementById('id_arrival_airport'),
+            departure_datetime: document.getElementById('id_departure_datetime'),
+            departure_flight_number: document.getElementById('id_departure_flight_number'),
+            departure_airport: document.getElementById('id_departure_airport'),
+            transfer_needed: document.getElementById('id_transfer_needed'),
+            hotel_details: document.getElementById('id_hotel_details'),
+            meeting_person: document.getElementById('id_meeting_person'),
+        };
+
+        // Плейсхолдеры для полей «Гостиница проживания» и «Встречающий»
+        const hotelInput = document.getElementById('id_hotel_details');
+        if (hotelInput) {
+            hotelInput.setAttribute('placeholder', 'Название, адрес, номер брони и т.д.');
+        }
+        const meetingInput = document.getElementById('id_meeting_person');
+        if (meetingInput) {
+            meetingInput.setAttribute('placeholder', 'ФИО встречающего');
+        }
+
+        function clearLogisticsFields() {
+            if (fld.arrival_datetime) fld.arrival_datetime.value = '';
+            if (fld.arrival_flight_number) fld.arrival_flight_number.value = '';
+            if (fld.arrival_airport) fld.arrival_airport.value = '';
+            if (fld.departure_datetime) fld.departure_datetime.value = '';
+            if (fld.departure_flight_number) fld.departure_flight_number.value = '';
+            if (fld.departure_airport) fld.departure_airport.value = '';
+            if (fld.transfer_needed) fld.transfer_needed.checked = false;
+            if (fld.hotel_details) fld.hotel_details.value = '';
+            if (fld.meeting_person) fld.meeting_person.value = '';
+        }
+
+        function applyLogisticsData(data) {
+            if (!data || !data.exists) { clearLogisticsFields(); return; }
+            if (fld.arrival_datetime && data.arrival_datetime !== undefined) fld.arrival_datetime.value = data.arrival_datetime;
+            if (fld.arrival_flight_number && data.arrival_flight_number !== undefined) fld.arrival_flight_number.value = data.arrival_flight_number;
+            if (fld.arrival_airport && data.arrival_airport !== undefined) fld.arrival_airport.value = data.arrival_airport;
+            if (fld.departure_datetime && data.departure_datetime !== undefined) fld.departure_datetime.value = data.departure_datetime;
+            if (fld.departure_flight_number && data.departure_flight_number !== undefined) fld.departure_flight_number.value = data.departure_flight_number;
+            if (fld.departure_airport && data.departure_airport !== undefined) fld.departure_airport.value = data.departure_airport;
+            if (fld.transfer_needed && data.transfer_needed !== undefined) fld.transfer_needed.checked = !!data.transfer_needed;
+            if (fld.hotel_details && data.hotel_details !== undefined) fld.hotel_details.value = data.hotel_details;
+            if (fld.meeting_person && data.meeting_person !== undefined) fld.meeting_person.value = data.meeting_person;
+        }
+
+        async function loadLogistics() {
+            const eventId = eventSelect && eventSelect.value;
+            if (!eventId) { clearLogisticsFields(); return; }
+            try {
+                const url = '{% url "users:get_logistics_for_event" %}?event_id=' + encodeURIComponent(eventId);
+                const resp = await fetch(url, { method: 'GET' });
+                if (!resp.ok) { clearLogisticsFields(); return; }
+                const data = await resp.json();
+                applyLogisticsData(data);
+            } catch (e) {
+                console.error('Ошибка загрузки логистики:', e);
+                clearLogisticsFields();
+            }
+        }
+
+        if (eventSelect) {
+            eventSelect.addEventListener('change', loadLogistics);
+        }
+
+        if (modalEl) {
+            modalEl.addEventListener('shown.bs.modal', function () {
+                if (eventSelect && eventSelect.value) {
+                    loadLogistics();
+                }
+            });
+        }
+
+        // --- Инлайн-редактирование в блоке «Перемещения» ---
+        async function inlineUpdate(pk, field, value) {
+            try {
+                const url = '{% url "users:update_logistics_field" 0 %}'.replace('/0/', '/' + pk + '/');
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ field: field, value: value })
+                });
+                if (!resp.ok) {
+                    const text = await resp.text();
+                    throw new Error(text || ('HTTP ' + resp.status));
+                }
+                const data = await resp.json();
+                const target = document.getElementById(`logist-${pk}-${field}`);
+                if (target) target.textContent = data.value;
+            } catch (e) {
+                alert('Не удалось сохранить: ' + (e && e.message ? e.message : e));
+            }
+        }
+
+        function promptForField(field, currentText) {
+            if (field === 'transfer_needed') {
+                return confirm('Отметить «Нужен трансфер»?') ? 'true' : 'false';
+            }
+            if (field.endsWith('_datetime')) {
+                const val = prompt('Введите дату/время (ГГГГ-ММ-ДДTЧЧ:ММ):', currentText || '');
+                return val == null ? null : val.trim();
+            }
+            const val = prompt('Введите значение:', currentText || '');
+            return val == null ? null : val.trim();
+        }
+
+        document.querySelectorAll('.edit-field').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pk = btn.getAttribute('data-pk');
+                const field = btn.getAttribute('data-field');
+                const span = document.getElementById(`logist-${pk}-${field}`);
+                const current = span ? span.textContent.trim() : '';
+                const value = promptForField(field, current);
+                if (value === null) return; // cancel
+                inlineUpdate(pk, field, value);
+            });
+        });
+    });
+    </script>
+    
+</html>

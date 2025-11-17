@@ -12,6 +12,26 @@
 	<link rel="stylesheet" href="{% static 'general/css/events_available.css' %}">
 	<link rel="stylesheet" href="{% static 'general/css/jquery-ui.css' %}">
 	<link rel="stylesheet" href="{% static 'scripts/select2.min.css' %}">
+    <style>
+        /* Simple page preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity .3s ease, visibility .3s ease;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+    </style>
     
     {% block style %}{% endblock style %}
 
@@ -19,10 +39,13 @@
 </head>
 
 <body>
+    <div id="preloader" aria-label="Загрузка страницы">
+        <div class="spinner-border text-secondary" role="status" aria-hidden="true"></div>
+    </div>
 	<header>
         <nav class="navbar navbar-expand-lg bg-dark text-white">
             <div class="container-fluid">
-                <a class="navbar-brand" href={% url "main:index" %}>Home</a>
+                <a class="navbar-brand" href={% url "main:index" %}><img class="home-icon" src="{% static 'general/icons/home.png' %}" alt="Home" width="25" height="25"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -71,15 +94,17 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
                                 </li>
-                                <li>
+                                {% comment %} <li>
                                     <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
-                                </li>
-                                {% if user.is_admin or user.is_superuser or user.is_staff %}
+                                </li> {% endcomment %}
+                                {% if user.is_staff %}
+                                    {% if user.is_admin or user.is_superuser %}
+                                        <li>
+                                            <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
+                                        </li>
+                                    {% endif %}
                                 <li>
-                                    <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
+                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет организатора</a>
                                 </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider" /></li>
@@ -92,9 +117,9 @@
                         {% endif %}
                     </ul>
                     <form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">
-                        <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                        <input class="form-control search me-2 " type="search" name="q" placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">
-                            <img src="{% static "general/icons/search.svg" %}" alt="S">
+                            <img src="{% static "general/icons/search.png" %}" alt="S">
                         </button>
                     </form>
                 </div>
@@ -134,6 +159,41 @@
     <script src="{% static 'scripts/jquery-3.6.0.min.js' %}"></script>
 	<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 	<script src="{% static 'scripts/select2.min.js' %}"></script>
+    <script>
+        // Hide preloader once all resources are fully loaded
+        window.addEventListener('load', function () {
+            var preloader = document.getElementById('preloader')
+            if (preloader) {
+                preloader.classList.add('hidden')
+                setTimeout(function(){
+                    if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader)
+                }, 400)
+            }
+        })
+    </script>
+
+    {% comment %} Отправка сообщения участникам {% endcomment %}
+    <script>
+        $(document).ready(function() {
+            $('#id_event_type').change(function() {
+                var eventType = $(this).val();
+                $.ajax({
+                    url: "{% url 'bookmarks:get_event_choices' %}",
+                    data: {
+                        'event_type': eventType
+                    },
+                    success: function(data) {
+                        var eventSelect = $('#id_event');
+                        eventSelect.empty();
+                        eventSelect.append('<option value="">---------</option>');
+                        $.each(data, function(index, event) {
+                            eventSelect.append('<option value="' + event.id + '">' + event.name + '</option>');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
     
 
 </body>

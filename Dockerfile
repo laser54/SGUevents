@@ -7,9 +7,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN ls -R /code
 
 ENV DJANGO_SETTINGS_MODULE=SGUevents.settings
 ENV PYTHONPATH=/code
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 8887
 

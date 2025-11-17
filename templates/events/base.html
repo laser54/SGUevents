@@ -7,64 +7,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
-    <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
-    <link rel="stylesheet" href="{% static 'general/css/general-page.css' %}">
-    <link rel="stylesheet" href="{% static 'general/css/events_available.css' %}">
-    <link rel="stylesheet" href="{% static 'general/css/jquery-ui.css' %}">
-    <link rel="stylesheet" href="{% static 'scripts/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static "css/styles.css" %}">
+    <link rel="stylesheet" href="{% static "css/notification.css" %}">
+    <style>
+        /* Simple page preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity .3s ease, visibility .3s ease;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+    </style>
 
-    
+    <script src="{% static 'lib/js/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    {% comment %} <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Days+One&display=swap" rel="stylesheet"> {% endcomment %}
 
     {% block title %}{% endblock title %}
 </head>
 
-<body>
+<body style="background-image: url({% static "images/background.jpg" %});">
     <header>
         <nav class="navbar navbar-expand-lg bg-dark text-white">
             <div class="container-fluid">
-                <a class="navbar-brand" href={% url "main:index" %}>Home</a>
+                <a class="navbar-brand" href={% url "main:index" %}><img class="home-icon" src="{% static 'icons/home.png' %}" alt="Home" width="25" height="25"></a> 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        {% if not user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'users:login' %}">Войти</a>
-                        </li>
-                        {% else %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 Доступные мероприятия
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href={% url "events_available:online" %}>Онлайн мероприятия</a></li>
-                                <li><a class="dropdown-item" href={% url "events_available:offline" %}>Оффлайн мероприятия</a></li>
+                                <li><a class="dropdown-item" href={% url "events_available:online" %}>
+                                    Онлайн мероприятия</a></li>
+                                <li><a class="dropdown-item" href={% url "events_available:offline" %}>
+                                    Оффлайн мероприятия</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 Культурные мероприятия
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
-                                
+
                                 <li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href={% url "events_calendar:index" %}>Календарь мероприятий</a>
+                            <a class="nav-link text-white calendar" aria-current="page" href={% url "events_calendar:index" %}>Календарь мероприятий</a>
                         </li>
-                        
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Мой профиль </a>
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false"> Мой профиль </a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный кабинет</a>
+                                    <a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный
+                                        кабинет</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item text-black" href={% url "bookmarks:registered" %}>Зарегистрированные</a>
@@ -72,9 +92,7 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
-                                </li>
+
                                 {% if user.is_staff %}
                                     {% if user.is_admin or user.is_superuser %}
                                         <li>
@@ -82,7 +100,7 @@
                                         </li>
                                     {% endif %}
                                 <li>
-                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
+                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет организатора</a>
                                 </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider" /></li>
@@ -91,262 +109,1089 @@
                                 </li>
                             </ul>
                         </li>
-                        
-                        {% endif %}
+
+
                     </ul>
                     <form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">
-                        <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                        <input class="form-control search me-2 " type="search" name="q" placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">
-                            <img src="{% static "general/icons/search.svg" %}" alt="S">
+                            <img src="{% static "icons/search.png" %}" alt="S" style="height: 20px; width: 20px;" margin-top: 0;> 
                         </button>
                     </form>
                 </div>
             </div>
         </nav>
     </header>
-
-    <section>
-		{% if user.is_authenticated %}
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-1"></div>
-		
-				<div class="col-lg-10">
-					{% block filters %}{% endblock filters %}
-		
-					<div class="row mt-3 mb-3 name-for-events">
-						<div class="col-lg-12">
-							<h2> {{ name_page }} </h2>
-						</div>
-					</div>
-
-					{% if request.GET.q %}
-						<h3 class="mt-4">Результаты поиска по запросу {{ request.GET.q }}</h3>
-						{% if not event_card_views %}
-							<h2 class="mt-4">По запросу ничего не найдено</h2>
-						{% endif %}
-					{% endif %}
-
-                    {% comment %} Для панели администратора {% endcomment %}
+    
+    <main class="row" style="margin-left: -10px; margin-right: 0px;">
+        <div class="col-lg-1 left-column"></div>
+        <div class="col-lg-10 feed">
+            <section>
+                <div class="row mt-3 mb-2 name-for-events">
+                    <nav class="arrow-nav-left" aria-label="Arrow navigation"
+                        style="position: fixed; width: fit-content;">
+                        <ul class="pagination" style="margin-top: 10px;">
+                            <li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
+                                <a class="page-link-arrow" href="{% if event_card_views.has_previous %}?{% change_params page=event_card_views.previous_page_number %}{% else %}#{% endif %}">
+                                    <div class="arrow">
+                                        {% if event_card_views.has_previous %}
+                                            <img src="{% static "icons/arrow-left.png" %}" class="arrow" alt="<--">     
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-7 main-header">
+                        <h2 style="color: white;" class="page-header {% if name_page == 'Онлайн' %}page-header-online {% elif name_page == 'Оффлайн' %} page-header-offline {% elif name_page == 'Избранные' %}page-header-favorites {% elif name_page == 'Зарегистрированные' %}page-header-registered{% endif %}"> {{ name_page }} </h2>
+                    </div>
                     
-                    {% block form_events %}{% endblock form_events %}
-                    {% for events in event_card_views %}
-                        
-                        
-                        <div class="row mt-2 event_cards">
-                            <div class="col-lg-12">
-                                <div class="card mb-3">
-                                    <div class="row g-0">
-                                        <div class="col-md-4">
-                                            {% if events.image %}
-                                                <img src="{{ events.image.url }}" class="img-fluid rounded-start" alt="{{ events.name }}">
-                                            {% else %} 
-                                                <img src="{% static "general/images/img.png" %}" class="img-fluid rounded-start" alt="{{ events.name }}">
+                    {% if name_page != "Зарегистрированные" and name_page != "Избранные" %}
+                        <div class="col-lg-3 selection text-end d-flex justify-content-end">
+                            <!-- Кнопка сброса фильтров, которая будет скрыта по умолчанию -->
+                            <div id="reset-filters-container" class="me-2 hidden">
+                                <form action="#" method="get">
+                                    <button class="btn btn-primary" type="submit">Сбросить</button>
+                                </form>
+
+                            </div>
+
+                            <!-- Кнопка для отправки сообщений участникам -->
+                            {% if name_page == "Кабинет организатора" %}
+                                {% block message %}{% endblock message %}
+                            {% endif %}
+
+                            <!-- Кнопка для открытия фильтров -->
+                            <button id="filter-toggle" class="btn btn-primary">
+                                <img src="{% static "icons/filters.png" %}" alt="" class="selection-icon">
+                            </button>
+
+                            <!-- Кнопка для сортировки -->
+                            <button id="sort-toggle" class="btn btn-primary">
+                                <img src="{% static "icons/sort.png" %}"  alt="" class="selection-icon">
+                            </button>
+
+
+                        </div>
+                    {% endif %}
+
+
+                    <nav class="arrow-nav-right" aria-label="Arrow navigation"
+                        style="position: fixed; width: fit-content;">
+                        <ul class="pagination" style="margin-top: 10px;">
+                            <li class="page-item ">
+                                <a class="page-link-arrow" href="{% if event_card_views.has_next %}?{% change_params page=event_card_views.next_page_number %}{% else %}#{% endif %}">
+                                    <div class="arrow">
+                                        {% if event_card_views.has_next %}
+                                            <img src="{% static "icons/arrow-right.png" %}" class="arrow"
+                                            alt="-->">
+                                            {% else %}
+                                        {% endif %}
+
+                                    </div> 
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="col-lg-1"></div>
+                </div>
+
+                
+                {% if name_page != "Зарегистрированные" and name_page != "Избранные" %}
+
+                    <div id="rools" class="row filter-events-row hidden">
+                        <div class="row filter-events-row">
+                            <div class="col-lg-1 feed-left-column"></div>
+                            <div class="col-lg-2">
+                                <div class="dropdown dropdown-button">
+                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Название
+                                    </button>
+                                    <form action="" method="get" class="dropdown-menu dropdown-filter w-100"
+                                        data-bs-theme="dark" id="name-form" data-bs-auto-close="outside">
+                                        <div class="form-check">
+                                            <input class="form-control me-3" type="search" id="event-name-search"
+                                                name="name_search" placeholder="Введите название">
+                                        </div>
+                                        <div id="autocomplete-results" class="autocomplete-results"></div>
+                                        <div class="text-center">
+                                            <button class="btn btn-outline-success" type="submit" id="apply-name-button"
+                                                style="margin-top: 10px;">Применить</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div class="dropdown dropdown-button">
+                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false" id="dateFilterButton">
+                                        Дата
+                                    </button>
+                                    <form action="{{ request.path }}" method="get" class="dropdown-menu dropdown-filter" id="dateDropdown" style="overflow-y: auto;">
+                                        <div class="form-check ">
+                                            Дата начала <br>
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                <input type="date" id="date_start" name="date_start" value="{{ date_start|default_if_none:'' }}"
+                                                    placeholder="дд/мм/гггг" class="flatpickr-input">
+                                            </label>
+                                        </div>
+                                        <div class="form-check ">
+                                            Дата окончания <br>
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                <input type="date" id="date_end" name="date_end" value=""
+                                                    placeholder="дд/мм/гггг" class="flatpickr-input">
+                                            </label>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-outline-success mt-3"
+                                                id="apply-date-button">Применить</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div class="dropdown dropdown-button">
+                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Время
+                                    </button>
+                                    <form action="" method="get" class="dropdown-menu dropdown-filter dropdown-menu-custom"
+                                        data-bs-theme="dark" style="max-height: 220px; overflow-y: auto;" id="timeDropdown">
+                                        <div class="form-check ">
+                                            Время начала <br>
+                                            <label class="form-check-label" for="flexCheckDefault" style="width: 100%;">
+                                                <input type="time" id="time_to_start" name="time_to_start" value=""
+                                                    style="width: 100%;">
+                                            </label>
+                                        </div>
+                                        <div class="form-check ">
+                                            Время окончания <br>
+                                            <label class="form-check-label" for="flexCheckDefault" style="width: 100%;">
+                                                <input type="time" id="time_to_end" name="time_to_end" value=""
+                                                    style="width: 100%;">
+                                            </label>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-outline-success mt-3 "
+                                                id="apply-time-button">Применить</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2 ">
+                                <div class="dropdown dropdown-button">
+                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Спикеры
+                                    </button>
+                                    <form action="" method="get" class="dropdown-menu speaker-filter dropdown-filter "
+                                        style="max-height: 220px; overflow-y: auto; width: fit-content; word-break: keep-all; white-space: nowrap;"
+                                        id="speaker-form">
+                                        <!-- Поле для ввода, которое будет использоваться для поиска -->
+                                        <div class="form-check" style="margin-left: 15px; margin-right:15px; padding: 0px;">
+                                            <input class="form-control w-100" id="search-speakers" type="text"
+                                                placeholder="Поиск спикеров..." style="height: 35px;">
+                                        </div>
+
+                                        <!-- Список спикеров, который будет фильтроваться по мере ввода текста -->
+                                        <div id="speakers-list">
+                                            {% for speaker in speakers %}
+                                                <div class="form-check mx-3 speaker-item">
+                                                    <input class="form-check-input" type="checkbox" name="f_speakers[]" id="flexCheckDefault{{ forloop.counter }}" value="{{ speaker }}" {% if request.GET.f_speakers == speaker %}checked{% endif %}>
+                                                    <label class="form-check-label" for="flexCheckDefault{{ forloop.counter }}">{{ speaker }}</label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-outline-success mt-3"
+                                                id="apply-speakers-button">Применить</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div class="dropdown dropdown-button">
+                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Теги
+                                    </button>
+                                    <form action="" method="get" class="dropdown-menu dropdown-filter"
+                                        style="max-height: 200px; overflow-y: auto; width: fit-content;" id="tags-form">
+                                        <!-- Поле для поиска тегов -->
+                                        <div class="form-check "
+                                            style="margin-left: 15px; margin-right:15px; padding: 0px;">
+                                            <input class="form-control w-100" id="search-tags" type="text"
+                                                placeholder="Поиск тегов..." style="height: 35px;">
+                                        </div>
+
+                                        <!-- Список тегов -->
+                                        <div id="tags-list">
+                                            {% for tag in tags %}
+                                                <div class="form-check  mx-3 tag-item" style="height: 5px;">
+                                                    <input class="form-check-input" type="checkbox" name="f_tags[]"
+                                                        id="flexCheckDefault1" value="{{ tag }}" {% if request.GET.f_tags == tag %}checked{% endif %}>
+                                                    <label class="form-check-label" for="flexCheckDefault1">{{ tag }}</label>
+                                                    <br>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <!-- Для сохранения других фильтров -->
+                                        {% comment %} {% for key, value in request.GET.items %}
+                                            {% if key != 'f_tags' and key != 'date_start' and key != 'date_end' %}
+                                                <input type="hidden" name="{{ key }}" value="{{ value }}">
                                             {% endif %}
-                                            
-                                            {% if name_page != "Главная" %}
-                                                {% if events.id in favorites %}
-                                                    <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites|get_item:events.id }}">
-                                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+                                        {% endfor %} {% endcomment %}
+
+                                        <!-- Кнопка для применения тегов -->
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-outline-success mt-3"
+                                                id="apply-tags-button">Применить</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div id="sort-section" class="col-lg-10 dropdown-menu" style="width: fit-content;">
+                        <form action="" method="get" id="sort-form">
+                            <div class="form-check  mx-3">
+                                <input class="form-check-input" type="radio" name="order_by" id="sort-time-default" value="default">
+
+                                <label class="form-check-label" for="sort-time-default">По умолчанию</label>
+                            </div>
+
+                            <h6 class="dropdown-header">Сортировка по времени</h6>
+
+                            <div class="form-check  mx-3">
+                                <input class="form-check-input" type="radio" name="order_by" id="sort-time-earlier"
+                                    value="time_start">
+                                <label class="form-check-label" for="sort-time-earlier">Раньше</label>
+                            </div>
+                            <div class="form-check  mx-3">
+                                <input class="form-check-input" type="radio" name="order_by" id="sort-time-later"
+                                    value="-time_start">
+                                <label class="form-check-label" for="sort-time-later">Позже</label>
+                            </div>
+
+                            <h6 class="dropdown-header ">Сортировка по дате</h6>
+
+                            <div class="form-check  mx-3">
+                                <input class="form-check-input" type="radio" name="order_by" id="sort-date-newest"
+                                    value="-date">
+                                <label class="form-check-label" for="sort-date-newest">Сначала новые</label>
+                            </div>
+                            <div class="form-check  mx-3">
+                                <input class="form-check-input" type="radio" name="order_by" id="sort-date-oldest"
+                                    value="date">
+                                <label class="form-check-label" for="sort-date-oldest">Сначала старые</label>
+                            </div>
+
+                            <!-- Передаем активные фильтры (исключаем текущий параметр сортировки) -->
+                            <!-- Кнопка для применения сортировки -->
+                            <div class="text-center"><button type="submit" class="btn btn-outline-success mt-3"
+                                    id="apply-sort-button">Применить</button></div>
+
+                        </form>
+                    </div>    
+
+                    <div class="row">
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10">
+                            <div id="filter-sort-message" class="filter-message hidden">
+                                Сортировка: <span id="filter-sort-value"></span>
+                                <button class="delete-filter delete-sort-filter" id="delete-sort-filter"
+                                    style="border: none; background: none; box-shadow: none;">
+                                    <img src="{% static "icons/cancel-close.svg" %}"
+                                        style="height: 20px; width: 20px; margin-top: 0;">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row filters-selected-row">
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10">
+                            <div id="filter-name-message" class="filter-message hidden">
+                                Фильтр по названию: <span id="filter-name-value"></span>
+                                <button class="delete-filter delete-name-filter" type="submit"
+                                    style="border: none; background: none; box-shadow: none;" id="delete-name-filter">
+                                    <img src="{% static "icons/cancel-close.svg" %}"
+                                        style="height: 20px; width: 20px; margin-top: 0;">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10">
+                            <div id="filter-date-message" class="filter-message hidden">
+                                Фильтр по дате: <span id="filter-start-date-value"></span> &#8212;
+                                <span id="filter-end-date-value"></span>
+                                <button class="delete-filter delete-date-filter" type="submit"
+                                    style="border: none; background: none; box-shadow: none;" id="delete-date-filter">
+                                    <img src="{% static "icons/cancel-close.svg" %}"
+                                        style="height: 20px; width: 20px; margin-top: 0;">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10">
+                            <div id="filter-time-message" class="filter-message hidden">
+                                Фильтр по времени: <span id="filter-start-time-value"></span> &#8212;
+                                <span id="filter-end-time-value"></span>
+                                <button class="delete-filter delete-time-filter" type="submit" id="delete-time-filter"
+                                    style="border: none; background: none; box-shadow: none;">
+                                    <img src="{% static "icons/cancel-close.svg" %}"
+                                        style="height: 20px; width: 20px; margin-top: 0;">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10">
+                            <div id="filter-place-message" class="filter-message hidden">
+                                Фильтр по адресу: <span id="filter-place-value"></span>
+                                <button class="delete-filter delete-place-filter" type="submit"
+                                    style="border: none; background: none; box-shadow: none;" id="delete-place-filter">
+                                    <img src="{% static "icons/cancel-close.svg" %}"
+                                        style="height: 20px; width: 20px; margin-top: 0;">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10">
+                            <div id="filter-speakers-message" class="filter-message hidden">
+                                Выбранные спикеры: <span id="filter-speakers-value"></span>
+                                <button class="delete-filter delete-speakers-filter" type="submit"
+                                    id="delete-speakers-filter" style="border: none; background: none; box-shadow: none;">
+                                    <img src="{% static "icons/cancel-close.svg" %}"
+                                        style="height: 20px; width: 20px; margin-top: 0;">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10">
+                            <div id="filter-tags-message" class="filter-message">
+                                Выбранные теги: <span id="filter-tags-value"></span>
+                                <button class="delete-filter delete-tags-filter" type="submit" id="delete-tags-filter"
+                                    style="border: none; background: none; box-shadow: none;">
+                                    <img src="{% static "icons/cancel-close.svg" %}"
+                                        style="height: 20px; width: 20px; margin-top: 0;">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                    </div>
+                {% endif %}
+                
+                {% block form_events %}{% endblock form_events %}
+                {% block favorites %}{% endblock favorites %}
+                {% block register %}{% endblock register %}
+                
+                <!-- в строке ниже убран mt-3 из класса-->
+                {% for events in event_card_views %}
+                    <div class="row mb-3 events">
+                        <div class="col-lg-1 feed-left-column"></div>
+                        <div class="col-lg-10 cards">
+                            <div class="card">
+                                <div class="row event">
+                                    
+                                    <div class="col-lg-5 col-md-5 col-sm-5 event-preview-photo">   
+                                        
+
+                                        {% if name_page != "Главная" %}
+                                            {% if events.slug in favorites %}
+                                                <a href="#" class="{% if events.slug in liked %}remove-from-favorites{% else %}add-to-cart{% endif %}" data-event-slug="{{ events.slug }}">
+                                                    <img class="heart-icon {% if events.slug in liked %}hidden{% endif %}"
+                                                        src="{% static 'icons/heart.svg' %}" alt="" width="32" height="32">
+                                        
+                                                    <img class="heart-red-icon {% if events.slug not in liked %}hidden{% endif %}"
+                                                        src="{% static 'icons/heart_red.png' %}" alt="" width="32" height="32">
+                                                </a>
+                                            {% else %}
+                                                <a href="#" class="add-to-cart" data-event-slug="{{ events.slug }}">
+                                                    <img class="heart-icon" src="{% static 'icons/heart.svg' %}" alt="" width="32" height="32">
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            {% with model_name=events|model_name %}
+                                                {% if model_name == 'Events_online' and events.slug in liked %}
+                                                    <a href="#" class="remove-from-favorites" data-event-slug="{{ events.slug }}">
+                                                        <img class="heart-icon hidden" src="{% static 'icons/heart.svg' %}" alt="" width="32" height="32">
+                                                        <img class="heart-red-icon" src="{% static 'icons/heart_red.png' %}" alt="" width="32" height="32">
+                                                    </a>
+                                                {% elif model_name == 'Events_offline' and events.slug in liked %}
+                                                    <a href="#" class="remove-from-favorites" data-event-slug="{{ events.slug }}">
+                                                        <img class="heart-icon hidden" src="{% static 'icons/heart.svg' %}" alt="" width="32" height="32">
+                                                        <img class="heart-red-icon" src="{% static 'icons/heart_red.png' %}" alt="" width="32" height="32">
+                                                    </a>
+                                                {% elif model_name == 'Attractions' and events.slug in liked %}
+                                                    <a href="#" class="remove-from-favorites" data-event-slug="{{ events.slug }}">
+                                                        <img class="heart-icon hidden" src="{% static 'icons/heart.svg' %}" alt="" width="32" height="32">
+                                                        <img class="heart-red-icon" src="{% static 'icons/heart_red.png' %}" alt="" width="32" height="32">
+                                                    </a>
+                                                {% elif model_name == 'Events_for_visiting' and events.slug in liked %}
+                                                    <a href="#" class="remove-from-favorites" data-event-slug="{{ events.slug }}">
+                                                        <img class="heart-icon hidden" src="{% static 'icons/heart.svg' %}" alt="" width="32" height="32">
+                                                        <img class="heart-red-icon" src="{% static 'icons/heart_red.png' %}" alt="" width="32" height="32">
                                                     </a>
                                                 {% else %}
-                                                    <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
-                                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
+                                                    <a href="#" class="add-to-cart" data-event-slug="{{ events.slug }}">
+                                                        <img class="heart-icon" src="{% static 'icons/heart.svg' %}" alt="" width="32" height="32">
                                                     </a>
                                                 {% endif %}
-                                            {% else %}
-                                                {% if events|model_name == 'Events_online' %}
-                                                    {% if events.id in favorites.online %}
-                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.online|get_item:events.id }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% else %}
-                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% endif %}
-                                                {% elif events|model_name == 'Events_offline' %}
-                                                    {% if events.id in favorites.offline %}
-                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.offline|get_item:events.id }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% else %}
-                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% endif %}
-                                                {% elif events|model_name == 'Attractions' %}
-                                                    {% if events.id in favorites.attractions %}
-                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.attractions|get_item:events.id }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% else %}
-                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% endif %}
-                                                {% elif events|model_name == 'Events_for_visiting' %}
-                                                    {% if events.id in favorites.for_visiting %}
-                                                        <a href="#" class="btn remove-from-favorites" data-event-id="{{ favorites.for_visiting|get_item:events.id }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% else %}
-                                                        <a href="#" class="btn add-to-cart" data-event-slug="{{ events.slug }}">
-                                                            <img class="mx-1 heart-icon" src="{% static 'general/icons/heart.svg' %}" alt="Catalog Icon" width="32" height="32">
-                                                        </a>
-                                                    {% endif %}
-                                                {% endif %}
-                                            {% endif %}
-                                            <div class="card-img-info">
-                                                <p>id: {{ events.display_id }}</p>
-                                                <p>category: {{ events.category }}</p>
+                                            {% endwith %}
+                                        {% endif %}
+                                    
+                                        
+                                        {% if events.image %}
+                                            <img src="{{ events.image.url }}" alt="" class="preview-photo">
+                                        {% else %}
+                                            <img src="{% static "images/no_photo.png" %}" alt="" class="preview-photo">
+                                        {% endif %}
+                                        
+                                        <div class="rating-overlay" data-event-id="{{ events.id }}">
+                                            <div class="half-stars">
+                                                <div class="ranting-count">{{ reviews_avg|get_item:events.id|floatformat:1|default:"0.0" }}</div>
+
+
+                                                <div class="rating-group">
+                                                    <!-- по умолчанию 0 -->
+                                                    <input disabled checked name="hsr" value="0" type="radio">
+
+                                                    <!-- рейтинг 0.5 -->
+                                                    <input disabled name="hsr" id="hsr1-05" value="0.5" type="radio">
+                                                    <label class="hsr" for="hsr1-05">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 1 -->
+                                                    <input disabled name="hsr" id="hsr1-10" value="1" type="radio">
+                                                    <label for="hsr1-10">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 1.5 -->
+                                                    <input disabled name="hsr" id="hsr1-15" value="1.5" type="radio">
+                                                    <label class="hsr" for="hsr1-15">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 2 -->
+                                                    <input disabled name="hsr" id="hsr1-20" value="2" type="radio">
+                                                    <label for="hsr1-20">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 2.5 -->
+                                                    <input disabled name="hsr" id="hsr1-25" value="2.5" type="radio">
+                                                    <label class="hsr" for="hsr1-25">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 3 -->
+                                                    <input disabled name="hsr" id="hsr1-30" value="3" type="radio">
+                                                    <label for="hsr1-30">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 3.5 -->
+                                                    <input disabled name="hsr" id="hsr1-35" value="3.5" type="radio">
+                                                    <label class="hsr" for="hsr1-35">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 4 -->
+                                                    <input disabled name="hsr" id="hsr1-40" value="4" type="radio">
+                                                    <label for="hsr1-40">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 4.5 -->
+                                                    <input disabled name="hsr" id="hsr1-45" value="4.5" type="radio">
+                                                    <label class="hsr" for="hsr1-45">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                        </svg>
+                                                    </label>
+
+                                                    <!-- рейтинг 5 -->
+                                                    <input disabled name="hsr" id="hsr1-50" value="5" type="radio">
+                                                    <label for="hsr1-50">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                            <path
+                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                        </svg>
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-8">
-                                            <div class="card-body">
-                                                <h5 class="card-title">
-                                                    <a href="
-                                                    {% if events.category  == 'Онлайн' %}
-                                                        {% url "events_available:online_card" events.slug %}
-                                                    {% elif events.category  == 'Оффлайн' %}
-                                                        {% url "events_available:offline_card" events.slug %}
-                                                    {% elif events.category  == 'Достопримечательности' %}
-                                                        {% url "events_cultural:attractions_card" events.slug %}
-                                                    {% elif events.category  == 'Доступные к посещению' %}
-                                                        {% url "events_cultural:events_for_visiting_card" events.slug %}
-                                                    {% endif %}">
-                                                    {% autoescape off %}
-                                                        {% if events.headline %}{{ events.headline }}{% else %}{{ events.name }}{% endif %}
-                                                    {% endautoescape %}
-                                                </a></h5>
-                                                <h6 class="card-date"> 
-                                                    <split class="card-day"><b>{{ events.date }}</b></split> 
-                                                    <split class="card-time">{{ events.time_start }} - {{ events.time_end }}</split> </h6> 
-                                                {% comment %} <h6 class="event-place"> {{ events.place }} </h6> {% endcomment %}
-                                                
-                                                <h6><strong>Администратор:</strong>
-                                                    {% for admin in events.events_admin.all %}
-                                                        {{admin}}
-                                                    {% endfor %}
-                                                </h6>
+                                        <div class="type-substrate">
+                                            <div class="event-type online">
+                                                {% if events.category  == 'Онлайн' %}
+                                                    онлайн 
+                                                {% elif events.category  == 'Оффлайн' %}
+                                                    оффлайн
+                                                {% elif events.category  == 'Достопримечательности' %}
+                                                    достопримечательности
+                                                {% elif events.category  == 'Доступные к посещению' %}
+                                                    для посещения
+                                                {% endif %} 
+                                            </div>
+                                        </div>
+
+                                        {% block content %}{% endblock content %}
+                                        
+
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-7 event-preview-text">
+                                        <a href="{% if events.category  == 'Онлайн' %}
+                                                    {% url "events_available:online_card" events.slug %}
+                                                {% elif events.category  == 'Оффлайн' %}
+                                                    {% url "events_available:offline_card" events.slug %}
+                                                {% elif events.category  == 'Достопримечательности' %}
+                                                    {% url "events_cultural:attractions_card" events.slug %}
+                                                {% elif events.category  == 'Доступные к посещению' %}
+                                                    {% url "events_cultural:events_for_visiting_card" events.slug %}
+                                                {% endif %}" class="show-more">
+                                            {% if events.headline_name %}
+                                                <h4 class="event-title-preview">{{ events.headline_name|truncatechars:65|safe }}</h4>
+                                            {% else %}
+                                                <h4 class="event-title-preview">{{ events.name|truncatechars:65 }}</h4>
+                                            {% endif %}
+                                        </a>
+
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-5 col-sm-5 event-preview-time">
+                                                <div class="preview-date">
+                                                    {% if events.category  != 'Достопримечательности' %}
+                                                        <div class="date-time-row">
+                                                            <span class="card-date">Дата: {{ events.formatted_date_range }}</span>
+                                                            <span class="card-time">
+                                                                {% if events.time_start != events.time_end %}
+                                                                    Время: {{ events.time_start }} – {{ events.time_end }}
+                                                                {% else %}
+                                                                    Время: {{ events.time_start }}
+                                                                {% endif %}
+                                                            </span>
+                                                        </div>
+                                                        
                                                     
-                                                
-                                                {% comment %} <h7 class="event-place"> <strong>Администратор: {{ events.events_admin }}</strong>  </h7> {% endcomment %}
-                                                {% autoescape off %}
-                                                    {% if events.bodyline %}
-                                                        {{ events.bodyline }}
-                                                    {% else %}
-                                                        <p class="card-text">{{ events.description|truncatechars:625 }}</p>
                                                     {% endif %}
-                                                {% endautoescape %}
-                                                
-                                                <p class="card-text">
-                                                    <small class="text-muted">{% if events.tags %} 
-                                                        {{ events.tags }}
+                                                </div>
+                                            </div>
+
+                                            <div class="event-preview-speaker">
+                                                {% if events.category != "Доступные к посещению" and events.category != "Достопримечательности"%}
+                                                <label for="speaker" class="preview-speaker">Спикеры:</label>
+                                                    {% for speaker in events.speakers.all %}
+                                                        {{ speaker.last_name }} {{ speaker.first_name }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                {% else %}
+                                                    {% if events.place_limit and events.date >= now %}
+                                                        {% if events.place_free > 0 %}
+                                                            Свободных мест: <span id="free-places-{{events.slug}}"> {{events.place_free }} </span> / {{events.place_limit }}
                                                         {% else %}
+                                                            Нет свободных мест
                                                         {% endif %}
-                                                    </small>
-                                                </p>
-                                                <p>
-                                                    {% if events.town %}г.{{ events.town }}{% endif %} {% if events.street %}ул.{{ events.street }}{% endif %} {% if events.house %} д.{{ events.house }}{% endif %}{% if events.cabinet %} кабинет {{ events.cabinet }}{% endif %}
-                                                </p>
-                                                
-                                                
-                                                {% if events.speakers.all %}
-                                                    <p>
-                                                        <h6><strong>Спикеры:</strong></h6>
-                                                        {% for speaker in events.speakers.all %}
-                                                            {{ speaker.last_name }} {{ speaker.first_name }}{% if speaker.middle_name %} {{ speaker.middle_name }}{% endif %}{% if not forloop.last %}, {% endif %}
-                                                        {% endfor %}
-                                                    </p>
+                                                    {% endif %}  
                                                 {% endif %}
-                                                
-                                                
-                                                {% block content %}{% endblock content %}
-                                                {% block admins_events %}{% endblock admins_events %}
-                                                {% if reviews %}
-                                                    <div class="reviews">
-                                                        {% if reviews|get_item:events.unique_id %}
-                                                            <ul>
-                                                                {% for review in reviews|get_item:events.unique_id %}
-                                                                    <li>
-                                                                        <h5>Отзыв:</h5>
-                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }} </strong> ({{ review.formatted_date }}):</p>
-                                                                        <p>{{ review.comment }}</p>
-                                                                    </li>
-                                                                {% endfor %}
-                                                            </ul>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endif %}
-                                                
                                                 
                                             </div>
+
+                                            {% if events.town or events.street %}
+                                                <div class="col-lg-12 col-md-12 col-sm-5 event-preview-adress">
+                                                    <label for="adress" class="preview-speaker">Адрес:</label>
+                                                    {% if events.town %}г.{{ events.town }}{% endif %} {% if events.street %}ул.{{ events.street }}{% endif %} {% if events.house %} д.{{ events.house }}{% endif %}{% if events.cabinet %} кабинет {{ events.cabinet }}{% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="event-preview-description">
+                                            <label for="" class="preview-about">О мероприятии:</label>
+                                            <p class="preview-description">
+                                                {% autoescape off %}
+                                                    {% if events.headline_description %}
+                                                        {{ events.headline_description|truncatechars:200 }}
+                                                    {% else %}
+                                                        {{ events.description|truncatechars:200 }}
+                                                    {% endif %}
+                                                {% endautoescape %}
+                                                <a href="{% if events.category  == 'Онлайн' %}
+                                                    {% url "events_available:online_card" events.slug %}
+                                                {% elif events.category  == 'Оффлайн' %}
+                                                    {% url "events_available:offline_card" events.slug %}
+                                                {% elif events.category  == 'Достопримечательности' %}
+                                                    {% url "events_cultural:attractions_card" events.slug %}
+                                                {% elif events.category  == 'Доступные к посещению' %}
+                                                    {% url "events_cultural:events_for_visiting_card" events.slug %}
+                                                {% endif %}"  class="show-more">Подробнее</a>
+                                            </p>
+                                        </div>
+                                        <div class="preview-event-id">
+                                            <div class="event-content-row">
+                                                <div class="event-reviews-link">
+                                                    <a href="#" class="reviews-link" type="button" data-bs-toggle="modal"
+                                                        data-bs-target="#modal-{{ events.unique_id }}">Посмотреть отзывы</a>
+                                                </div>
+                                                <div class="event-tags">
+                                                    {% if events.tags %} 
+                                                        {{ events.tags }}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 right-column"></div>
+                    </div>
+
+                    {% if reviews %}
+                        <div class="modal fade" id="modal-{{ events.unique_id }}" tabindex="-1" aria-labelledby="modalLabel-{{ events.unique_id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="modalLabel-{{ events.unique_id }}">Отзывы</h1>
+                                        <button type="button" class="button-close" data-bs-dismiss="modal" aria-label="Close">
+                                            <img src="{% static "icons/close-button.png" %}" alt="">
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="reviews" data-event-id="{{ events.id }}">
+                                            {% spaceless %}
+                                                {% for review in reviews|get_item:events.unique_id|dictsortreversed:"date_submitted" %}
+                                                    {% if review.event.unique_id == events.unique_id %}
+                                                        <div class="existent-comment">
+                                                            <div class="existent-review">
+                                                                <div class="user-info-existent-review">
+                                                                    <div class="user-icon-existent-review"> 
+                                                                        {% if review.user.profile_photo %}
+                                                                            <img src="{{ review.user.profile_photo.url }}" alt="">
+                                                                        {% else %}
+                                                                            <img src="{% static "icons/profile-image-default.png" %}" alt="">
+                                                                        {% endif %}
+                                                                    </div>
+                                                                    
+                                                                    <div class="username-existent-review">
+                                                                        <div class="user-lastname">{{ review.user.username }}</div>
+                                                                    </div>
+                                                                    {% comment %} <div class="full-stars-com">
+                                                                        <div class="rating-group-com">
+                                                                            <!-- по умолчанию 0 -->
+                                                                            <input name="fst" value="0" type="radio" disabled checked />
+                        
+                                                                            <!-- рейтинг 1 -->
+                                                                            <label for="fst-1">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                    <path
+                                                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                </svg>
+                                                                            </label>
+                                                                            <input name="fst" id="fst-1" value="1" type="radio" />
+                        
+                                                                            <!-- рейтинг 2 -->
+                                                                            <label for="fst-2">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                    <path
+                                                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                </svg>
+                                                                            </label>
+                                                                            <input name="fst" id="fst-2" value="2" type="radio" />
+                        
+                                                                            <!-- рейтинг 3 -->
+                                                                            <label for="fst-3">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                    <path
+                                                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                </svg>
+                                                                            </label>
+                                                                            <input name="fst" id="fst-3" value="3" type="radio" />
+                        
+                                                                            <!-- рейтинг 4 -->
+                                                                            <label for="fst-4">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                    <path
+                                                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                </svg>
+                                                                            </label>
+                                                                            <input name="fst" id="fst-4" value="4" type="radio" />
+                        
+                                                                            <!-- рейтинг 5 -->
+                                                                            <label for="fst-5">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                    <path
+                                                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                </svg>
+                                                                            </label>
+                                                                            <input name="fst" id="fst-5" value="5" type="radio" />
+                                                                        </div>
+                                                                    </div> {% endcomment %}
+                                                                    <div class="review-date-submitted">
+                                                                        {{ review.formatted_date }}
+                                                                    </div> 
+                                                                </div>
+                                                                <div class="review-block review-block-existent-review">
+                                                                    <div class="review-text review-text-existent-review">
+                                                                        {{ review.comment }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>   
+                                                            <hr class="review-divider">                                                     
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endspaceless %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
- 
-                    {% block favorite %}{% endblock favorite %}
-                    {% block register %}{% endblock register %}
-                    
-					
-				</div>
-				<div class="col-lg-1"></div>
-			</div>
-		</div>
-		{% endif %}
-    </section>
-   
-    <pagination>
-        {% if user.is_authenticated %}
-            {% if event_card_views %}
-                {% if event_card_views.paginator.page_range %}
-                    <nav aria-label="Page navigation example" >
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item {% if not event_card_views.has_previous %} disabled {% endif %}">
-                                <a class="page-link" href="
-                                {% if event_card_views.has_previous %}  
-                                    ?{% change_params page=event_card_views.previous_page_number %}
-                                {% else %} 
-                                    #
-                                {% endif %}">Назад </a>
-                            </li>
-                            {% for page in event_card_views.paginator.page_range %}		
-                                {% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
-                                    <li class="page-item {% if event_card_views.number == page %} active {% endif %}">
-                                        <a class="page-link" href="
-                                        ?{% change_params page=page %}">
-                                        {{ page }}</a>
-                                    </li>
-                                {% endif %}		
-                            {% endfor %}
-                            <li class="page-item {% if not event_card_views.has_next %} disabled {% else %}{% endif %}">
-                                <a class="page-link" href="
-                                {% if event_card_views.has_next %}
-                                    ?{% change_params page=event_card_views.next_page_number %}
-                                {% else %} 
-                                    #
-                                {% endif %}">Следующая </a>
-                            </li>
-                        </ul>
-                    </nav>
-                {% endif %} 
-            {% endif %}
-        {% endif %}
-    </pagination>
+                    {% endif %}
+                {% endfor %}
+            </section>
+
+            {% block favorite %}{% endblock favorite %}
+
+            
+            <pagination>
+                {% if user.is_authenticated %}
+                    {% if event_card_views %}
+                        <ul class="pagination">
+                                <li class="{% if not event_card_views.has_previous %} disabled {% endif %} pagination__item pagination__item--prev">
+                                    <a class="pagination__link" href="{% if event_card_views.has_previous %}?{% change_params page=event_card_views.previous_page_number %}{% else %}#{% endif %}">Назад</a>
+                                </li>
+                                {% for page in event_card_views.paginator.page_range %}
+                                    {% if page >= event_card_views.number|add:-2 and page <= event_card_views.number|add:2 %}
+                                        <li class="pagination__item {% if event_card_views.number == page %} pagination__item--active {% endif %}">
+                                            <a class="pagination__link" href="?{% change_params page=page %}">{{ page }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                <li class="{% if not event_card_views.has_next %} disabled {% endif %} pagination__item pagination__item--next">
+                                    <a class="pagination__link" href="{% if event_card_views.has_next %}?{% change_params page=event_card_views.next_page_number %}{% else %}#{% endif %}">Следующая</a>
+                                </li>
+                        </ul>        
+                    {% endif %}
+                {% endif %}
+            </pagination>
+        </div>
+        <div class="col-lg-1 right-column" style="padding: 0;"></div>
+
+        <div class="modal" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-modal="true"
+            role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="commentModalLabel">Оставить отзыв</h5>
+                        <button type="button" class="button-close" data-bs-dismiss="modal" aria-label="Close">
+                            <img src="{% static "icons/close-button.png" %}" alt="">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="commentForm">
+                            <input type="hidden" id="eventId" name="event_id" value="7">
+                            <input type="hidden" id="modelType" name="model_type" value="online">
+
+                            <!-- Контейнер для оценки и звезд -->
+                            <div style="text-indent: 0;">
+                                <div class="rating-container">
+                                    <label class="form-label" style="margin-right: 10px;">Оценка:</label>
+                                    <div class="full-stars">
+                                        <div class="rating-group">
+                                            <input name="rating" value="0" type="radio" checked />
+
+                                            <!-- Рейтинг 1 -->
+                                            <label for="rating-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                    <path
+                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                </svg>
+                                            </label>
+                                            <input name="rating" id="rating-1" value="1" type="radio" />
+
+                                            <!-- Рейтинг 2 -->
+                                            <label for="rating-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                    <path
+                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                </svg>
+                                            </label>
+                                            <input name="rating" id="rating-2" value="2" type="radio" />
+
+                                            <!-- Рейтинг 3 -->
+                                            <label for="rating-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                    <path
+                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                </svg>
+                                            </label>
+                                            <input name="rating" id="rating-3" value="3" type="radio" />
+
+                                            <!-- Рейтинг 4 -->
+                                            <label for="rating-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                    <path
+                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                </svg>
+                                            </label>
+                                            <input name="rating" id="rating-4" value="4" type="radio" />
+
+                                            <!-- Рейтинг 5 -->
+                                            <label for="rating-5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                    <path
+                                                        d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                </svg>
+                                            </label>
+                                            <input name="rating" id="rating-5" value="5" type="radio" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Поле для отзыва -->
+                            <div class="mb-3" style="text-indent: 0;">
+                                <label for="commentText" class="form-label" style="text-indent: 0;">Ваш отзыв:</label>
+                                <textarea class="form-control" id="commentText" name="comment" rows="3"></textarea>
+                            </div>
+
+                            <!-- Кнопка отправки -->
+                            <button type="submit" class="btn btn-outline-success">Отправить</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+
+    </main>
+
+    <script src="{% static "js/filter_area_offline_place.js" %}"></script>
     
+    <script src="{% static "js/autocomplete.js" %}"></script>
 
-    <script src="{% static 'scripts/jquery-3.6.0.min.js' %}"></script>
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'scripts/select2.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-datepicker.ru.min.js' %}"></script>
-    <script src="{% static 'scripts/moment.min.js' %}"></script>
-    <script src="{% static 'django_select2/django_select2.js' %}"></script>
+    <script src="{% static "js/card_popup_script.js" %}"></script>
 
+    <script src="{% static "js/events_registration.js" %}"></script>
+
+    <script src="{% static "js/like.js" %}"></script>
+
+    <script src="{% static "js/rating_script.js" %}"></script>
+
+    <script src="{% static "js/registration_disallowed_script.js" %}"></script>
+
+    <script src="{% static "js/create_comment.js" %}"></script>
+
+    <script src="{% static "js/filters_script.js" %}"></script>
+
+    <script src="{% static "js/sort_script.js" %}"></script>
+
+    <script src="{% static "js/filters_selected_script.js" %}"></script>
+
+    <script src="{% static "js/sort_selected_script.js" %}"></script>
+
+    <script src="{% static "js/content_load_script.js" %}"></script>
+
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Mini App Auto-login -->
+    <script>
+        (function() {
+            // Проверяем, что мы в Telegram Mini App
+            if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                
+                // Проверяем, что пользователь не авторизован
+                {% if not user.is_authenticated %}
+                    // Получаем initData (в Telegram Web App API это строка в формате query string)
+                    const initData = tg.initData;
+                    
+                    if (initData) {
+                        // Отправляем initData на сервер для авторизации
+                        fetch('{% url "users:miniapp_auth" %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            credentials: 'include',  // Важно: отправляем куки с запросом
+                            body: JSON.stringify({
+                                initData: initData
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Response data:', data);
+                            if (data.success) {
+                                // Редирект на указанный URL
+                                console.log('Авторизация успешна через Mini App, редирект на:', data.redirect_url);
+                                console.log('Session key:', data.session_key);
+                                console.log('Cookies перед редиректом:', document.cookie);
+                                
+                                // Небольшая задержка для сохранения сессии
+                                setTimeout(() => {
+                                    const sessionCookie = getCookie('sessionid');
+                                    console.log('Session cookie после задержки:', sessionCookie ? 'установлен (' + sessionCookie.substring(0, 20) + '...)' : 'не установлен');
+                                    console.log('Все cookies:', document.cookie);
+                                    
+                                    if (data.redirect_url) {
+                                        console.log('Выполняю редирект на:', data.redirect_url);
+                                        try {
+                                            window.location.replace(data.redirect_url);
+                                        } catch (e) {
+                                            console.error('Ошибка при редиректе:', e);
+                                            window.location.href = data.redirect_url;
+                                        }
+                                    } else {
+                                        console.log('Выполняю редирект на главную');
+                                        try {
+                                            window.location.replace('/');
+                                        } catch (e) {
+                                            window.location.href = '/';
+                                        }
+                                    }
+                                }, 500);
+                            } else {
+                                // Если пользователь не найден, показываем сообщение или редирект на регистрацию
+                                if (data.needs_registration) {
+                                    console.log('Пользователь не найден. Требуется регистрация.');
+                                    // Можно показать уведомление или редирект на регистрацию
+                                } else {
+                                    console.error('Ошибка авторизации:', data.error);
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Ошибка при авторизации через Mini App:', error);
+                        });
+                    }
+                {% endif %}
+            }
+            
+            // Функция для получения CSRF токена
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        })();
+    </script>
+
+    <script>
+        // Hide preloader once all resources are fully loaded
+        window.addEventListener('load', function () {
+            var preloader = document.getElementById('preloader')
+            if (preloader) {
+                preloader.classList.add('hidden')
+                setTimeout(function(){
+                    if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader)
+                }, 400)
+            }
+        })
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const stars = document.querySelectorAll('input[name="rating"]');
+            const ratingInput = document.getElementById('ratingInput');
+        
+            stars.forEach(star => {
+                star.addEventListener('change', function () {
+                    ratingInput.value = this.value;
+                });
+            });
+        });
+        </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.rating-overlay').forEach(overlay => {
+          const ratingText = overlay.querySelector('.ranting-count');
+          if (!ratingText) return;
+      
+          const rawText = ratingText.innerText.trim().replace(',', '.');
+          const raw = parseFloat(rawText) || 0;
+          const rounded = Math.round(raw * 2) / 2;
+      
+          const inputs = overlay.querySelectorAll('.rating-group input[type="radio"]');
+          const labels = overlay.querySelectorAll('.rating-group label');
+      
+          // Очистка
+          labels.forEach(label => label.classList.remove('filled'));
+      
+          // Заполнение
+          inputs.forEach(input => {
+            const val = parseFloat(input.value);
+            const label = overlay.querySelector(`label[for="${input.id}"]`);
+            if (val <= rounded) {
+              if (label) label.classList.add('filled');
+            } else {
+            }
+          });
+        });
+      });
+      
+</script>
 
 
     <script type="text/javascript">
@@ -356,241 +1201,18 @@
     </script>
     {% block javascript_files %}
 
-<!-- Notification ДОБАВЛЕНИЕ В ИЗБРАННЫЕ И УДАЛЕНИЕ ИЗ ИЗБРАННЫХ -->
-<div id="favoriteNotification" class="notification" style="display: none;">
+<!-- Notification for Favorites-->
+<div id="favoriteNotification" class="notification-toast" style="display: none;">
     <p></p>
 </div>
-
-<script>
-    function initializeFavoriteButtons() {
-        // Обработчик для добавления в избранное
-        document.querySelectorAll('.add-to-cart').forEach(function (button) {
-            button.addEventListener('click', function (event) {
-                event.preventDefault()
-                const eventSlug = this.getAttribute('data-event-slug')
-                const icon = this.querySelector('.heart-icon')
-                const button = this
-    
-                fetch(`/bookmarks/events_add/${eventSlug}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ 'slug': eventSlug })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.added) {
-                            icon.src = "{% static 'general/icons/heart_red.png' %}"
-                            button.classList.remove('add-to-cart')
-                            button.classList.add('remove-from-favorites')
-                            button.setAttribute('data-event-id', data.event_id)
-                            showNotification("Добавлено в избранное")
-                        } else {
-                            icon.src = "{% static 'general/icons/heart.svg' %}"
-                            button.classList.remove('remove-from-favorites')
-                            button.classList.add('add-to-cart')
-                            button.removeAttribute('data-event-id')
-                            showNotification("Удалено из избранного")
-                        }
-                    })
-                    .catch(error => console.error('Error:', error))
-            })
-        })
-    
-        // Обработчик для удаления из избранного
-        document.querySelectorAll('.remove-from-favorites').forEach(function (button) {
-            button.addEventListener('click', function (event) {
-                event.preventDefault()
-                const eventId = this.getAttribute('data-event-id')
-                const buttonElement = this
-                const icon = this.querySelector('.heart-icon')
-    
-                fetch(`/bookmarks/events_remove/${eventId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ 'id': eventId })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.removed) {
-                            icon.src = "{% static 'general/icons/heart.svg' %}"
-                            buttonElement.classList.remove('remove-from-favorites')
-                            buttonElement.classList.add('add-to-cart')
-                            buttonElement.removeAttribute('data-event-id')
-                            showNotification("Удалено из избранного")
-                        } else {
-                            console.error('Ошибка:', data.error)
-                        }
-                    })
-                    .catch(error => console.error('Ошибка:', error))
-            })
-        })
-    }
-    
-    function showNotification(message) {
-        const notification = document.getElementById('favoriteNotification')
-        notification.querySelector('p').textContent = message
-        notification.style.display = 'block'
-        setTimeout(() => {
-            notification.classList.add('fade-in')
-        }, 10)
-    
-        setTimeout(function () {
-            notification.classList.remove('fade-in')
-            notification.classList.add('fade-out')
-    
-            setTimeout(function () {
-                notification.style.display = 'none'
-                notification.classList.remove('fade-out')
-            }, 700)
-        }, 1000)
-    }
-    
-    document.addEventListener('DOMContentLoaded', function () {
-        initializeFavoriteButtons()
-    })
-</script>
 
 <!-- Notification for Registration -->
-<div id="registrationNotification" class="notification" style="display: none;">
+<div id="registrationNotification" class="notification-toast" style="display: none;">
     <p></p>
 </div>
 
-<script>
-    function initializeRegistrationButtons() {
-        document.querySelectorAll('.btn-sent_app').forEach(function(button) {
-            button.removeEventListener('click', handleRegister);
-            button.addEventListener('click', handleRegister);
-        });
-
-        document.querySelectorAll('.btn-remove_app').forEach(function(button) {
-            button.removeEventListener('click', handleUnregister);
-            button.addEventListener('click', handleUnregister);
-        });
-    }
-
-    function handleRegister(event) {
-        event.preventDefault();
-        const eventSlug = this.getAttribute('data-event-slug');
-        const buttonElement = this;
-
-        fetch(`/bookmarks/events_registered/${eventSlug}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ 'slug': eventSlug })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.added) {
-                buttonElement.classList.remove('btn-danger', 'btn-sent_app');
-                buttonElement.classList.add('btn-light', 'btn-remove_app');
-                buttonElement.innerHTML = 'Отмена регистрации';
-                buttonElement.setAttribute('data-event-id', data.event_id);
-                buttonElement.removeAttribute('data-event-slug');
-                showRegistrationNotification("Зарегистрировано");
-                initializeRegistrationButtons();
-            } else {
-                console.error('Ошибка при регистрации:', data.error);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    function handleUnregister(event) {
-        event.preventDefault();
-        const eventId = this.getAttribute('data-event-id');
-        const buttonElement = this;
-
-        fetch(`/bookmarks/registered_remove/${eventId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ 'id': eventId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.removed) {
-                buttonElement.classList.remove('btn-light', 'btn-remove_app');
-                buttonElement.classList.add('btn-danger', 'btn-sent_app');
-                buttonElement.innerHTML = 'Регистрация';
-                buttonElement.setAttribute('data-event-slug', data.event_slug);
-                buttonElement.removeAttribute('data-event-id');
-                showRegistrationNotification("Регистрация отменена");
-                initializeRegistrationButtons();
-            } else {
-                console.error('Ошибка при отмене регистрации:', data.error);
-            }
-        })
-        .catch(error => console.error('Ошибка:', error));
-    }
-
-    function showRegistrationNotification(message) {
-        const notification = document.getElementById('registrationNotification');
-        notification.querySelector('p').textContent = message;
-        notification.style.display = 'block';
-        setTimeout(() => {
-            notification.classList.add('fade-in');
-        }, 10);
-
-        setTimeout(function() {
-            notification.classList.remove('fade-in');
-            notification.classList.add('fade-out');
-
-            setTimeout(function() {
-                notification.style.display = 'none';
-                notification.classList.remove('fade-out');
-            }, 700);
-        }, 1000);
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeRegistrationButtons();
-    });
-</script>
-
-
-<style>
-    .notification {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-20px);
-        width: auto;
-        max-width: 300px;
-        padding: 15px;
-        background-color: #4caf50;
-        color: white;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        opacity: 0;
-        transition: opacity 0.5s ease, transform 0.5s ease;
-        z-index: 1000;
-    }
-    .notification p {
-        margin: 0;
-    }
-    .notification.fade-in {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-    .notification.fade-out {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-20px);
-    }
-</style>
-
-<!-- Notification -->
-<div id="reviewNotification" class="notification" style="display: none;">
+<!-- Notification for Review-->
+<div id="reviewNotification" class="notification-toast" style="display: none;">
     <p></p>
 </div>
 
@@ -606,6 +1228,45 @@
                 <form id="commentForm">
                     <input type="hidden" id="eventId" name="event_id">
                     <input type="hidden" id="modelType" name="model_type">
+                    <div class="mt-1">
+                        <div class="full-stars">
+                            <div class="rating-group">
+                                <!-- по умолчанию 0 -->
+                                <input name="rating_{{ events.unique_id }}" value="0" type="radio" disabled checked />
+                                
+                                    
+                                    <!-- рейтинг 1 -->    
+                                    <label for="rating_{{ events.unique_id }}-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
+                                    </label>
+                                    <input name="rating_{{ events.unique_id }}" id="rating_{{ events.unique_id }}-1" value="1" type="radio" />
+                                    
+                                    <!-- рейтинг 2 -->    
+                                    <label for="rating_{{ events.unique_id }}-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
+                                    </label>
+                                    <input name="rating_{{ events.unique_id }}" id="rating_{{ events.unique_id }}-2" value="2" type="radio" />
+
+                                    <!-- рейтинг 3 -->    
+                                    <label for="rating_{{ events.unique_id }}-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
+                                    </label>
+                                    <input name="rating_{{ events.unique_id }}" id="rating_{{ events.unique_id }}-3" value="3" type="radio" />
+
+                                    <!-- рейтинг 4 -->    
+                                    <label for="rating_{{ events.unique_id }}-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
+                                    </label>
+                                    <input name="rating_{{ events.unique_id }}" id="rating_{{ events.unique_id }}-4" value="4" type="radio" />
+
+                                    <!-- рейтинг 5 -->    
+                                    <label for="rating_{{ events.unique_id }}-5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/></svg>
+                                    </label>
+                                    <input name="rating_{{ events.unique_id }}" id="rating_{{ events.unique_id }}-5" value="5" type="radio" />
+                            </div>
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label for="commentText" class="form-label">Ваш отзыв</label>
                         <textarea class="form-control" id="commentText" name="comment" rows="3"></textarea>
@@ -618,124 +1279,6 @@
     </div>
 </div>
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.btn-comment').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const eventId = this.getAttribute('data-event-id');
-                const modelType = this.getAttribute('data-model-type');
-                document.getElementById('eventId').value = eventId;
-                document.getElementById('modelType').value = modelType;
-                const modal = new bootstrap.Modal(document.getElementById('commentModal'));
-                modal.show();
-            });
-        });
-
-        document.getElementById('commentForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const eventId = document.getElementById('eventId').value;
-            const modelType = document.getElementById('modelType').value;
-            const formData = new FormData(this);
-            formData.append('model_type', modelType);
-            const csrftoken = getCookie('csrftoken');
-
-            let url = '';
-            if (modelType === 'attractions' || modelType === 'for_visiting') {
-                url = `/events_cultural/submit_review/${eventId}/`;
-            } else if (modelType === 'offline' || modelType === 'online') {
-                url = `/events_available/submit_review/${eventId}/`;
-            }
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(`Отзыв добавлен: ${data.formatted_date}`);
-                    document.getElementById('commentForm').reset();
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('commentModal'));
-                    modal.hide();
-                } else {
-                    showNotification(data.message, true);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        function showNotification(message, isError = false) {
-            const notification = document.getElementById('reviewNotification');
-            notification.querySelector('p').textContent = message;
-            notification.style.display = 'block';
-            notification.style.backgroundColor = isError ? '#f44336' : '#4caf50';
-            setTimeout(() => {
-                notification.classList.add('fade-in');
-            }, 10);
-
-            setTimeout(function() {
-                notification.classList.remove('fade-in');
-                notification.classList.add('fade-out');
-
-                setTimeout(function() {
-                    notification.style.display = 'none';
-                    notification.classList.remove('fade-out');
-                }, 500);
-            }, 2000);
-        }
-    });
-</script>
-
-<style>
-    .notification {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-20px);
-        width: auto;
-        max-width: 300px;
-        padding: 15px;
-        background-color: #4caf50;
-        color: white;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        opacity: 0;
-        transition: opacity 0.5s ease, transform 0.5s ease;
-        z-index: 1000;
-    }
-    .notification p {
-        margin: 0;
-    }
-    .notification.fade-in {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-    .notification.fade-out {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-20px);
-    }
-</style>
-
-
-    {% endblock javascript_files %}
+    {% endblock javascript_files %} 
 </body>
 </html>

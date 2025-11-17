@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    if: github.repository == 'laser54/SGUevents' && github.ref == 'refs/heads/main'
+    if: github.repository == 'LAlexanderS/SGUevents' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements.txt
 
   build_and_push_to_docker_hub:
-    if: github.repository == 'laser54/SGUevents' && github.ref == 'refs/heads/main'
+    if: github.repository == 'LAlexanderS/SGUevents' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: tests
     steps:
@@ -46,9 +46,10 @@ jobs:
           push: true
           context: .
           tags: ${{ secrets.DOCKER_USERNAME }}/events:latest
+          build-args: --no-cache
 
   deploy:
-    if: github.repository == 'laser54/SGUevents' && github.ref == 'refs/heads/main'
+    if: github.repository == 'LAlexanderS/SGUevents' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build_and_push_to_docker_hub
     steps:
@@ -60,7 +61,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /home/event.larin.work
+            cd /home/dockerhub
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/events:latest
             sudo docker-compose stop
             sudo docker-compose rm -f backend

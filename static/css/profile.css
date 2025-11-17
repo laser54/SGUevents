@@ -1,0 +1,412 @@
+.index-link {
+    font-family: 'Days One', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    text-decoration: none;
+    color: aliceblue;
+    font-size: 20pt;
+}
+
+.user-photo {
+    align-content: center;
+    text-align: center;
+}
+
+.photo-frame {
+    height: 160px;
+    width: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+}
+
+.user-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.change-photo {
+    width: 100%;
+    background: rgb(39, 66, 106);
+    white-space: nowrap;
+}
+
+.change-photo :hover {
+    background: none !important;
+}
+
+.photo-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.photo-upload-btn {
+    background: rgb(39, 66, 106);
+    border: none;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-family: 'Onest';
+    font-weight: 600;
+    box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.25), -2px 2px 4px 0px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.photo-upload-btn:hover {
+    background: rgb(51, 84, 136);
+    transform: translateY(-2px);
+    box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.3), -2px 4px 8px 0px rgba(0, 0, 0, 0.3);
+}
+
+.logistic-btn {
+    width: 50%;
+}
+
+.photo-delete-btn {
+    background: rgb(220, 53, 69);
+    border: none;
+    color: white;
+    border-radius: 25px;
+    padding: 10px 18px;
+    font-family: 'Onest';
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.25), -2px 2px 4px 0px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.photo-delete-btn:hover {
+    background: rgb(200, 35, 51);
+    transform: translateY(-2px);
+    box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.3), -2px 4px 8px 0px rgba(0, 0, 0, 0.3);
+}
+
+.upload-icon,
+.delete-icon,
+.password-icon {
+    font-size: 16px;
+}
+
+@media (max-width: 992px) {
+    .photo-buttons-container {
+        flex-direction: row;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .photo-buttons-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+/* .user-right-profile {
+    justify-content: center;
+} */
+
+.admin-request {
+    text-indent: 0;
+    color: white;
+    font-family: 'Onest';
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 0%;
+    margin-top: 10px;
+    text-align: center;
+    text-shadow: -0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+
+
+
+.movement-header {
+    text-indent: 0;
+    color: white;
+    font-family: 'Onest';
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 0%;
+    margin-top: 10px;
+    text-align: center;
+    text-shadow: -0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.no-movement {
+    text-align: center;
+    font-size: 24px;
+    color: rgb(39, 66, 106);
+
+}
+
+.user-movement {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.user-movement-info {
+    display: flex;
+    color: rgb(39, 66, 106);
+    font-family: 'Onest';
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 160%;
+    letter-spacing: 0%;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.user-movement-event {
+    border-bottom: 1px solid;
+}
+
+.user-movement-info span:first-of-type {
+    font-weight: 600;
+    width: 40%;
+}
+
+.user-movement-info span:last-of-type {
+    max-width: 60%;
+    text-align: right;
+}
+
+
+.rights-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.rights-table td:first-child {
+    width: auto;
+    white-space: nowrap;
+}
+
+.rights-table td:nth-child(2) {
+    text-align: right;
+    width: 100%;
+}
+
+.send_message {
+    list-style-type: none;
+}
+
+.change-password {
+    width: 100%;
+    margin-right: 0;
+    border-radius: 25px;
+    box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.25), -2px 2px 4px 0px rgba(0, 0, 0, 0.25);
+    background: rgb(39, 66, 106);
+    border: none;
+    color: rgb(255, 255, 255);
+    font-family: 'Onest';
+    /* font-size: 18px; */
+    font-weight: 600;
+    letter-spacing: 0%;
+    text-align: center;
+}
+
+.profile-fields {
+    text-indent: 0;
+    top: 201px;
+    color: rgb(39, 66, 106);
+    font-family: Onest;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 160%;
+    letter-spacing: 0%;
+}
+
+.account-information {
+    text-indent: 0;
+    color: rgb(39, 66, 106);
+    font-family: 'Onest';
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 160%;
+    letter-spacing: 0%;
+    text-align: right;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.input-with-button {
+    position: relative;
+    width: 100%;
+}
+
+.input-with-button input {
+    width: 100%;
+    padding-right: 60px;
+    height: 40px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.send-request {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    /* background-color: rgb(39, 66, 106); */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: none;
+}
+
+.send-request :hover {
+    background: none !important;
+}
+
+.group-info {
+    text-align: right;
+}
+
+.group-info :left {
+    width: 30%;
+}
+
+.form-check {
+    padding-left: 0px;
+    padding-top: 5px;
+}
+
+@media(max-width: 1566px) {
+    .send-request {
+        font-size: 16px;
+    }
+
+    .user-movement,
+    .no-movement {
+        font-size: 26px;
+    }
+
+    .admin-request {
+        font-size: 26px;
+    }
+}
+
+
+/* @media (max-width: 1115px) {
+    .send-request {
+        margin-top: 10px;
+    } 
+}*/
+
+@media (max-width: 1088px) {
+    .send-request {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .photo-frame {
+        height: 90px;
+        width: 90px;
+    }
+
+    .admin-request {
+        font-size: 18px;
+    }
+
+    /* .send-request {
+        display: block;
+        margin: 10px auto 0 auto;
+    } */
+
+    .user-movement-info {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 160%;
+        letter-spacing: 0%;
+        justify-content: space-between;
+        width: 100%;
+        margin: 0px;
+    }
+
+    .no-movement {
+        font-size: 14px;
+    }
+
+    .movement-header {
+        font-size: 18px;
+        margin-top: 0px;
+    }
+
+    .account-information,
+    .role-info,
+    .group-info {
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    .role,
+    .groups,
+    .profile-fields {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .send-request {
+        width: 38px;
+        height: 38px;
+    }
+
+    .rights-table {
+        margin-top: 20px;
+    }
+
+    .movement {
+        margin-top: 20px;
+    }
+
+    .logistic-btn {
+        width: auto;
+    }
+
+    .modal-dialog-scrollable .modal-content {
+        overflow: auto;
+    }
+
+    .dop-info {
+        margin-top: 5px;
+    }
+
+    .info-block {
+        margin-top: 0.5rem;
+    }
+
+    /* .mb-3 .text-primary,
+    .mb-3 .text-success,
+    .mb-3 .text-info,
+    .form-label {
+        margin-bottom: 0px !important;
+    } */
+}

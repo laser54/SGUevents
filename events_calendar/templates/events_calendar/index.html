@@ -1,75 +1,69 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
+    <title>Календарь</title>
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
-    <link rel="stylesheet" href="{% static 'general/css/general-page.css' %}">
-    <link rel="stylesheet" href="{% static 'general/css/events_available.css' %}">
-    <link rel="stylesheet" href="{% static 'calendar/css/calendar.css' %}">
-    
-    {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/ru.js"></script> {% endcomment %}
+    <link rel="stylesheet" href="{% static "css/styles.css" %}">
+    <link rel="stylesheet" href="{% static "css/calendar.css" %}">
+    <link rel="stylesheet" href="{% static "css/fullcalendar.min.css" %}">
 
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Days+One&display=swap" rel="stylesheet">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static "calendar/js/ru.js" %}"></script>
+    <script src="{% static 'lib/js/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 
-    <title>Календарь мероприятий</title>
 
 </head>
-<body>
+<body style="background-image: url({% static "images/background.jpg" %});">
     <header>
         <nav class="navbar navbar-expand-lg bg-dark text-white">
             <div class="container-fluid">
-                <a class="navbar-brand" href={% url "main:index" %}>Home</a>
+                <a class="navbar-brand" href={% url "main:index" %}><img class="home-icon" src="{% static 'icons/home.png' %}" alt="Home" width="25" height="25"></a> 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        {% if not user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'users:login' %}">Войти</a>
-                        </li>
-                        {% else %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 Доступные мероприятия
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href={% url "events_available:online" %}>Онлайн мероприятия</a></li>
-                                <li><a class="dropdown-item" href={% url "events_available:offline" %}>Оффлайн мероприятия</a></li>
+                                <li><a class="dropdown-item" href={% url "events_available:online" %}>
+                                    Онлайн мероприятия</a></li>
+                                <li><a class="dropdown-item" href={% url "events_available:offline" %}>
+                                    Оффлайн мероприятия</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 Культурные мероприятия
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href={% url "events_cultural:attractions" %}>Достопримечательности</a></li>
-                                
+
                                 <li><a class="dropdown-item" href={% url "events_cultural:events_for_visiting" %}>Доступные к посещению</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href={% url "events_calendar:index" %}>Календарь мероприятий</a>
+                            <a class="nav-link text-white calendar" aria-current="page" href={% url "events_calendar:index" %}>Календарь мероприятий</a>
                         </li>
-                        
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Мой профиль </a>
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false"> Мой профиль </a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный кабинет</a>
+                                    <a class="dropdown-item text-black" href="{% url 'users:profile' %}">Личный
+                                        кабинет</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item text-black" href={% url "bookmarks:registered" %}>Зарегистрированные</a>
@@ -77,15 +71,15 @@
                                 <li>
                                     <a class="dropdown-item text-black" href="{% url 'bookmarks:favorites' %}">Избранные</a>
                                 </li>
+
+                                {% if user.is_staff %}
+                                    {% if user.is_admin or user.is_superuser %}
+                                        <li>
+                                            <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
+                                        </li>
+                                    {% endif %}
                                 <li>
-                                    <a class="dropdown-item text-black" href="{% url 'bookmarks:events_attended' %}">Посещенные</a>
-                                </li>
-                                {% if user.is_admin or user.is_superuser %}
-                                <li>
-                                    <a class="dropdown-item text-black" href="{% url 'admin:index' %}">Админ панель</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет администратора</a>
+                                    <a class="dropdown-item text-black" href="{% url 'personal:personal' %}">Кабинет организатора</a>
                                 </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider" /></li>
@@ -94,13 +88,13 @@
                                 </li>
                             </ul>
                         </li>
-                        
-                        {% endif %}
+
+
                     </ul>
                     <form class="d-flex" role="search" action="{% if name_page == 'Онлайн' %}{% url "events_available:search_online" %}{% elif name_page == 'Оффлайн' %}{% url "events_available:search_offline" %}{% elif name_page == 'Доступные к посещению' %}{% url "events_cultural:search_events_for_visiting" %}{% elif name_page == 'Достопримечательности' %}{% url "events_cultural:search_attractions" %}{% elif name_page == 'Все мероприятия' %}{% url "main:search_all" %}{% endif %}" method="get">
-                        <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                        <input class="form-control search me-2 " type="search" name="q" placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">
-                            <img src="{% static "general/icons/search.svg" %}" alt="S">
+                            <img src="{% static "icons/search.png" %}" alt="S" style="height: 20px; width: 20px;" margin-top: 0;> 
                         </button>
                     </form>
                 </div>
@@ -108,33 +102,47 @@
         </nav>
     </header>
 
-
-<section class="container-fluid calendar-container">
-    {% comment %} <h1 class="text-center my-4">Календарь мероприятий</h1> {% endcomment %}
+    <!-- Контейнер календаря -->
+    <section class="container-fluid calendar-container">
     <div id="calendar"></div>
-</section>
+    </section>
+    
+    <script src="{% static "js/jquery.min.js" %}"></script>
+    <script src="{% static "js/moment.min.js" %}"></script>
+    <script src="{% static "js/fullcalendar.min.js" %}"></script>
+    <script src="{% static "js/ru.js" %}"></script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+
+    <!-- Скрипт инициализации календаря -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
         var events = {{ events|safe }};
-        console.log(events);
 
         $('#calendar').fullCalendar({
-            locale: 'ru',
-            height: 'parent',
-            events: events,
-            eventRender: function(event, element) {
-                element.css('background-color', event.backgroundColor); // Устанавливаем цвет события
-                element.find('.fc-title').html('<a href="' + event.url + '" style="color:white;">' + event.title + '</a>');
-                element.find('.fc-title').append('<br/><b>' + event.time + '</b><br/><i>' + event.category + '</i>');
-            },
-            dayRender: function(date, cell) {
-                if (date.isSame(new Date(), "day")) {
-                    cell.css("background-color", "yellow"); // Сегодняшняя дата выделена желтым
-                }
+        locale: 'ru',
+        height: 'auto',
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''
+        },
+        events: events,
+        eventRender: function(event, element) {
+            element.addClass(event.css_class);
+            element.find('.fc-title').html(
+            '<span style="font-weight: bold;">' + event.time + '</span> ' +
+            event.title + '<br/><a href="' + event.url + '>' + event.title + '</a>'
+            );
+        },
+        dayRender: function(date, cell) {
+            if (date.isSame(new Date(), "day")) {
+            cell.css("background-color", "#ffffa5");
             }
+        }
         });
     });
-</script>
+    </script>
+
+
 </body>
 </html>

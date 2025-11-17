@@ -17,10 +17,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', default='p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = False
+ALLOWED_HOSTS = [
+    'sguevents.ru',
+    'www.sguevents.ru',
+    '95.47.161.83',
+#    'sguevents.help',
+#    'www.sguevents.help',
+    'event.larin.work',
+#    '127.0.0.1',
+#    'localhost',
+]
 
-ALLOWED_HOSTS = ['*']
+
+
+# Значение по умолчанию для разработки
+DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development')
 
 # Application definition
 
@@ -67,6 +79,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'users.middleware.CurrentUserMiddleware',
+    'users.middleware.NoCacheMiddleware',
+    'users.middleware.MiniAppAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'SGUevents.urls'
@@ -89,9 +103,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SGUevents.wsgi.application'
 
-# Значение по умолчанию для разработки
-DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development')
-
 # Токены для разработки и продакшена
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_DEV_BOT_TOKEN = os.getenv("TELEGRAM_DEV_BOT_TOKEN")
@@ -102,6 +113,23 @@ SUPPORT_CHAT_ID = os.getenv("SUPPORT_CHAT_ID")
 # Выбор активного токена на основе окружения
 ACTIVE_TELEGRAM_BOT_TOKEN = TELEGRAM_DEV_BOT_TOKEN if DJANGO_ENV == 'development' else TELEGRAM_BOT_TOKEN
 ACTIVE_TELEGRAM_SUPPORT_CHAT_ID = DEV_SUPPORT_CHAT_ID if DJANGO_ENV == 'development' else SUPPORT_CHAT_ID
+
+# Telegram Bot settings
+TELEGRAM_BOT_USERNAME = os.getenv('DEV_BOT_NAME') if os.getenv('DJANGO_ENV') == 'development' else os.getenv('BOT_NAME')
+
+# Telegram Mini App settings
+TELEGRAM_BOT_SECRET = os.getenv('TELEGRAM_BOT_SECRET', '')
+WEBHOOK_HOST = os.getenv('WEBHOOK_HOST', '').rstrip('/')
+TELEGRAM_MINIAPP_BASE_URL = WEBHOOK_HOST if WEBHOOK_HOST else 'https://event.larin.work'
+
+# Feature flags для способов авторизации
+ENABLE_MINIAPP_AUTH = os.getenv('ENABLE_MINIAPP_AUTH', 'True').lower() == 'true'
+ENABLE_LOGIN_WIDGET_AUTH = os.getenv('ENABLE_LOGIN_WIDGET_AUTH', 'True').lower() == 'true'
+
+# Yandex Disk settings
+YANDEX_DISK_CLIENT_ID = os.getenv('YANDEX_DISK_CLIENT_ID')
+YANDEX_DISK_CLIENT_SECRET = os.getenv('YANDEX_DISK_CLIENT_SECRET')
+YANDEX_DISK_OAUTH_TOKEN = os.getenv('YANDEX_DISK_OAUTH_TOKEN')
 
 if DJANGO_ENV == 'development':
     DATABASES = {
@@ -136,6 +164,11 @@ else:
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.auth_backends.TelegramAuthBackend',
+]
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -152,11 +185,34 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Security settings for HTTPS
+# Доверяем заголовку от внешнего прокси (nginx/caddy на VPS)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
+# Всегда работаем через HTTPS (локально тоже заходишь через домен с https)
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# Настройки для работы с Telegram Web App (нужно разрешить куки в iframe)
+# Для Telegram Web App нужен SameSite=None и Secure=True
+SESSION_COOKIE_SAMESITE = 'None' if SECURE_SSL_REDIRECT else 'Lax'
+CSRF_COOKIE_SAMESITE = 'None' if SECURE_SSL_REDIRECT else 'Lax'
+# Убеждаемся, что куки доступны для чтения JavaScript (если нужно)
+SESSION_COOKIE_HTTPONLY = True  # Безопасность - только HTTP
+SESSION_COOKIE_AGE = 1209600  # 2 недели
+SECURE_HSTS_SECONDS = 31536000  # 1 год
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://sguevents.ru',
+    'https://www.sguevents.ru',
+    # 'https://sguevents.help',  # удалено: используем event.larin.work
+    # 'https://www.sguevents.help',
+#    'https://event.larin.work',
+#    'http://127.0.0.1:8000',  # Для прямого доступа при разработке
+#    'http://localhost:8000',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -168,6 +224,14 @@ TIME_ZONE = 'Asia/Novosibirsk'
 USE_I18N = True
 
 USE_TZ = True
+
+DATE_INPUT_FORMATS = ['%d/%m/%Y', '%d.%m.%Y', '%Y-%m-%d']
+TIME_INPUT_FORMATS = ['%H:%M', '%H:%M:%S']
+DATETIME_INPUT_FORMATS = [
+    '%Y-%m-%d %H:%M', '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%dT%H:%M', '%Y-%m-%dT%H:%M:%S',
+    '%d.%m.%Y %H:%M', '%d.%m.%Y %H:%M:%S',
+]
 
 LOGIN_URL = 'users:login'
 
@@ -187,6 +251,14 @@ MEDIA_URL = 'media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Ограничение размера загружаемого файла (10 МБ на один файл)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+# Лимитобъёма изображений(галерея + поля qr image documents)
+# 9.5 МБ для запаса
+MAX_GALLERY_UPLOAD_BYTES = min(int(9.5 * 1024 * 1024), DATA_UPLOAD_MAX_MEMORY_SIZE)
+MAX_GALLERY_UPLOAD_MB = round(MAX_GALLERY_UPLOAD_BYTES / (1024 * 1024), 1)
+
 INTERNAL_IPS = [
     "127.0.0.1",
     # ...
@@ -197,9 +269,37 @@ INTERNAL_IPS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Отключаем все виды кэширования для разработки
+if DEBUG:
+    # Отключаем кэш
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+    
+    # Отключаем кэширование шаблонов
+    for template_engine in TEMPLATES:
+        template_engine['OPTIONS']['debug'] = True
+        
+    # Отключаем кэширование статических файлов
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    
+    # Отключаем кэширование сессий
+    SESSION_CACHE_ALIAS = 'default'
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+    
+    # Отключаем кэширование админки
+    ADMIN_MEDIA_PREFIX = '/static/admin/'
+    
+    # Принудительно перезагружаем модули
+    import sys
+    if 'users.admin' in sys.modules:
+        del sys.modules['users.admin']
+
 # Настройки Celery
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

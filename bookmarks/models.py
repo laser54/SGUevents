@@ -7,11 +7,13 @@ from events_cultural.models import Attractions, Events_for_visiting
 from users.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from users.telegram_utils import send_message_to_user_with_toggle_button, send_custom_notification_with_toggle
+from users.telegram_utils import send_custom_notification_with_toggle
 import logging
 from django.utils import timezone
 from pytz import timezone as pytz_timezone
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Avg
+
 
 logger = logging.getLogger(__name__)
 
@@ -35,15 +37,15 @@ class Favorite(models.Model):
 
     def __str__(self):
         try:
-            return f'Избранные {self.user.middle_name} | Мероприятие {self.online.name} | Тип {self.online.category}'
+            return f'Избранные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.online.name} | Тип {self.online.category}'
         except:
             try:
-                return f'Избранные {self.user.middle_name} | Мероприятие {self.offline.name} | Тип {self.offline.category}'
+                return f'Избранные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.offline.name} | Тип {self.offline.category}'
             except:
                 try:
-                    return f'Избранные {self.user.middle_name} | Мероприятие {self.attractions.name} | Тип {self.attractions.category}'
+                    return f'Избранные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.attractions.name} | Тип {self.attractions.category}'
                 except:
-                    return f'Избранные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
+                    return f'Избранные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
 
 
 class Registered(models.Model):
@@ -67,15 +69,15 @@ class Registered(models.Model):
 
     def __str__(self):
         try:
-            return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.online.name} | Тип {self.online.category}'
+            return f'Зарегистрированные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.online.name} | Тип {self.online.category}'
         except:
             try:
-                return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.offline.name} | Тип {self.offline.category}'
+                return f'Зарегистрированные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.offline.name} | Тип {self.offline.category}'
             except:
                 try:
-                    return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.attractions.name} | Тип {self.attractions.category}'
+                    return f'Зарегистрированные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.attractions.name} | Тип {self.attractions.category}'
                 except:
-                    return f'Зарегистрированные {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
+                    return f'Зарегистрированные | {self.user.last_name} {self.user.first_name} {self.user.middle_name} | Мероприятие {self.for_visiting.name} | Тип {self.for_visiting.category}'
 
 
 from django.utils import timezone
@@ -87,12 +89,26 @@ class Review(models.Model):
     object_id = models.PositiveIntegerField()
     event = GenericForeignKey('content_type', 'object_id')
     comment = models.TextField(verbose_name='Комментарий')
+    rating = models.PositiveIntegerField(verbose_name='Оценка', choices=[
+        (1, '1 звезда'),
+        (2, '2 звезды'),
+        (3, '3 звезды'),
+        (4, '4 звезды'),
+        (5, '5 звезд')
+    ], null=True, blank=True) 
     date_submitted = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')
 
     def save(self, *args, **kwargs):
         local_timezone = pytz_timezone('Asia/Novosibirsk')
         self.date_submitted = timezone.now().astimezone(local_timezone)
         super(Review, self).save(*args, **kwargs)
+
+            # Обновить рейтинг после сохранения
+        content_type = ContentType.objects.get_for_model(self.event)
+        model_class = content_type.model_class()
+        if hasattr(self.event, 'reviews'):
+            avg = Review.objects.filter(content_type=content_type, object_id=self.object_id, rating__isnull=False).aggregate(Avg('rating'))['rating__avg'] or 0
+            model_class.objects.filter(pk=self.object_id).update(average_rating_cached=round(avg, 1))
 
     class Meta:
         db_table = 'reviews'
@@ -104,26 +120,7 @@ class Review(models.Model):
 
     def formatted_date(self):
         local_timezone = pytz_timezone('Asia/Novosibirsk')
-        return self.date_submitted.astimezone(local_timezone).strftime("%d.%m.%y %H:%M")
-
-
-
-@receiver(post_save, sender=Registered)
-def notify_user_on_registration(sender, instance, created, **kwargs):
-    if created:
-        event_name = instance.online.name if instance.online else (
-            instance.offline.name if instance.offline else (
-                instance.attractions.name if instance.attractions else instance.for_visiting.name))
-        message = f"\U00002705 Вы зарегистрировались на мероприятие: {event_name}."
-        user_telegram_id = instance.user.telegram_id
-
-        # Проверка наличия Telegram ID
-        if user_telegram_id:
-            logger.info(f"Отправка сообщения о регистрации пользователю {instance.user.username} с telegram_id: {user_telegram_id}")
-            send_message_to_user_with_toggle_button(user_telegram_id, message, instance.id, instance.notifications_enabled)
-        else:
-            logger.warning(f"У пользователя {instance.user.username} нет telegram_id, пропускаем отправку.")
-
+        return self.date_submitted.astimezone(local_timezone).strftime("%d.%m.%Y %H:%M")
 
 
 def send_update_notification(user, event, new_start_time):

@@ -3,366 +3,379 @@
 {% load bookmarks_tags %}
 {% user_favorites request as event_card_views %}
 {% block title %} <title>Избранные мероприятия</title> {% endblock %} 
-{% block favorite %}
-<div class="container-fluid">
-    <h2>Избранные мероприятия</h2>
-    <ul>
-        {% for favorite in favorites %}
-            {% if favorite.online %}
-                <div class="row mt-2 event_cards">
-                    <div class="col-lg-12">
-                        <div class="card mb-3">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    {% if favorite.online.image %}
-                                    <img src="{{ favorite.online.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.online.name }}">
-                                    {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.online.name }}">
-                                    {% endif %}
-                                    <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
+{% block favorite %}   
+    {% for favorite in favorites %}
+        <div class="row mb-3 events">
+            <div class="col-lg-1 feed-left-column"></div>
+
+            <div class="col-lg-10 cards">
+                <div class="card">
+                    <div class="row event">
+                        {% with favorite.online|default:favorite.offline|default:favorite.attractions|default:favorite.for_visiting as item %}
+                            {% if item %}
+                                <div class="col-lg-5 col-md-5 col-sm-5 event-preview-photo">
+                                    <a href="{% url 'bookmarks:events_remove' item.slug %}" class="remove-from-favorites" data-event-slug="{{ item.slug }}">
+                                        <!-- Белое (пустое) сердце -->
+                                        <img class="heart-icon {% if item.slug in liked %}hidden{% endif %}"
+                                        src="{% static 'icons/heart.svg' %}"
+                                        alt="Белое сердце" width="32" height="32">
+
+                                        <!-- Красное сердце -->
+                                        <img class="heart-red-icon {% if not item.slug in liked %}hidden{% endif %}"
+                                            src="{% static 'icons/heart_red.png' %}"
+                                            alt="Красное сердце" width="32" height="32">
                                     </a>
-                                    <div class="card-img-info">
-                                        <p>id: {{ favorite.online.display_id }}</p>
-                                        <p>category: {{ favorite.online.category }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="{% url 'events_available:online_card' favorite.online.slug %}">
-                                                {% autoescape off %}
-                                                {% if favorite.online.headline %}{{ favorite.online.headline }}{% else %}{{ favorite.online.name }}{% endif %}
-                                                {% endautoescape %}
-                                            </a>
-                                        </h5>
-                                        <h6 class="card-date">
-                                            <split class="card-day"><b>{{ favorite.online.date }}</b></split>
-                                            <split class="card-time">{{ favorite.online.time_start }} - {{ favorite.online.time_end }}</split>
-                                        </h6>
-                                        <h6 class="event-place">{{ favorite.online.place }}</h6>
-                                        <h6 class="event-place">{{ evfavorite.onlineents.speakers }}</h6>
-                                        {% autoescape off %}
-                                        {% if favorite.online.bodyline %}
-                                        {{ favorite.online.bodyline }}
-                                        {% else %}
-                                        <p class="card-text">{{ favorite.online.description|truncatechars:625 }}</p>
-                                        {% endif %}
-                                        {% endautoescape %}
-                                        <p class="card-text">
-                                            <small class="text-muted">
-                                                {% if favorite.online.tags %}
-                                                {{ favorite.online.tags }}
-                                                {% else %}
-                                                {% endif %}
-                                            </small>
-                                        </p>
-                                        <p>
-                                            {% if favorite.online.town %}{{ favorite.online.town }}{% endif %} {% if favorite.online.street %}{{ evefavorite.onlinents.street }}{% endif %} {% if favorite.online.cabinet %}{{ favorite.online.cabinet }}{% endif %}
-                                        </p>
-                                        <p>{{ speakers }}</p>
-                                        
 
-                                        {% if favorite.online.id in registered.online %}
-                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.online.id }}">
-                                                Отмена регистрации
-                                            </a>
-                                        {% else %}
-                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.online.slug }}">
-                                                Регистрация
-                                            </a>
-                                        {% endif %}
+                                    {% if item.image %}
+                                        <img src="{{ item.image.url }}" alt="" class="preview-photo">
+                                    {% else %}
+                                            <img src="{% static "images/no_photo.png" %}" alt="" class="preview-photo">
+                                    {% endif %}
 
-                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.online.id }}" data-model-type="online">Оставить отзыв</button>
+                                    <div class="rating-overlay" data-event-id="{{ item.id }}">
+                                        <div class="half-stars">
+                                            <div class="ranting-count">{{ reviews_avg|get_item:item.id|floatformat:1|default:"0.0" }}</div>
 
-                                        {% if reviews %}
-                                            <div class="reviews">          
-                                                    <ul>
-                                                        {% for review in reviews|get_item:favorite.online.unique_id %}
-                                                            {% for i in reviews %}
-                                                                {% if favorite.online.unique_id == i %}
-                                                                    <li>
-                                                                        <h5>Отзыв:</h5>
-                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                        <p>{{ review.comment }}</p>
-                                                                    </li>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        {% endfor %}
-                                                    </ul>
+
+                                            <div class="rating-group">
+                                                <!-- по умолчанию 0 -->
+                                                <input disabled checked name="hsr" value="0" type="radio">
+
+                                                <!-- рейтинг 0.5 -->
+                                                <input disabled name="hsr" id="hsr1-05" value="0.5" type="radio">
+                                                <label class="hsr" for="hsr1-05">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 1 -->
+                                                <input disabled name="hsr" id="hsr1-10" value="1" type="radio">
+                                                <label for="hsr1-10">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 1.5 -->
+                                                <input disabled name="hsr" id="hsr1-15" value="1.5" type="radio">
+                                                <label class="hsr" for="hsr1-15">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 2 -->
+                                                <input disabled name="hsr" id="hsr1-20" value="2" type="radio">
+                                                <label for="hsr1-20">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 2.5 -->
+                                                <input disabled name="hsr" id="hsr1-25" value="2.5" type="radio">
+                                                <label class="hsr" for="hsr1-25">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 3 -->
+                                                <input disabled name="hsr" id="hsr1-30" value="3" type="radio">
+                                                <label for="hsr1-30">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 3.5 -->
+                                                <input disabled name="hsr" id="hsr1-35" value="3.5" type="radio">
+                                                <label class="hsr" for="hsr1-35">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 4 -->
+                                                <input disabled name="hsr" id="hsr1-40" value="4" type="radio">
+                                                <label for="hsr1-40">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 4.5 -->
+                                                <input disabled name="hsr" id="hsr1-45" value="4.5" type="radio">
+                                                <label class="hsr" for="hsr1-45">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M288 0c-11.4 0-22.8 5.9-28.7 17.8L194 150.2 47.9 171.4c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.1 23 46 46.4 33.7L288 439.6V0z" />
+                                                    </svg>
+                                                </label>
+
+                                                <!-- рейтинг 5 -->
+                                                <input disabled name="hsr" id="hsr1-50" value="5" type="radio">
+                                                <label for="hsr1-50">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                        <path
+                                                            d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                    </svg>
+                                                </label>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="type-substrate">
+                                            <div class="event-type online">
+                                                {% if item.category  == 'Онлайн' %}
+                                                    онлайн
+                                                {% elif item.category  == 'Оффлайн' %}
+                                                    оффлайн
+                                                {% elif item.category  == 'Достопримечательности' %}
+                                                    достопримечательности
+                                                {% elif item.category  == 'Доступные к посещению' %}
+                                                    для посещения
+                                                {% endif %} 
+                                            </div>
+                                    </div>
+
+                                    <div class="button-substrate">
+
+                                        {% if item.date >= now or request.user in item.member.all %}
+                                            {% if item.id in registered %}
+                                                <a href="#" class="btn btn-remove_app" data-event-id="{{ registered|get_item:item.id }}">
+                                                    Отмена регистрации
+                                                </a>
+                                            {% else %}
+                                                <a href="#" class="btn btn-sent_app" data-event-slug="{{ item.slug }}">
+                                                    Регистрация
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="btn btn-secondary">Регистрация закрыта</span>
                                         {% endif %}
+                                    
+                                        <button class="btn btn-comment" data-event-id="{{ item.id }}" data-model-type=
+                                        {% if item.category  == 'Онлайн' %}
+                                            "online"
+                                        {% elif item.category  == 'Оффлайн' %}
+                                            "offline"
+                                        {% elif item.category  == 'Достопримечательности' %}
+                                            "attractions"
+                                        {% elif item.category  == 'Доступные к посещению' %}
+                                            "for_visiting"
+                                        {% endif %}>
+                                        Оставить отзыв</button>
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="col-lg-7 col-md-7 col-sm-7 event-preview-text">
+                                    <a href="
+                                        {% if favorite.online %}
+                                            {% url 'events_available:online_card' item.slug %}
+                                        {% elif favorite.offline %}
+                                            {% url 'events_available:offline_card' item.slug %}
+                                        {% elif favorite.attractions %}
+                                            {% url 'events_cultural:attractions_card' item.slug %}
+                                        {% elif favorite.for_visiting %}
+                                            {% url 'events_cultural:events_for_visiting_card' item.slug %}
+                                        {% endif %}" class="show-more">
+                                        <h4 class="event-title-preview">{{ item.name|truncatechars:65 }}</h4>
+                                    </a> 
+
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-5 col-sm-5 event-preview-time">
+                                            <p class="preview-date">
+                                                {% if item.category  != 'Достопримечательности' %}
+                                                <h6 class="card-date"> 
+                                                    {% if item.date != item.date_end %}
+                                                        <split class="card-day"><b>{{ item.date }} - {{ item.date_end }}</b></split> 
+                                                    {% else %}
+                                                        <split class="card-day"><b>{{ item.date }}</b></split> 
+                                                    {% endif %}
+                                                </h6> 
+                                            {% endif %}
+                                            </p>
+                                            <p class="preview-time">
+                                                {% if item.time_start != item.time_end %}
+                                                    <split class="card-time">{{ item.time_start }} - {{ item.time_end }}</split> 
+                                                {% else %}
+                                                    <split class="card-time">{{ item.time_start }}</split> 
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="col-lg-6 col-md-5 col-sm-5 event-preview-speaker">
+                                            <label for="speaker" class="preview-speaker">Спикеры:</label>
+                                            {% for speaker in item.speakers.all %}
+                                                {{ speaker.last_name }} {{ speaker.first_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="event-preview-description">
+                                        <label for="" class="preview-about">О мероприятии:</label>
+                                        <p class="preview-description">
+                                            {% autoescape off %}
+                                                {% if item.headline_description %}
+                                                    {{ item.headline_description|truncatechars:200 }}
+                                                {% else %}
+                                                    {{ item.description|truncatechars:200 }}
+                                                {% endif %}
+                                            {% endautoescape %}
+                                            <a href="{% if item.category  == 'Онлайн' %}
+                                                {% url "events_available:online_card" item.slug %}
+                                            {% elif item.category  == 'Оффлайн' %}
+                                                {% url "events_available:offline_card" item.slug %}
+                                            {% elif item.category  == 'Достопримечательности' %}
+                                                {% url "events_cultural:attractions_card" item.slug %}
+                                            {% elif item.category  == 'Доступные к посещению' %}
+                                                {% url "events_cultural:events_for_visiting_card" item.slug %}
+                                            {% endif %}"  class="show-more">Подробнее</a>
+                                        </p>
+                                    </div>
+
+                                    <div class="preview-event-id">
+                                        <div class="event-reviews-link">
+                                            <a href="#" class="reviews-link" type="button" data-bs-toggle="modal"
+                                                data-bs-target="#modal-{{ item.unique_id }}">Посмотреть отзывы</a>
+                                        </div>
+                                        <label for="event-id" class="event-id"></label>
+                                        <div class="event-tags">
+                                            {% if item.tags %} 
+                                                {{ item.tags }}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+
+                                <div class="modal fade" id="modal-{{ item.unique_id }}" tabindex="-1" aria-labelledby="modalLabel-{{ item.unique_id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="modalLabel-{{ item.unique_id }}">Отзывы</h1>
+                                                <button type="button" class="button-close" data-bs-dismiss="modal" aria-label="Close">
+                                                    <img src="{% static "icons/close-button.png" %}" alt="">
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="reviews" data-event-id="{{ item.id }}">
+                                                    {% spaceless %}
+                                                        {% for review in reviews|get_item:item.unique_id %}
+                                                            {% if review.event.unique_id == item.unique_id %}
+                                                                <div class="existent-comment">
+                                                                    <div class="existent-review">
+                                                                        <div class="user-info-existent-review">
+                                                                            <div class="user-icon-existent-review"> 
+                                                                                {% if review.user.profile_photo %}
+                                                                                    <img src="{{ review.user.profile_photo.url }}" alt="">
+                                                                                {% else %}
+                                                                                    <img src="{% static "icons/profile-image-default.png" %}" alt="">
+                                                                                {% endif %}
+                                                                            </div>
+                                                                            <div class="username-existent-review">
+                                                                                <div class="user-lastname">{{ review.user.username }}</div>
+                                                                            </div>
+
+                                                                            {% comment %} <div class="full-stars-com">
+                                                                                <div class="rating-group-com">
+                                                                                    <!-- по умолчанию 0 -->
+                                                                                    <input name="fst" value="0" type="radio" disabled checked />
+                                
+                                                                                    <!-- рейтинг 1 -->
+                                                                                    <label for="fst-1">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                            <path
+                                                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                        </svg>
+                                                                                    </label>
+                                                                                    <input name="fst" id="fst-1" value="1" type="radio" />
+                                
+                                                                                    <!-- рейтинг 2 -->
+                                                                                    <label for="fst-2">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                            <path
+                                                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                        </svg>
+                                                                                    </label>
+                                                                                    <input name="fst" id="fst-2" value="2" type="radio" />
+                                
+                                                                                    <!-- рейтинг 3 -->
+                                                                                    <label for="fst-3">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                            <path
+                                                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                        </svg>
+                                                                                    </label>
+                                                                                    <input name="fst" id="fst-3" value="3" type="radio" />
+                                
+                                                                                    <!-- рейтинг 4 -->
+                                                                                    <label for="fst-4">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                            <path
+                                                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                        </svg>
+                                                                                    </label>
+                                                                                    <input name="fst" id="fst-4" value="4" type="radio" />
+                                
+                                                                                    <!-- рейтинг 5 -->
+                                                                                    <label for="fst-5">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                                                            <path
+                                                                                                d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" />
+                                                                                        </svg>
+                                                                                    </label>
+                                                                                    <input name="fst" id="fst-5" value="5" type="radio" />
+                                                                                </div>
+                                                                            </div> {% endcomment %}
+
+                                                                            <div class="review-date-submitted">
+                                                                                {{ review.formatted_date }}
+                                                                            </div> 
+                                                                        </div>
+
+                                                                        <div class="review-block review-block-existent-review">
+
+                                                                            <div class="review-text review-text-existent-review">
+                                                                                {{ review.comment }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                      
+                                                                </div>
+                                                                <hr class="review-divider"> 
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endspaceless %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                            {% endif %}
+                        {% endwith %}
                     </div>
                 </div>
-            {% endif %}
-            {% if favorite.offline %}
-                <div class="row mt-2 event_cards">
-                    <div class="col-lg-12">
-                        <div class="card mb-3">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    {% if favorite.offline.image %}
-                                    <img src="{{ favorite.offline.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.offline.name }}">
-                                    {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.offline.name }}">
-                                    {% endif %}
-                                    <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
-                                    </a>
-                                    <div class="card-img-info">
-                                        <p>id: {{ favorite.offline.display_id }}</p>
-                                        <p>category: {{ favorite.offline.category }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="{% url 'events_available:offline_card' favorite.offline.slug %}">
-                                                {% autoescape off %}
-                                                {% if favorite.offline.headline %}{{ favorite.offline.headline }}{% else %}{{ favorite.offline.name }}{% endif %}
-                                                {% endautoescape %}
-                                            </a>
-                                        </h5>
-                                        <h6 class="card-date">
-                                            <split class="card-day"><b>{{ favorite.offline.date }}</b></split>
-                                            <split class="card-time">{{ favorite.offline.time_start }} - {{ favorite.offline.time_end }}</split>
-                                        </h6>
-                                        <h6 class="event-place">{{ favorite.offline.place }}</h6>
-                                        <h6 class="event-place">{{ evfavorite.offline.speakers }}</h6>
-                                        {% autoescape off %}
-                                        {% if favorite.offline.bodyline %}
-                                        {{ favorite.offline.bodyline }}
-                                        {% else %}
-                                        <p class="card-text">{{ favorite.offline.description|truncatechars:625 }}</p>
-                                        {% endif %}
-                                        {% endautoescape %}
-                                        <p class="card-text">
-                                            <small class="text-muted">
-                                                {% if favorite.offline.tags %}
-                                                {{ favorite.offline.tags }}
-                                                {% else %}
-                                                {% endif %}
-                                            </small>
-                                        </p>
-                                        <p>
-                                            {% if favorite.offline.town %}{{ favorite.offline.town }}{% endif %} {% if favorite.offline.street %}{{ evefavorite.offline.street }}{% endif %} {% if favorite.offline.cabinet %}{{ favorite.offline.cabinet }}{% endif %}
-                                        </p>
-                                        <p>{{ speakers }}</p>
-                                        
-                                        
-                                        {% if favorite.offline.id in registered.offline %}
-                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.offline.id }}">
-                                                Отмена регистрации
-                                            </a>
-                                        {% else %}
-                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.offline.slug }}">
-                                                Регистрация
-                                            </a>
-                                        {% endif %}
+            </div>
 
-                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.offline.id }}" data-model-type="offline">Оставить отзыв</button>
-
-                                        {% if reviews %}
-                                            <div class="reviews">          
-                                                    <ul>
-                                                        {% for review in reviews|get_item:favorite.offline.unique_id %}
-                                                            {% for i in reviews %}
-                                                                {% if favorite.offline.unique_id == i %}
-                                                                    <li>
-                                                                        <h5>Отзыв:</h5>
-                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                        <p>{{ review.comment }}</p>
-                                                                    </li>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        {% endfor %}
-                                                    </ul>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-            {% if favorite.attractions %}
-                <div class="row mt-2 event_cards">
-                    <div class="col-lg-12">
-                        <div class="card mb-3">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    {% if favorite.attractions.image %}
-                                    <img src="{{ favorite.attractions.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.attractions.name }}">
-                                    {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.attractions.name }}">
-                                    {% endif %}
-                                    <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
-                                    </a>
-                                    <div class="card-img-info">
-                                        <p>id: {{ favorite.attractions.display_id }}</p>
-                                        <p>category: {{ favorite.attractions.category }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="{% url 'events_cultural:attractions_card' favorite.attractions.slug %}">
-                                                {% autoescape off %}
-                                                {% if favorite.attractions.headline %}{{ favorite.attractions.headline }}{% else %}{{ favorite.attractions.name }}{% endif %}
-                                                {% endautoescape %}
-                                            </a>
-                                        </h5>
-                                        <h6 class="card-date">
-                                            <split class="card-day"><b>{{ favorite.attractions.date }}</b></split>
-                                            <split class="card-time">{{ favorite.attractions.time_start }} - {{ favorite.attractions.time_end }}</split>
-                                        </h6>
-                                        <h6 class="event-place">{{ favorite.attractions.place }}</h6>
-                                        <h6 class="event-place">{{ evfavorite.attractions.speakers }}</h6>
-                                        {% autoescape off %}
-                                        {% if favorite.attractions.bodyline %}
-                                        {{ favorite.attractions.bodyline }}
-                                        {% else %}
-                                        <p class="card-text">{{ favorite.attractions.description|truncatechars:625 }}</p>
-                                        {% endif %}
-                                        {% endautoescape %}
-                                        <p class="card-text">
-                                            <small class="text-muted">
-                                                {% if favorite.attractions.tags %}
-                                                {{ favorite.attractions.tags }}
-                                                {% else %}
-                                                {% endif %}
-                                            </small>
-                                        </p>
-                                        <p>
-                                            {% if favorite.attractions.town %}{{ favorite.attractions.town }}{% endif %} {% if favorite.attractions.street %}{{ evefavorite.attractions.street }}{% endif %} {% if favorite.attractions.cabinet %}{{ favorite.attractions.cabinet }}{% endif %}
-                                        </p>
-                                        <p>{{ speakers }}</p>
-                                        
-                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.attractions.id }}" data-model-type="attractions">Оставить отзыв</button>
-
-                                        {% if reviews %}
-                                            <div class="reviews">          
-                                                    <ul>
-                                                        {% for review in reviews|get_item:favorite.attractions.unique_id %}
-                                                            {% for i in reviews %}
-                                                                {% if favorite.attractions.unique_id == i %}
-                                                                    <li>
-                                                                        <h5>Отзыв:</h5>
-                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                        <p>{{ review.comment }}</p>
-                                                                    </li>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        {% endfor %}
-                                                    </ul>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-            {% if favorite.for_visiting %}
-                <div class="row mt-2 event_cards">
-                    <div class="col-lg-12">
-                        <div class="card mb-3">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    {% if favorite.for_visiting.image %}
-                                    <img src="{{ favorite.for_visiting.image.url }}" class="img-fluid rounded-start" alt="{{ favorite.for_visiting.name }}">
-                                    {% else %}
-                                    <img src="{% static 'general/images/img.png' %}" class="img-fluid rounded-start" alt="{{ favorite.for_visiting.name }}">
-                                    {% endif %}
-                                    <a href="{% url 'bookmarks:events_remove' favorite.id %}" class="btn remove-from-favorites" data-event-id="{{ favorite.id }}">
-                                        <img class="mx-1 heart-icon" src="{% static 'general/icons/heart_red.png' %}" alt="Catalog Icon" width="32" height="32">
-                                    </a>
-                                    <div class="card-img-info">
-                                        <p>id: {{ favorite.for_visiting.display_id }}</p>
-                                        <p>category: {{ favorite.for_visiting.category }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="{% url 'events_cultural:events_for_visiting_card' favorite.for_visiting.slug %}">
-                                                {% autoescape off %}
-                                                {% if favorite.for_visiting.headline %}{{ favorite.for_visiting.headline }}{% else %}{{ favorite.for_visiting.name }}{% endif %}
-                                                {% endautoescape %}
-                                            </a>
-                                        </h5>
-                                        <h6 class="card-date">
-                                            <split class="card-day"><b>{{ favorite.for_visiting.date }}</b></split>
-                                            <split class="card-time">{{ favorite.for_visiting.time_start }} - {{ favorite.for_visiting.time_end }}</split>
-                                        </h6>
-                                        <h6 class="event-place">{{ favorite.for_visiting.place }}</h6>
-                                        <h6 class="event-place">{{ evfavorite.for_visiting.speakers }}</h6>
-                                        {% autoescape off %}
-                                        {% if favorite.for_visiting.bodyline %}
-                                        {{ favorite.for_visiting.bodyline }}
-                                        {% else %}
-                                        <p class="card-text">{{ favorite.for_visiting.description|truncatechars:625 }}</p>
-                                        {% endif %}
-                                        {% endautoescape %}
-                                        <p class="card-text">
-                                            <small class="text-muted">
-                                                {% if favorite.for_visiting.tags %}
-                                                {{ favorite.for_visiting.tags }}
-                                                {% else %}
-                                                {% endif %}
-                                            </small>
-                                        </p>
-                                        <p>
-                                            {% if favorite.for_visiting.town %}{{ favorite.for_visiting.town }}{% endif %} {% if favorite.for_visiting.street %}{{ evefavorite.for_visiting.street }}{% endif %} {% if favorite.for_visiting.cabinet %}{{ favorite.for_visiting.cabinet }}{% endif %}
-                                        </p>
-                                        <p>{{ speakers }}</p>
-                                        
-                                        {% if favorite.for_visiting.id in registered.for_visiting %}
-                                            <a href="#" class="btn btn-light btn-remove_app" data-event-id="{{ registered|get_item:favorite.for_visiting.id }}">
-                                                Отмена регистрации
-                                            </a>
-                                        {% else %}
-                                            <a href="#" class="btn btn-danger btn-sent_app" data-event-slug="{{ favorite.for_visiting.slug }}">
-                                                Регистрация
-                                            </a>
-                                        {% endif %}
-                                        
-                                        <button class="btn btn-primary btn-comment" data-event-id="{{ favorite.for_visiting.id }}" data-model-type="for_visiting">Оставить отзыв</button>
-
-                                        {% if reviews %}
-                                            <div class="reviews">          
-                                                    <ul>
-                                                        {% for review in reviews|get_item:favorite.for_visiting.unique_id %}
-                                                            {% for i in reviews %}
-                                                                {% if favorite.for_visiting.unique_id == i %}
-                                                                    <li>
-                                                                        <h5>Отзыв:</h5>
-                                                                        <p><strong>{{ review.user.last_name }} {{ review.user.first_name }}</strong> ({{ review.formatted_date }}):</p>
-                                                                        <p>{{ review.comment }}</p>
-                                                                    </li>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        {% endfor %}
-                                                    </ul>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</div>
+            <div class="col-lg-1 right-column"></div>
+        </div>
+    {% endfor %}
 {% endblock favorite %}
+                        
 
+
+
+
+
+    
 

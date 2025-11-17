@@ -4,7 +4,7 @@ from celery import shared_task
 from django.db.models import Q
 from bookmarks.models import Registered
 from users.models import User
-from users.telegram_utils import send_message_to_user_with_toggle_button, send_message_to_user_with_review_buttons
+from users.telegram_utils import send_message_to_user_with_toggle_button, send_message_to_user_with_review_buttons, send_event_notification_with_buttons
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,12 +16,28 @@ def round_to_minute(dt):
 @shared_task
 def send_notification(event_registered_id, user_id, event_name, timeframe):
     try:
+        from users.telegram_utils import get_event_url, create_event_hyperlink
+        
         user = User.objects.get(id=user_id)
         registered_event = Registered.objects.get(id=event_registered_id)
         if registered_event.notifications_enabled:
-            message = f"\U0001F550 Напоминаем, что мероприятие '{event_name}' начнется через {timeframe}."
+            # Получаем объект мероприятия для создания гиперссылки
+            event_obj = registered_event.online or registered_event.offline or registered_event.attractions or registered_event.for_visiting
+            
+            # Создаем гиперссылку для мероприятия
+            event_url = get_event_url(event_obj) if event_obj else None
+            event_hyperlink = create_event_hyperlink(event_name, event_url)
+            
+            message = f"\U0001F550 Напоминаем, что мероприятие {event_hyperlink} начнется через {timeframe}."
             if user.telegram_id:
-                send_message_to_user_with_toggle_button(user.telegram_id, message, event_registered_id, True)
+                # Отправляем уведомление с кнопкой отмены регистрации
+                send_event_notification_with_buttons(
+                    user.telegram_id,
+                    message,
+                    event_registered_id,
+                    notifications_enabled=True,
+                    include_unregister_button=True
+                )
             else:
                 logger.warning(f"Пользователь {user.username} не имеет telegram_id, уведомление не отправлено.")
     except User.DoesNotExist:

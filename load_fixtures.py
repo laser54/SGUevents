@@ -1,3 +1,5 @@
+#Скрипт для загрузки fixtures. Автоматически испольузется в run_django_linux.py 
+
 import os
 import subprocess
 import sys
@@ -5,24 +7,25 @@ import sys
 # Список файлов фикстур
 fixtures = [
     'fixtures/departments.json',
-    'fixtures/users/users.json',
     'fixtures/groups.json',
+    'fixtures/users.json',
     'fixtures/events_available/events_offline.json',
     'fixtures/events_available/events_online.json',
     'fixtures/events_cultural/attractions.json',
     'fixtures/events_cultural/events_for_visiting.json',
     'fixtures/bookmarks/favorites.json',
     'fixtures/bookmarks/registered.json',
+    'fixtures/checklist_tasks.json'
 ]
 
 def load_fixtures():
-    python_executable = sys.executable  # Получаем путь к текущему интерпретатору Python
+    python_executable = sys.executable 
     successful_fixtures = []
     failed_fixtures = []
 
     for fixture in fixtures:
         try:
-            # Используем команду manage.py loaddata для загрузки каждой фикстуры
+            # Команда manage.py loaddata для загрузки каждой фикстуры
             subprocess.run([python_executable, 'manage.py', 'loaddata', fixture], check=True)
             print(f"Успешно загружен файл: {fixture}")
             successful_fixtures.append(fixture)
