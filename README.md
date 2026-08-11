@@ -11,6 +11,16 @@
 ![Nginx](https://img.shields.io/badge/nginx-1.21-009639?logo=nginx)&nbsp;
 ![Docker](https://img.shields.io/badge/docker-compose%203.8-0db7ed?logo=docker)
 
+## Case overview
+
+**Problem.** Event services need a coherent path from public web pages and personal collections to operational workflows, notifications, and Telegram entry points.
+
+**System overview.** Web and Telegram clients → Django/DRF → PostgreSQL; Celery and Redis handle background notifications and scheduled work; an aiogram bot runs alongside the web application; Docker Compose, Gunicorn, and Nginx provide the deployment stack.
+
+**My contribution.** This is a collaborative project. My work covered the Python/Django backend, Telegram and aiogram integrations, Celery/Redis workflows, and deployment work. This repository does not claim sole authorship.
+
+**Status and boundary.** The repository documents a working project, but it does not claim a currently operating production service or current green CI. Configure your own credentials and infrastructure; never commit Telegram tokens, database passwords, or OAuth secrets.
+
 ## Содержание
 
 - [Обзор](#обзор)
