@@ -1,0 +1,7 @@
+# Keep generated/asset-heavy frontend files out of GitHub's primary language stats.
+static/** linguist-vendored
+staticfiles/** linguist-generated
+
+# Django templates are presentation assets, not the project's primary language.
+templates/** linguist-vendored
+**/templates/** linguist-vendored
